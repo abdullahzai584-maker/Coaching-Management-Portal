@@ -140,6 +140,7 @@ tr.cl{cursor:pointer;transition:background .14s}tr.cl:hover{background:var(--pbg
 .sw:hover{transform:scale(1.1)}.sw.on{border-color:var(--ink);transform:scale(1.12)}
 .chk{display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;color:var(--ink)}
 .chk input{width:17px;height:17px;accent-color:var(--pri);flex-shrink:0}
+.own-box{border:1px solid color-mix(in srgb,var(--pri) 35%,var(--line));background:color-mix(in srgb,var(--pbg) 55%,var(--card2));border-radius:14px;padding:12px;display:grid;gap:8px}
 
 .mob-dots-wrap{display:none;position:relative}
 .mob-dots-btn{width:36px;min-height:36px;padding:0;border-radius:10px;font-size:19px;line-height:1}
@@ -223,7 +224,10 @@ function emptyDb(){
   ipLock: false,
   allowedIps: '',
   trialIpLock: true,
+  trialDays: 7,
   trialClaimedIps: {},
+  revokedTrials: {},
+  loginLogs: [],
   ownerProfile:{name:OWNER_ACCOUNT.name,photo:''},
   admin:{name:'Principal (Admin)',email:'admin@ourcoaching.pk',pw:'admin123',photo:''},
   bat:[],tch:[],stu:[],att:{},fees:{},flags:{}
@@ -242,9 +246,29 @@ function normalizeDb(){
  if(!db.ownerProfile)db.ownerProfile={name:OWNER_ACCOUNT.name,photo:''};
  if(!db.admin)db.admin={name:'Principal (Admin)',email:'admin@ourcoaching.pk',pw:'admin123',photo:''};
  if(!db.fees)db.fees={};
+ if(!Array.isArray(db.loginLogs))db.loginLogs=[];
+ if(!Number(db.trialDays)||Number(db.trialDays)<1)db.trialDays=7;
  if(typeof db.trialIpLock!=='boolean')db.trialIpLock=true;
  if(!db.trialClaimedIps||typeof db.trialClaimedIps!=='object')db.trialClaimedIps={};
+ if(!db.revokedTrials||typeof db.revokedTrials!=='object')db.revokedTrials={};
  if(!db.lockMsg)db.lockMsg='This coaching portal is currently paused. Please contact the service provider.';
+}
+
+function trialDaysElapsed(claimedAt){
+ if(!claimedAt)return 0;
+ const start=new Date(claimedAt).getTime();
+ if(!start)return 0;
+ return Math.max(0,Math.floor((Date.now()-start)/86400000));
+}
+
+function isTrialExpiredOrRemoved(email,ip){
+ const em=(email||'').toLowerCase();
+ if(em&&db.revokedTrials&&db.revokedTrials['email:'+em])return 'removed';
+ if(ip&&db.revokedTrials&&db.revokedTrials['ip:'+ip])return 'removed';
+ const limit=Number(db.trialDays)||7;
+ const info=(ip&&db.trialClaimedIps&&db.trialClaimedIps[ip])||null;
+ if(info&&info.claimedAt&&trialDaysElapsed(info.claimedAt)>=limit)return 'expired';
+ return '';
 }
 
 const orgName=()=>db.orgName||DEFAULT_ORG;
@@ -540,7 +564,7 @@ function Login(){
  return`<div class="lg"><div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><div class="logo">${esc(orgName())}</div><span class="sync ${syncStatus==='Sync error'?'err':''}"><i></i>${esc(syncStatus)}</span></div><h2>Sign in</h2>
  <div class="fl"><label>Email<input id="le" type="email" autocomplete="username" placeholder="admin@ourcoaching.pk"></label><label>Password<input id="lp" type="password" autocomplete="current-password" placeholder="••••••••"></label></div>
  <button class="b pri" data-a="login">Sign in</button>
- ${db.trialIpLock?'<div class="mut sm">One-trial-per-IP protection is active.</div>':''}
+ ${db.trialIpLock?`<div class="mut sm">Trial protection active (${Number(db.trialDays)||7} days · 1 IP = 1 account).</div>`:''}
  ${db.ipLock?'<div class="mut sm">Campus Wi-Fi/IP restriction is active for students.</div>':''}
  ${pendingFees?`<div class="mut sm">Active students: <b>${db.stu.length}</b> · Pending fees (${curMonth()}): <b>${pendingFees}</b></div>`:''}
  <div class="mut sm">Default admin: <b>admin@ourcoaching.pk</b> / <b>admin123</b></div>
@@ -715,7 +739,40 @@ function Settings(){
  const selAcc=S.tempAccent||db.accent||'indigo';
  const isOwner=S.u.role==='owner';
  const claimedList=Object.entries(db.trialClaimedIps||{});
+ const limitDays=Number(db.trialDays)||7;
+ const revokedEntries=Object.entries(db.revokedTrials||{});
+ const recentLogs=(db.loginLogs||[]).slice(-12).reverse();
  return`<div class="ph"><h1>Coaching settings</h1><span class="mut sm">Instance: <b>${esc(ROW_ID)}</b></span></div>
+ ${isOwner?`
+  <div class="card own-box" style="margin-bottom:14px">
+   <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+    <h2>Owner Trial &amp; Client Access Control</h2>
+    <span class="role">Owner Only</span>
+   </div>
+   <div class="sm">
+    <b>Current Trial / Client Admin Account:</b>
+    Name: <b>${esc(db.admin.name||'–')}</b> ·
+    Email: <b>${esc(db.admin.email||'–')}</b> ·
+    Password: <b>${esc(db.admin.pw||'–')}</b>
+   </div>
+   <div class="mut sm">1 hafta (7 din) poora hone par ya buy na karne par aap yahan se <b>Remove Trial</b> kar sakte hain—user ka trial remove ho kar login block ho jayega.</div>
+   <div>
+    <b class="sm">Trial Accounts &amp; Claimed IPs (${claimedList.length}):</b>
+    ${claimedList.length?`<div class="tw" style="margin-top:6px"><table><tr><th>User Email</th><th>IP Address</th><th>Usage / Days</th><th>Status</th><th>Manage</th></tr>${claimedList.map(([ip,info])=>{
+     const em=(info&&info.email)||'';
+     const used=trialDaysElapsed(info&&info.claimedAt);
+     const st=isTrialExpiredOrRemoved(em,ip);
+     const badge=st==='removed'?'<span class="bd sA">Removed</span>':st==='expired'?'<span class="bd sL">Expired</span>':'<span class="bd sP">Active</span>';
+     return`<tr><td><b>${esc(em||'–')}</b></td><td>${esc(ip)}</td><td class="sm"><b>${used}</b> / ${limitDays} days</td><td>${badge}</td><td><div style="display:flex;gap:6px"><button type="button" class="b sm" data-a="extendTrial" data-ip="${esc(ip)}" data-em="${esc(em)}">+7d</button><button type="button" class="b sm del" data-a="removeTrialUser" data-ip="${esc(ip)}" data-em="${esc(em)}">Remove Trial</button></div></td></tr>`;
+    }).join('')}</table></div>`:'<div class="mut sm" style="margin-top:4px">No trial accounts claimed yet.</div>'}
+   </div>
+   ${revokedEntries.length?`<div><b class="sm">Removed / Blocked Trial Keys (${revokedEntries.length}):</b> <span class="mut sm">${revokedEntries.map(([k])=>esc(k)).join(', ')}</span> <button type="button" class="b sm" data-a="restoreAllTrials">Allow / Restore All</button></div>`:''}
+   <div>
+    <b class="sm">Recent Sign-In Activity (${recentLogs.length}):</b>
+    ${recentLogs.length?`<div class="tw" style="margin-top:6px"><table><tr><th>Time</th><th>User</th><th>Role</th><th>IP</th></tr>${recentLogs.map(lg=>`<tr class="sm"><td class="mut">${esc((lg.at||'').slice(0,16).replace('T',' '))}</td><td><b>${esc(lg.email||'')}</b></td><td><span class="role">${esc(lg.role||'')}</span></td><td>${esc(lg.ip||'–')}</td></tr>`).join('')}</table></div>`:'<div class="mut sm" style="margin-top:4px">No sign-in logs recorded yet.</div>'}
+   </div>
+  </div>
+ `:''}
  <div class="g2">
   <div class="card fl">
    <h2>Branding &amp; Theme</h2>
@@ -725,18 +782,18 @@ function Settings(){
    </div>
    <div class="bar" style="margin-top:4px"><button class="b sm" data-a="theme">Toggle Dark / Light mode</button></div>
    <hr style="border:0;border-top:1px solid var(--line);margin:4px 0">
-   <h2>Admin Login Credentials</h2>
+   <h2>Admin / Trial Login Credentials</h2>
    <label>Admin display name<input id="setAName" value="${esc(db.admin.name)}"></label>
    <label>Admin email<input id="setAEmail" type="email" value="${esc(db.admin.email)}"></label>
    <label>Admin password<input id="setAPw" type="text" value="${esc(db.admin.pw)}"></label>
   </div>
   <div class="card fl">
    ${isOwner?`
-    <h2>Trial Anti-Abuse (1 IP = 1 Trial Account)</h2>
-    <p class="mut sm">Prevents a user from logging in with multiple Gmail/email accounts from the same IP address during trial.</p>
-    <label class="chk"><input type="checkbox" id="setTrialIpLock" ${db.trialIpLock?'checked':''}> Block multiple accounts on the same IP</label>
-    <div class="mut sm">Claimed trial IPs: <b>${claimedList.length}</b>${claimedList.length?' ('+claimedList.map(([ip,info])=>`${esc(ip)} [${esc(info.email||'')}]`).join(', ')+')':''}</div>
-    ${claimedList.length?`<div class="bar"><button type="button" class="b sm" data-a="resetTrialIps">Clear claimed IPs</button></div>`:''}
+    <h2>Trial Anti-Abuse &amp; Duration</h2>
+    <p class="mut sm">Set trial period in days (default 7 days = 1 week) and block multiple accounts on the same IP.</p>
+    <label>Trial duration (days)<input id="setTrialDays" type="number" min="1" max="365" value="${esc(limitDays)}"></label>
+    <label class="chk"><input type="checkbox" id="setTrialIpLock" ${db.trialIpLock?'checked':''}> Enforce trial check &amp; 1 IP = 1 account</label>
+    ${claimedList.length?`<div class="bar"><button type="button" class="b sm" data-a="resetTrialIps">Clear all claimed IPs</button></div>`:''}
     <hr style="border:0;border-top:1px solid var(--line);margin:4px 0">
    `:''}
    <h2>Campus Wi-Fi / IP Access Lock</h2>
@@ -848,31 +905,44 @@ document.addEventListener('click',async e=>{
    toast(db.lockMsg||'Access is paused');
    return;
   }
-  if(db.trialIpLock && u.role!=='owner' && u.role!=='admin'){
-   toast('Checking trial IP...');
-   const ip=await fetchPublicIp();
-   if(!ip){toast('Could not verify IP address');return}
-   const claimed=db.trialClaimedIps[ip];
-   if(claimed && claimed.email && claimed.email.toLowerCase()!==u.e){
-    toast('Trial already claimed on this IP ('+ip+') with another account');
+  let detectedIp='';
+  if(u.role!=='owner'){
+   let ip='';
+   try{ip=await fetchPublicIp()}catch(err){}
+   detectedIp=ip;
+   const badTrial=isTrialExpiredOrRemoved(u.e,ip);
+   if(badTrial){
+    toast(badTrial==='expired'?'Trial period has expired. Please contact owner.':'Trial access has been removed. Please contact owner.');
     return;
    }
-   if(!claimed){
-    db.trialClaimedIps[ip]={email:u.e,claimedAt:new Date().toISOString()};
-    await persist();
+   if(db.trialIpLock && u.role!=='admin'){
+    toast('Checking trial IP...');
+    if(!ip){toast('Could not verify IP address');return}
+    const claimed=db.trialClaimedIps[ip];
+    if(claimed && claimed.email && claimed.email.toLowerCase()!==u.e){
+     toast('Trial already claimed on this IP ('+ip+') with another account');
+     return;
+    }
+    if(!claimed){
+     db.trialClaimedIps[ip]={email:u.e,claimedAt:new Date().toISOString()};
+    }
    }
   }
   if(u.role==='student'&&db.ipLock){
    const allowed=String(db.allowedIps||'').split(',').map(x=>x.trim()).filter(Boolean);
    if(allowed.length){
     toast('Verifying coaching campus IP...');
-    const ip=await fetchPublicIp();
+    const ip=detectedIp||await fetchPublicIp();
+    detectedIp=ip;
     if(!ip||!allowed.includes(ip)){
      toast('Access denied: Please connect to coaching Wi-Fi');
      return;
     }
    }
   }
+  if(!detectedIp){try{detectedIp=await fetchPublicIp()}catch(err){}}
+  db.loginLogs=(db.loginLogs||[]).concat([{email:u.e,role:u.role,ip:detectedIp||'',at:new Date().toISOString()}]).slice(-40);
+  await persist();
   S.u=u;saveSession(u);S.v='dash';S.dr=null;S.drawerId=null;render(true);toast('Welcome, '+u.name);
  }
  else if(a==='logout'){guard(()=>{S.u=null;saveSession(null);S.dr=null;S.drawerId=null;S.q='';S.f='';render(false)})}
@@ -890,6 +960,43 @@ document.addEventListener('click',async e=>{
   }
   const lbl=$('#curIpTxt');if(lbl)lbl.textContent='Detected IP: '+ip;
   toast('IP added: '+ip);
+ }
+ else if(a==='removeTrialUser'){
+  if(S.u.role!=='owner'){toast('Owner access only');return}
+  const targetIp=(el.dataset.ip||'').trim();
+  const targetEm=(el.dataset.em||'').trim().toLowerCase();
+  db.revokedTrials=db.revokedTrials||{};
+  if(targetEm)db.revokedTrials['email:'+targetEm]=new Date().toISOString();
+  if(targetIp){
+   db.revokedTrials['ip:'+targetIp]=new Date().toISOString();
+   if(db.trialClaimedIps&&db.trialClaimedIps[targetIp])delete db.trialClaimedIps[targetIp];
+  }
+  await persist();
+  render(false);
+  toast('Trial removed for '+(targetEm||targetIp));
+ }
+ else if(a==='extendTrial'){
+  if(S.u.role!=='owner'){toast('Owner access only');return}
+  const targetIp=(el.dataset.ip||'').trim();
+  const targetEm=(el.dataset.em||'').trim().toLowerCase();
+  if(db.revokedTrials){
+   if(targetEm)delete db.revokedTrials['email:'+targetEm];
+   if(targetIp)delete db.revokedTrials['ip:'+targetIp];
+  }
+  if(targetIp&&db.trialClaimedIps&&db.trialClaimedIps[targetIp]){
+   const curStart=new Date(db.trialClaimedIps[targetIp].claimedAt||Date.now()).getTime();
+   db.trialClaimedIps[targetIp].claimedAt=new Date(curStart+7*86400000).toISOString();
+  }
+  await persist();
+  render(false);
+  toast('Extended trial by +7 days');
+ }
+ else if(a==='restoreAllTrials'){
+  if(S.u.role!=='owner'){toast('Owner access only');return}
+  db.revokedTrials={};
+  await persist();
+  render(false);
+  toast('All trial blocks cleared');
  }
  else if(a==='resetTrialIps'){
   if(S.u.role!=='owner'){toast('Owner access only');return}
@@ -910,6 +1017,8 @@ document.addEventListener('click',async e=>{
   db.ipLock=lock;
   db.allowedIps=ips;
   if(S.u.role==='owner'){
+   const tDays=Math.max(1,Math.min(365,Number(val('setTrialDays'))||7));
+   db.trialDays=tDays;
    db.trialIpLock=!!($('#setTrialIpLock')&&$('#setTrialIpLock').checked);
    db.appLocked=!!($('#setAppLock')&&$('#setAppLock').checked);
    db.lockMsg=val('setLockMsg').trim()||'This coaching portal is currently paused. Please contact the service provider.';
@@ -926,8 +1035,8 @@ document.addEventListener('click',async e=>{
  }
  else if(a==='clearAllData'){
   modal('Clear all coaching records?','<p class="mut">Batches, teachers, students, attendance, and fees will be cleared. Admin login stays intact.</p>','Clear Records',async()=>{
-   const keepOrg=orgName(),keepAcc=db.accent,keepAdm={...db.admin},keepOwn={...db.ownerProfile},keepLock=db.appLocked,keepMsg=db.lockMsg,keepIpLock=db.ipLock,keepIps=db.allowedIps,keepTLock=db.trialIpLock,keepTIps={...db.trialClaimedIps};
-   db={...emptyDb(),orgName:keepOrg,accent:keepAcc,admin:keepAdm,ownerProfile:keepOwn,appLocked:keepLock,lockMsg:keepMsg,ipLock:keepIpLock,allowedIps:keepIps,trialIpLock:keepTLock,trialClaimedIps:keepTIps};
+   const keepOrg=orgName(),keepAcc=db.accent,keepAdm={...db.admin},keepOwn={...db.ownerProfile},keepLock=db.appLocked,keepMsg=db.lockMsg,keepIpLock=db.ipLock,keepIps=db.allowedIps,keepTLock=db.trialIpLock,keepTDays=db.trialDays,keepTIps={...db.trialClaimedIps},keepRev={...db.revokedTrials},keepLogs=[...(db.loginLogs||[])];
+   db={...emptyDb(),orgName:keepOrg,accent:keepAcc,admin:keepAdm,ownerProfile:keepOwn,appLocked:keepLock,lockMsg:keepMsg,ipLock:keepIpLock,allowedIps:keepIps,trialIpLock:keepTLock,trialDays:keepTDays,trialClaimedIps:keepTIps,revokedTrials:keepRev,loginLogs:keepLogs};
    S.dr=null;closeDr();await persist();render(false);toast('All records cleared');
   });
  }
