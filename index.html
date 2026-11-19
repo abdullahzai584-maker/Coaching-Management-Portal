@@ -254,6 +254,17 @@ function normalizeDb(){
  if(!db.lockMsg)db.lockMsg='This coaching portal is currently paused. Please contact the service provider.';
 }
 
+function wipeTrialRecords(){
+ db.bat=[];
+ db.tch=[];
+ db.stu=[];
+ db.att={};
+ db.fees={};
+ db.flags={};
+ S.dr=null;
+ closeDr();
+}
+
 function trialDaysElapsed(claimedAt){
  if(!claimedAt)return 0;
  const start=new Date(claimedAt).getTime();
@@ -755,7 +766,7 @@ function Settings(){
     Email: <b>${esc(db.admin.email||'–')}</b> ·
     Password: <b>${esc(db.admin.pw||'–')}</b>
    </div>
-   <div class="mut sm">1 hafta (7 din) poora hone par ya buy na karne par aap yahan se <b>Remove Trial</b> kar sakte hain—user ka trial remove ho kar login block ho jayega.</div>
+   <div class="mut sm"><b>Remove Trial</b> dabane par user ka trial block hoga aur uska demo/coaching data (batches, students, attendance, fees) bhi saath hi remove ho jayega.</div>
    <div>
     <b class="sm">Trial Accounts &amp; Claimed IPs (${claimedList.length}):</b>
     ${claimedList.length?`<div class="tw" style="margin-top:6px"><table><tr><th>User Email</th><th>IP Address</th><th>Usage / Days</th><th>Status</th><th>Manage</th></tr>${claimedList.map(([ip,info])=>{
@@ -971,9 +982,10 @@ document.addEventListener('click',async e=>{
    db.revokedTrials['ip:'+targetIp]=new Date().toISOString();
    if(db.trialClaimedIps&&db.trialClaimedIps[targetIp])delete db.trialClaimedIps[targetIp];
   }
+  wipeTrialRecords();
   await persist();
   render(false);
-  toast('Trial removed for '+(targetEm||targetIp));
+  toast('Trial removed & demo data wiped for '+(targetEm||targetIp));
  }
  else if(a==='extendTrial'){
   if(S.u.role!=='owner'){toast('Owner access only');return}
