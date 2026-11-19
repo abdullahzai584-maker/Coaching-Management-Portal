@@ -2,88 +2,118 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>OUR COACHING — Attendance &amp; Operations</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
-  --bg:#f1f5f9;--card:#ffffff;--card2:#f8fafc;--ink:#0f172a;--mut:#64748b;--line:#e2e8f0;
+  --bg:#f1f5f9;--card:rgba(255,255,255,.92);--card2:#f8fafc;--ink:#0f172a;--mut:#64748b;--line:#e2e8f0;
   --pri:#4f46e5;--pri2:#6366f1;--pbg:#eef2ff;--onpri:#ffffff;
   --P:#059669;--Pb:#d1fae5;--A:#e11d48;--Ab:#ffe4e6;--L:#b45309;--Lb:#fef3c7;--V:#0369a1;--Vb:#e0f2fe;
   --sh:0 4px 20px -2px rgba(15,23,42,.06),0 1px 3px rgba(15,23,42,.04);
   --sh-lg:0 20px 45px -10px rgba(15,23,42,.18)
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#070b14;--card:#0f172a;--card2:#162036;--ink:#f1f5f9;--mut:#94a3b8;--line:#1e293b;
+  --bg:#070b14;--card:rgba(15,23,42,.90);--card2:#162036;--ink:#f1f5f9;--mut:#94a3b8;--line:#1e293b;
   --pbg:rgba(99,102,241,.16);--onpri:#ffffff;
   --P:#34d399;--Pb:rgba(16,185,129,.16);--A:#fb7185;--Ab:rgba(244,63,94,.16);--L:#fbbf24;--Lb:rgba(245,158,11,.16);--V:#38bdf8;--Vb:rgba(14,165,233,.16);
   --sh:0 4px 24px rgba(0,0,0,.35);--sh-lg:0 24px 50px rgba(0,0,0,.6)
 }}
 :root[data-theme="dark"]{
-  --bg:#070b14;--card:#0f172a;--card2:#162036;--ink:#f1f5f9;--mut:#94a3b8;--line:#1e293b;
+  --bg:#070b14;--card:rgba(15,23,42,.90);--card2:#162036;--ink:#f1f5f9;--mut:#94a3b8;--line:#1e293b;
   --pbg:rgba(99,102,241,.16);--onpri:#ffffff;
   --P:#34d399;--Pb:rgba(16,185,129,.16);--A:#fb7185;--Ab:rgba(244,63,94,.16);--L:#fbbf24;--Lb:rgba(245,158,11,.16);--V:#38bdf8;--Vb:rgba(14,165,233,.16);
   --sh:0 4px 24px rgba(0,0,0,.35);--sh-lg:0 24px 50px rgba(0,0,0,.6)
 }
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes tabEnter{0%{opacity:0;transform:translateY(12px) scale(.99)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes orbDrift1{0%,100%{transform:translate3d(0,0,0) scale(1)}33%{transform:translate3d(42px,-30px,0) scale(1.12)}66%{transform:translate3d(-24px,26px,0) scale(.94)}}
+@keyframes orbDrift2{0%,100%{transform:translate3d(0,0,0) scale(1)}33%{transform:translate3d(-38px,28px,0) scale(1.1)}66%{transform:translate3d(30px,-22px,0) scale(.92)}}
+@keyframes orbDrift3{0%,100%{transform:translate3d(0,0,0) rotate(0deg)}50%{transform:translate3d(24px,24px,0) rotate(180deg)}}
 @keyframes popIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
 @keyframes slideLeft{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:translateX(0)}}
 @keyframes pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.85)}}
 
-*{box-sizing:border-box}
+*,*::before,*::after{box-sizing:border-box}
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-html{scroll-padding-top:env(safe-area-inset-top,0px);overflow-x:hidden}
-body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.55 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;overflow-x:hidden;max-width:100vw}
-h1,h2,h3{margin:0;font-weight:700;letter-spacing:-.02em}h1{font-size:22px}h2{font-size:15px}
+html{scroll-padding-top:env(safe-area-inset-top,0px);width:100%;max-width:100%;overflow-x:hidden}
+body{margin:0;width:100%;max-width:100%;background:var(--bg);color:var(--ink);font:14px/1.55 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative}
+
+/* Lively animated background after login */
+#bg-fx{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+#bg-fx .grid-bg{position:absolute;inset:0;background-image:radial-gradient(color-mix(in srgb,var(--pri) 22%,transparent) 1px,transparent 1px);background-size:28px 28px;opacity:.45}
+#bg-fx .orb{position:absolute;border-radius:50%;filter:blur(54px);opacity:.48;will-change:transform}
+#bg-fx .o1{width:320px;height:320px;top:-60px;left:-50px;background:radial-gradient(circle,var(--pri),transparent 70%);animation:orbDrift1 14s ease-in-out infinite}
+#bg-fx .o2{width:360px;height:360px;bottom:-80px;right:-60px;background:radial-gradient(circle,var(--P),transparent 70%);animation:orbDrift2 17s ease-in-out infinite}
+#bg-fx .o3{width:240px;height:240px;top:42%;left:45%;background:radial-gradient(circle,var(--pri2),transparent 72%);opacity:.3;animation:orbDrift3 22s linear infinite}
+
+/* PC mouse-following trailing aura & ring */
+#cursor-fx{display:none;position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+#cursor-fx .cur-aura{position:fixed;width:240px;height:240px;margin:-120px 0 0 -120px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--pri) 26%,transparent),color-mix(in srgb,var(--pri2) 10%,transparent) 55%,transparent 72%);filter:blur(18px);opacity:0;transition:opacity .25s ease;will-change:transform}
+#cursor-fx .cur-ring{position:fixed;width:36px;height:36px;margin:-18px 0 0 -18px;border-radius:50%;border:1.5px solid color-mix(in srgb,var(--pri) 55%,transparent);background:color-mix(in srgb,var(--pri) 6%,transparent);opacity:0;transition:opacity .25s ease;will-change:transform}
+@media (hover:hover) and (pointer:fine){
+  #cursor-fx{display:block}
+}
+
+#app,#m,#dr,#toast{position:relative;z-index:1}
+#app{width:100%;max-width:100%;overflow-x:hidden}
+h1,h2,h3{margin:0;font-weight:700;letter-spacing:-.02em;word-break:break-word}h1{font-size:21px}h2{font-size:15px}
 button,input,select,textarea{font:inherit;color:inherit;max-width:100%}
 input,select,textarea{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:9px 12px;min-width:0;transition:border-color .18s,box-shadow .18s,background .18s}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--pri);box-shadow:0 0 0 3px var(--pbg);background:var(--card)}
 textarea{width:100%;min-height:90px}
-.b{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:9px 14px;cursor:pointer;font-weight:600;min-height:40px;transition:transform .14s,background .18s,border-color .18s,box-shadow .18s;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;white-space:nowrap}
+.b{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:9px 14px;cursor:pointer;font-weight:600;min-height:40px;transition:transform .14s,background .18s,border-color .18s,box-shadow .18s;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;white-space:nowrap;flex-shrink:0}
 .b:hover:not(:disabled){background:var(--pbg);border-color:var(--pri);transform:translateY(-1px)}
 .b:active:not(:disabled){transform:translateY(0) scale(.98)}
 .b.pri{background:linear-gradient(135deg,var(--pri),var(--pri2));color:var(--onpri);border-color:transparent;box-shadow:0 6px 16px -4px var(--pri)}
 .b.pri:hover:not(:disabled){opacity:.94;transform:translateY(-1px)}
 .b.del{color:var(--A);border-color:rgba(225,29,72,.3)}.b.del:hover:not(:disabled){background:var(--Ab);border-color:var(--A)}
-.b.sm{padding:5px 11px;min-height:32px;font-size:12.5px;border-radius:8px}
+.b.sm{padding:6px 11px;min-height:34px;font-size:12.5px;border-radius:8px}
 .b:disabled{opacity:.45;cursor:not-allowed}
 :focus-visible{outline:2px solid var(--pri);outline-offset:2px}
 
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--sh);transition:transform .2s,box-shadow .2s;min-width:0}
+.card{background:var(--card);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--sh);transition:transform .2s,box-shadow .2s;min-width:0;max-width:100%;overflow:hidden}
 .mut{color:var(--mut)}.sm{font-size:13px}
-.lg{min-height:100dvh;display:grid;place-items:center;padding:16px;background:radial-gradient(circle at top right,var(--pbg),transparent 55%),var(--bg)}
-.lg .card{width:100%;max-width:440px;display:grid;gap:12px;padding:22px;animation:popIn .28s ease}
-.logo{font-weight:800;font-size:18px;letter-spacing:-.03em;background:linear-gradient(135deg,var(--pri),var(--pri2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:inline-flex;align-items:center;gap:8px;min-width:0}
+.lg{min-height:100dvh;width:100%;display:grid;place-items:center;padding:14px;background:radial-gradient(circle at top right,var(--pbg),transparent 55%),var(--bg)}
+.lg .card{width:100%;max-width:440px;display:grid;gap:12px;padding:20px;animation:popIn .28s ease}
+.logo{font-weight:800;font-size:17px;letter-spacing:-.03em;background:linear-gradient(135deg,var(--pri),var(--pri2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:inline-flex;align-items:center;gap:8px;min-width:0;overflow:hidden;text-overflow:ellipsis}
 .sync{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--pbg);color:var(--pri);white-space:nowrap;flex-shrink:0}
 .sync i{width:7px;height:7px;border-radius:50%;background:var(--P);display:inline-block;animation:pulseDot 2s infinite}
 .sync.err i{background:var(--A);animation:none}
 
-.shell{display:grid;grid-template-columns:228px 1fr;min-height:100dvh}
-.side{background:var(--card);border-right:1px solid var(--line);padding:18px 12px;position:sticky;top:0;height:100dvh;display:flex;flex-direction:column;gap:4px}
+.shell{display:grid;grid-template-columns:228px minmax(0,1fr);min-height:100dvh;width:100%;max-width:100%}
+.shell > div{min-width:0;width:100%;max-width:100%}
+.side{background:var(--card);backdrop-filter:blur(12px);border-right:1px solid var(--line);padding:18px 12px;position:sticky;top:0;height:100dvh;display:flex;flex-direction:column;gap:4px}
 .side .logo{padding:4px 10px 16px}
 .nv{display:flex;align-items:center;gap:8px;width:100%;text-align:left;border:0;background:none;padding:10px 12px;border-radius:10px;cursor:pointer;font-weight:600;color:var(--mut);transition:all .16s;white-space:nowrap}
 .nv.on{background:var(--pbg);color:var(--pri)}.nv:hover{color:var(--ink);background:var(--card2)}
-.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:color-mix(in srgb,var(--card) 88%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:center;padding:10px 22px;min-width:0}
-.top .sp{flex:1;min-width:4px}.top input{width:200px}
-.chip{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card2);border-radius:999px;padding:4px 10px 4px 4px;flex-shrink:0}
-.av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px;flex-shrink:0}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:12;background:color-mix(in srgb,var(--card) 88%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:center;padding:10px 20px;width:100%;max-width:100%;min-width:0}
+.top .sp{flex:1;min-width:0}.top input{width:200px}
+.chip{display:flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--card2);border-radius:999px;padding:4px 10px 4px 4px;flex-shrink:0;cursor:pointer;transition:border-color .16s,background .16s}
+.chip:hover{border-color:var(--pri);background:var(--pbg)}
+.av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px;flex-shrink:0;overflow:hidden}
+.av img{width:100%;height:100%;object-fit:cover;display:block}
+.av.lg-av{width:68px;height:68px;font-size:24px;border:2px solid var(--line)}
+.prof-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:10px;border:1px solid var(--line);border-radius:14px;background:var(--card2)}
 .role{font-size:11px;font-weight:700;background:var(--pbg);color:var(--pri);border-radius:6px;padding:2px 7px;text-transform:capitalize}
-main{padding:22px;max-width:1160px;width:100%;min-width:0;animation:fadeUp .24s ease}
-.ph{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
-.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
-.kp{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
-.kp .card{position:relative;overflow:hidden}
+main{padding:20px;max-width:1160px;width:100%;min-width:0;animation:fadeUp .24s ease}
+.tab-anim{animation:tabEnter .3s cubic-bezier(.22,1,.36,1)}
+.ph{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;min-width:0}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center;width:100%;min-width:0}
+.kp{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin-bottom:16px;width:100%;min-width:0}
+.kp .card{position:relative;overflow:hidden;animation:fadeUp .32s ease both}
+.kp .card:nth-child(2){animation-delay:.04s}.kp .card:nth-child(3){animation-delay:.08s}.kp .card:nth-child(4){animation-delay:.12s}.kp .card:nth-child(5){animation-delay:.16s}.kp .card:nth-child(6){animation-delay:.2s}
 .kp .card:hover{transform:translateY(-2px)}
-.kp .card b{display:block;font-size:26px;font-weight:800;line-height:1.2;margin-top:4px;word-break:break-word}
-.g2{display:grid;grid-template-columns:3fr 2fr;gap:14px;margin-bottom:14px}
+.kp .card b{display:block;font-size:24px;font-weight:800;line-height:1.2;margin-top:4px;word-break:break-word}
+.g2{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:14px;margin-bottom:14px;width:100%;min-width:0}
 .bd{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
 .sP{background:var(--Pb);color:var(--P)}.sA{background:var(--Ab);color:var(--A)}.sL{background:var(--Lb);color:var(--L)}.sV{background:var(--Vb);color:var(--V)}.sN{background:var(--line);color:var(--mut)}
 .ok{color:var(--P)}.bad{color:var(--A)}
-.cnt{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.cnt span{padding:5px 11px;border-radius:10px;font-weight:700;font-size:12.5px}
-.row{display:flex;align-items:center;gap:10px;justify-content:space-between;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:8px;flex-wrap:wrap;box-shadow:var(--sh);transition:transform .15s,border-color .15s}
+.cnt{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;width:100%}.cnt span{padding:5px 10px;border-radius:10px;font-weight:700;font-size:12px}
+.row{display:flex;align-items:center;gap:10px;justify-content:space-between;background:var(--card);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:8px;flex-wrap:wrap;box-shadow:var(--sh);transition:transform .15s,border-color .15s;width:100%;min-width:0}
 .row:hover{border-color:var(--pri)}
-.row .nm{flex:1;min-width:140px;cursor:pointer}.row .nm b{display:block;font-weight:600}
+.row .nm{flex:1;min-width:140px;cursor:pointer;word-break:break-word}.row .nm b{display:block;font-weight:600}
 .seg{display:flex;gap:5px;flex-shrink:0}
 .seg button{width:42px;height:38px;border:1px solid var(--line);background:var(--card2);border-radius:10px;cursor:pointer;font-weight:700;color:var(--mut);transition:all .14s}
 .seg button:hover:not(:disabled){border-color:var(--pri);color:var(--ink)}
@@ -91,57 +121,64 @@ main{padding:22px;max-width:1160px;width:100%;min-width:0;animation:fadeUp .24s 
 .seg .oA{background:var(--A);color:#fff;border-color:var(--A);box-shadow:0 4px 12px -2px var(--A)}
 .seg .oL{background:var(--L);color:#fff;border-color:var(--L);box-shadow:0 4px 12px -2px var(--L)}
 .seg .oV{background:var(--V);color:#fff;border-color:var(--V);box-shadow:0 4px 12px -2px var(--V)}
-.mins{width:68px;padding:6px}
-.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);white-space:nowrap}th{color:var(--mut);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em;background:var(--card2)}
+.mins{width:72px;padding:6px}
+.tw{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}th{color:var(--mut);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.03em;background:var(--card2)}
 tr.cl{cursor:pointer;transition:background .14s}tr.cl:hover{background:var(--pbg)}
 .mt{height:7px;background:var(--line);border-radius:999px;overflow:hidden;min-width:60px}.mt i{display:block;height:100%;background:linear-gradient(90deg,var(--pri),var(--P));border-radius:999px;transition:width .35s ease}.mt i.lo{background:var(--A)}
-.al{border-radius:12px;padding:11px 14px;margin-bottom:12px;background:var(--Ab);color:var(--A);font-weight:600;border:1px solid rgba(225,29,72,.2)}.al.w{background:var(--Lb);color:var(--L);border-color:rgba(180,83,9,.2)}
+.al{border-radius:12px;padding:11px 14px;margin-bottom:12px;background:var(--Ab);color:var(--A);font-weight:600;border:1px solid rgba(225,29,72,.2);word-break:break-word}.al.w{background:var(--Lb);color:var(--L);border-color:rgba(180,83,9,.2)}
 .dirty{color:var(--L);font-weight:700}
-.emp{text-align:center;padding:28px 16px;color:var(--mut);border:1px dashed var(--line);border-radius:14px}
+.emp{text-align:center;padding:24px 14px;color:var(--mut);border:1px dashed var(--line);border-radius:14px}
 .ov{position:fixed;inset:0;background:rgba(7,11,20,.6);backdrop-filter:blur(4px);display:grid;place-items:center;padding:12px;z-index:20}
-.md{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;width:100%;max-width:500px;max-height:88dvh;overflow:auto;display:grid;gap:12px;box-shadow:var(--sh-lg);animation:popIn .2s ease}
+.md{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;width:100%;max-width:500px;max-height:88dvh;overflow:auto;display:grid;gap:12px;box-shadow:var(--sh-lg);animation:popIn .2s ease}
 .md.w{max-width:680px}.mf{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:4px}
-.dr{position:fixed;top:0;right:0;bottom:0;width:min(440px,100vw);background:var(--card);border-left:1px solid var(--line);z-index:15;padding:18px;overflow:auto;display:grid;gap:12px;align-content:start;box-shadow:var(--sh-lg);animation:slideLeft .22s ease}
+.dr{position:fixed;top:0;right:0;bottom:0;width:min(440px,100vw);background:var(--card);border-left:1px solid var(--line);z-index:15;padding:16px;overflow:auto;display:grid;gap:12px;align-content:start;box-shadow:var(--sh-lg);animation:slideLeft .22s ease}
 #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:600;z-index:30;transition:opacity .2s;pointer-events:none;box-shadow:var(--sh-lg);max-width:calc(100vw - 24px);text-align:center;font-size:13px}
-.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}.cal div{padding:8px 0;border-radius:9px;font-size:12.5px;font-weight:600;background:var(--card2)}
-.fl{display:grid;gap:10px}.fl label{display:grid;gap:4px;font-size:13px;font-weight:500;color:var(--mut)}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;text-align:center}.cal div{padding:7px 0;border-radius:9px;font-size:12px;font-weight:600;background:var(--card2)}
+.fl{display:grid;gap:10px;min-width:0}.fl label{display:grid;gap:4px;font-size:13px;font-weight:500;color:var(--mut);min-width:0}
 .swatches{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
 .sw{width:30px;height:30px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:transform .15s}
 .sw:hover{transform:scale(1.1)}.sw.on{border-color:var(--ink);transform:scale(1.12)}
 .chk{display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;color:var(--ink)}
-.chk input{width:17px;height:17px;accent-color:var(--pri)}
-.bn{display:none}
+.chk input{width:17px;height:17px;accent-color:var(--pri);flex-shrink:0}
+
+.mob-dots-wrap{display:none;position:relative}
+.mob-dots-btn{width:36px;min-height:36px;padding:0;border-radius:10px;font-size:19px;line-height:1}
+.mob-dots-menu{position:absolute;top:calc(100% + 6px);right:0;width:210px;max-height:78dvh;overflow-y:auto;background:var(--card);backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh-lg);padding:6px;display:grid;gap:2px;z-index:30;animation:popIn .16s ease}
+.mob-dots-menu button{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;text-align:left;border:0;background:none;padding:9px 12px;border-radius:9px;cursor:pointer;font-weight:600;font-size:13px;color:var(--ink)}
+.mob-dots-menu button:hover{background:var(--pbg);color:var(--pri)}
+.mob-dots-menu button.on{background:var(--pbg);color:var(--pri);font-weight:700}
+.mob-dots-menu hr{border:0;border-top:1px solid var(--line);margin:4px 6px}
 
 @media (max-width:860px){
-  h1{font-size:19px}
-  .shell{grid-template-columns:1fr}
+  h1{font-size:18px}
+  .shell{grid-template-columns:minmax(0,1fr)}
   .side{display:none}
-  .top{padding:8px 12px;gap:6px;flex-wrap:nowrap}
+  .top{padding:8px 12px;gap:6px;flex-wrap:wrap}
   .top .sync{font-size:10.5px;padding:3px 8px}
-  .top input{width:108px;padding:7px 9px;font-size:13px}
+  .top input{order:10;flex:1 1 100%;width:100%;padding:8px 10px;font-size:13.5px}
   .top .rl,.top .chip .role{display:none}
-  .top .chip{padding:2px 4px 2px 2px;border:0;background:none}
+  .top .chip{padding:2px;border:0;background:none}
   .top .b.sm{padding:6px 9px;min-height:34px;font-size:12px}
-  main{padding:12px;padding-bottom:84px}
+  .mob-dots-wrap{display:inline-flex;align-items:center}
+  main{padding:12px;padding-bottom:28px}
   .card{padding:14px;border-radius:14px}
-  .kp{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-  .kp .card b{font-size:22px}
-  .g2{grid-template-columns:1fr;gap:12px}
-  .bar>*{flex:1 1 auto}
-  .bar input,.bar select{min-width:120px}
+  .kp{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .kp .card{padding:12px}
+  .kp .card b{font-size:20px}
+  .g2{grid-template-columns:minmax(0,1fr);gap:12px}
+  .bar{gap:6px}
+  .bar > input,.bar > select{flex:1 1 100%;width:100%}
+  .bar > button,.bar > a.b{flex:1 1 calc(50% - 6px);min-width:0;padding:8px 10px;font-size:12.5px}
   .row{padding:10px 12px;gap:8px}
+  .row .nm{flex:1 1 100%;min-width:0}
   .seg{width:100%;justify-content:space-between}
   .seg button{flex:1;height:40px;width:auto}
-  #toast{bottom:76px}
-  .bn{display:flex;position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:4px 4px calc(4px + env(safe-area-inset-bottom,0px));z-index:6;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;gap:2px}
-  .bn::-webkit-scrollbar{display:none}
-  .bn .nv{flex:0 0 auto;width:auto;justify-content:center;padding:8px 11px;min-height:42px;font-size:12px;border-radius:9px}
 }
-@media print{.side,.top,.bn,.bar,.noprint{display:none!important}.shell{display:block}body{background:#fff}}
+@media print{#bg-fx,#cursor-fx{display:none!important}.side,.top,.bar,.mob-dots-wrap,.noprint{display:none!important}.shell{display:block}body{background:#fff}}
 </style>
 </head>
 <body>
-<div id="app"></div><div id="m"></div><div id="dr"></div><div id="toast" style="opacity:0"></div>
+<div id="bg-fx" aria-hidden="true"></div><div id="cursor-fx" aria-hidden="true"></div><div id="app"></div><div id="m"></div><div id="dr"></div><div id="toast" style="opacity:0"></div>
 <script>
 const SUPABASE_URL = 'https://cukxgzrnbiinkzmolipj.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_hfUzvb1uykYMoRVKPY4laQ_1xqGnv-4';
@@ -185,7 +222,10 @@ function emptyDb(){
   lockMsg: 'This coaching portal is currently paused. Please contact the service provider.',
   ipLock: false,
   allowedIps: '',
-  admin:{name:'Principal (Admin)',email:'admin@ourcoaching.pk',pw:'admin123'},
+  trialIpLock: true,
+  trialClaimedIps: {},
+  ownerProfile:{name:OWNER_ACCOUNT.name,photo:''},
+  admin:{name:'Principal (Admin)',email:'admin@ourcoaching.pk',pw:'admin123',photo:''},
   bat:[],tch:[],stu:[],att:{},fees:{},flags:{}
  }
 }
@@ -199,8 +239,11 @@ function normalizeDb(){
  db={...emptyDb(),...db};
  if(!db.orgName)db.orgName=DEFAULT_ORG;
  if(!db.accent||!ACCENTS[db.accent])db.accent='indigo';
- if(!db.admin)db.admin={name:'Principal (Admin)',email:'admin@ourcoaching.pk',pw:'admin123'};
+ if(!db.ownerProfile)db.ownerProfile={name:OWNER_ACCOUNT.name,photo:''};
+ if(!db.admin)db.admin={name:'Principal (Admin)',email:'admin@ourcoaching.pk',pw:'admin123',photo:''};
  if(!db.fees)db.fees={};
+ if(typeof db.trialIpLock!=='boolean')db.trialIpLock=true;
+ if(!db.trialClaimedIps||typeof db.trialClaimedIps!=='object')db.trialClaimedIps={};
  if(!db.lockMsg)db.lockMsg='This coaching portal is currently paused. Please contact the service provider.';
 }
 
@@ -230,9 +273,134 @@ async function fetchPublicIp(){
  return '';
 }
 
-let S={u:null,v:'dash',b:'',d:TODAY,q:'',f:'',dr:null,rp:'month',from:'',to:'',rb:'',rf:'',drawerId:null,tempAccent:db.accent,feeMonth:curMonth(),feeFilter:''};
+let S={u:null,v:'dash',b:'',d:TODAY,q:'',f:'',dr:null,rp:'month',from:'',to:'',rb:'',rf:'',drawerId:null,tempAccent:db.accent,feeMonth:curMonth(),feeFilter:'',mobMenuOpen:false,tabTick:0,tempPhoto:''};
 function saveSession(u){try{if(u)localStorage.setItem(SESSION_KEY,JSON.stringify(u));else localStorage.removeItem(SESSION_KEY)}catch(e){}}
 try{const t=localStorage.getItem(THEME_KEY);if(t)document.documentElement.dataset.theme=t}catch(e){}
+
+function getCurrentUserProfile(){
+ if(!S.u)return{name:'',photo:''};
+ if(S.u.role==='owner')return{name:(db.ownerProfile&&db.ownerProfile.name)||S.u.name||OWNER_ACCOUNT.name,photo:(db.ownerProfile&&db.ownerProfile.photo)||''};
+ if(S.u.role==='admin')return{name:(db.admin&&db.admin.name)||S.u.name||'Principal (Admin)',photo:(db.admin&&db.admin.photo)||''};
+ if(S.u.role==='teacher'){const t=db.tch.find(x=>x.id===S.u.ref);return{name:(t&&t.name)||S.u.name,photo:(t&&t.photo)||''}}
+ if(S.u.role==='student'){const st=db.stu.find(x=>x.id===S.u.ref);return{name:(st&&st.name)||S.u.name,photo:(st&&st.photo)||''}}
+ return{name:S.u.name||'',photo:''};
+}
+
+function avOf(name,photo,cls=''){
+ const ch=esc((name||'?')[0].toUpperCase());
+ if(photo)return`<span class="av ${cls}"><img src="${photo}" alt="${esc(name||'Avatar')}"></span>`;
+ return`<span class="av ${cls}">${ch}</span>`;
+}
+
+function readPhotoFile(file,cb){
+ if(!file||!file.type.startsWith('image/')){toast('Please select an image file');return}
+ const reader=new FileReader();
+ reader.onload=ev=>{
+  const img=new Image();
+  img.onload=()=>{
+   const maxSide=240;
+   let w=img.width,h=img.height;
+   if(w>h&&w>maxSide){h=Math.round(h*maxSide/w);w=maxSide}
+   else if(h>=w&&h>maxSide){w=Math.round(w*maxSide/h);h=maxSide}
+   const cv=document.createElement('canvas');
+   cv.width=w;cv.height=h;
+   const ctx=cv.getContext('2d');
+   ctx.drawImage(img,0,0,w,h);
+   cb(cv.toDataURL('image/jpeg',0.82));
+  };
+  img.src=ev.target.result;
+ };
+ reader.readAsDataURL(file);
+}
+
+function openMyProfileModal(){
+ if(!S.u)return;
+ const cur=getCurrentUserProfile();
+ S.tempPhoto=cur.photo||'';
+ modal('Edit My Profile',`
+  <div class="fl">
+   <div class="prof-bar" id="myProfPreview">
+    ${avOf(cur.name,S.tempPhoto,'lg-av')}
+    <div style="display:grid;gap:6px">
+     <div><b>${esc(cur.name)}</b> <span class="role">${esc(S.u.role)}</span></div>
+     <label class="b sm" style="cursor:pointer;margin:0">Upload Photo<input type="file" id="profPhotoInput" accept="image/*" style="display:none"></label>
+     ${S.tempPhoto?`<button type="button" class="b sm" data-a="clearMyPhoto">Remove photo</button>`:''}
+    </div>
+   </div>
+   <label>Display name<input id="profNameInput" value="${esc(cur.name)}" placeholder="Enter your name"></label>
+  </div>
+ `,'Save profile',async()=>{
+  const newName=val('profNameInput').trim();
+  if(!newName){toast('Name cannot be empty');return false}
+  const newPhoto=S.tempPhoto||'';
+  if(S.u.role==='owner'){
+   db.ownerProfile={...(db.ownerProfile||{}),name:newName,photo:newPhoto};
+  }else if(S.u.role==='admin'){
+   db.admin={...db.admin,name:newName,photo:newPhoto};
+  }else if(S.u.role==='teacher'){
+   const t=db.tch.find(x=>x.id===S.u.ref);
+   if(t){t.name=newName;t.photo=newPhoto}
+  }else if(S.u.role==='student'){
+   const st=db.stu.find(x=>x.id===S.u.ref);
+   if(st){st.name=newName;st.photo=newPhoto}
+  }
+  S.u={...S.u,name:newName};
+  saveSession(S.u);
+  await persist();
+  render(false);
+  toast('Profile updated');
+ });
+ const fin=$('#profPhotoInput');
+ if(fin){
+  fin.addEventListener('change',()=>{
+   if(!fin.files||!fin.files[0])return;
+   readPhotoFile(fin.files[0],dataUrl=>{
+    S.tempPhoto=dataUrl;
+    const nm=val('profNameInput').trim()||cur.name;
+    const box=$('#myProfPreview');
+    if(box)box.innerHTML=`${avOf(nm,S.tempPhoto,'lg-av')}<div style="display:grid;gap:6px"><div><b>${esc(nm)}</b> <span class="role">${esc(S.u.role)}</span></div><label class="b sm" style="cursor:pointer;margin:0">Change Photo<input type="file" id="profPhotoInput" accept="image/*" style="display:none"></label><button type="button" class="b sm" data-a="clearMyPhoto">Remove photo</button></div>`;
+    const reFin=$('#profPhotoInput');
+    if(reFin)reFin.dispatchEvent(new Event('change'));
+   });
+  });
+ }
+}
+
+/* PC smooth cursor follower */
+let curTarget={x:-400,y:-400,active:false},curPos={x:-400,y:-400},ringPos={x:-400,y:-400};
+function syncCursorFx(){
+ const wrap=$('#cursor-fx');
+ if(!wrap){return}
+ if(!S.u){wrap.innerHTML='';return}
+ if(!wrap.children.length){wrap.innerHTML='<div class="cur-aura"></div><div class="cur-ring"></div>'}
+}
+document.addEventListener('pointermove',e=>{
+ if(e.pointerType!=='mouse'||!S.u)return;
+ curTarget.x=e.clientX;
+ curTarget.y=e.clientY;
+ if(!curTarget.active){curPos.x=e.clientX;curPos.y=e.clientY;ringPos.x=e.clientX;ringPos.y=e.clientY;curTarget.active=true}
+ const aura=$('#cursor-fx .cur-aura'),ring=$('#cursor-fx .cur-ring');
+ if(aura)aura.style.opacity='1';
+ if(ring)ring.style.opacity='1';
+},{passive:true});
+document.addEventListener('pointerleave',()=>{
+ curTarget.active=false;
+ const aura=$('#cursor-fx .cur-aura'),ring=$('#cursor-fx .cur-ring');
+ if(aura)aura.style.opacity='0';
+ if(ring)ring.style.opacity='0';
+});
+(function tickCursor(){
+ if(S.u && curTarget.active){
+  curPos.x+=(curTarget.x-curPos.x)*.16;
+  curPos.y+=(curTarget.y-curPos.y)*.16;
+  ringPos.x+=(curTarget.x-ringPos.x)*.09;
+  ringPos.y+=(curTarget.y-ringPos.y)*.09;
+  const aura=$('#cursor-fx .cur-aura'),ring=$('#cursor-fx .cur-ring');
+  if(aura)aura.style.transform=`translate3d(${curPos.x.toFixed(1)}px,${curPos.y.toFixed(1)}px,0)`;
+  if(ring)ring.style.transform=`translate3d(${ringPos.x.toFixed(1)}px,${ringPos.y.toFixed(1)}px,0)`;
+ }
+ requestAnimationFrame(tickCursor);
+})();
 
 function enforceRemoteLock(){
  if(db.appLocked && S.u && S.u.role !== 'owner'){
@@ -257,7 +425,7 @@ async function loadCloud(silent=false){
    document.title=`${orgName()} — Attendance`;
    try{localStorage.setItem(STORE_KEY,JSON.stringify(db))}catch(e){}
    syncStatus='Live synced';
-   if(!silent)render();
+   if(!silent)render(false);
   }
  }catch(err){
   syncStatus='Sync error';
@@ -293,7 +461,7 @@ function subscribeRealtime(){
     document.title=`${orgName()} — Attendance`;
     try{localStorage.setItem(STORE_KEY,JSON.stringify(db))}catch(e){}
     syncStatus='Live synced';
-    if(!dirty())render();
+    if(!dirty())render(false);
    }
   })
   .subscribe();
@@ -301,7 +469,7 @@ function subscribeRealtime(){
 
 function getUsers(){
  return[
-  {e:OWNER_ACCOUNT.email.toLowerCase(),pw:OWNER_ACCOUNT.pw,role:'owner',name:OWNER_ACCOUNT.name},
+  {e:OWNER_ACCOUNT.email.toLowerCase(),pw:OWNER_ACCOUNT.pw,role:'owner',name:(db.ownerProfile&&db.ownerProfile.name)||OWNER_ACCOUNT.name},
   {e:db.admin.email.toLowerCase(),pw:db.admin.pw,role:'admin',name:db.admin.name},
   ...db.tch.map(t=>({e:t.email.toLowerCase(),pw:t.pw||'teach123',role:'teacher',ref:t.id,name:t.name})),
   ...db.stu.map(s=>({e:s.email.toLowerCase(),pw:s.pw||'student123',role:'student',ref:s.id,name:s.name}))
@@ -369,9 +537,10 @@ function LockedScreen(){
 function Login(){
  if(db.appLocked)return LockedScreen();
  const pendingFees=db.stu.filter(s=>getFee(s.id,curMonth()).status==='Pending').length;
- return`<div class="lg"><div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div class="logo">${esc(orgName())}</div><span class="sync ${syncStatus==='Sync error'?'err':''}"><i></i>${esc(syncStatus)}</span></div><h2>Sign in</h2>
+ return`<div class="lg"><div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><div class="logo">${esc(orgName())}</div><span class="sync ${syncStatus==='Sync error'?'err':''}"><i></i>${esc(syncStatus)}</span></div><h2>Sign in</h2>
  <div class="fl"><label>Email<input id="le" type="email" autocomplete="username" placeholder="admin@ourcoaching.pk"></label><label>Password<input id="lp" type="password" autocomplete="current-password" placeholder="••••••••"></label></div>
  <button class="b pri" data-a="login">Sign in</button>
+ ${db.trialIpLock?'<div class="mut sm">One-trial-per-IP protection is active.</div>':''}
  ${db.ipLock?'<div class="mut sm">Campus Wi-Fi/IP restriction is active for students.</div>':''}
  ${pendingFees?`<div class="mut sm">Active students: <b>${db.stu.length}</b> · Pending fees (${curMonth()}): <b>${pendingFees}</b></div>`:''}
  <div class="mut sm">Default admin: <b>admin@ourcoaching.pk</b> / <b>admin123</b></div>
@@ -385,13 +554,16 @@ const NAV={
  student:[['dash','My attendance']]
 };
 function Shell(){
- const u=S.u,n=NAV[u.role].map(x=>`<button class="nv ${S.v===x[0]?'on':''}" data-a="nav" data-v="${x[0]}">${x[1]}</button>`).join('');
+ const u=S.u,curProf=getCurrentUserProfile(),n=NAV[u.role].map(x=>`<button class="nv ${S.v===x[0]?'on':''}" data-a="nav" data-v="${x[0]}">${x[1]}</button>`).join('');
+ const mobNav=NAV[u.role].map(x=>`<button type="button" class="${S.v===x[0]?'on':''}" data-a="nav" data-v="${x[0]}"><span>${x[1]}</span>${S.v===x[0]?'<span>●</span>':''}</button>`).join('');
  const ctx=S.v==='mark'?`${esc((bOf(S.b)||{}).name||'')} · ${fd(S.d)}`:`${fd(TODAY)}`,nr=risk().length;
- return`<div class="shell"><aside class="side"><div class="logo">${esc(orgName())}</div>${n}<div style="flex:1"></div><button class="nv" data-a="syncNow">Sync now</button><button class="nv" data-a="theme">Dark / Light mode</button><button class="nv" data-a="backupJson">Export backup</button><button class="nv" data-a="logout">Log out</button></aside>
- <div><div class="top"><b class="mut sm rl">${esc(ctx)}</b><span class="sync ${syncStatus==='Sync error'?'err':''}"><i></i>${esc(syncStatus)}</span><div class="sp"></div>${isStaff(u.role)?`<input id="gq" placeholder="Search students" aria-label="Search students" value="${esc(S.q)}">`:''}
+ return`<div class="shell"><aside class="side"><div class="logo">${esc(orgName())}</div>${n}<div style="flex:1"></div><button class="nv" data-a="myProfile">Edit profile</button><button class="nv" data-a="syncNow">Sync now</button><button class="nv" data-a="theme">Dark / Light mode</button><button class="nv" data-a="backupJson">Export backup</button><button class="nv" data-a="logout">Log out</button></aside>
+ <div><div class="top"><b class="mut sm rl">${esc(ctx)}</b><span class="sync ${syncStatus==='Sync error'?'err':''}"><i></i>${esc(syncStatus)}</span><div class="sp"></div>
  ${isStaff(u.role)?`<button class="b sm" data-a="bell" aria-label="Alerts">Alerts ${nr?`<b class="bad">${nr}</b>`:''}</button>`:''}
- <div class="chip"><span class="av">${esc(u.name[0])}</span><span class="role">${esc(u.role)}</span></div><button class="b sm" data-a="logout">Log out</button></div>
- <main id="mn">${View()}</main></div></div><nav class="bn">${n}</nav>`
+ <button type="button" class="chip" data-a="myProfile" title="Edit profile & photo">${avOf(curProf.name,curProf.photo)}<span class="role">${esc(u.role)}</span></button><button class="b sm" data-a="logout">Log out</button>
+ <div class="mob-dots-wrap"><button type="button" class="b sm mob-dots-btn" data-a="mobDots" aria-label="Menu" aria-expanded="${S.mobMenuOpen?'true':'false'}">⋮</button>${S.mobMenuOpen?`<div class="mob-dots-menu" role="menu">${mobNav}<hr><button type="button" data-a="myProfile">Edit profile</button><button type="button" data-a="syncNow">Sync now</button><button type="button" data-a="theme">Dark / Light mode</button><button type="button" data-a="backupJson">Export backup</button></div>`:''}</div>
+ ${isStaff(u.role)?`<input id="gq" placeholder="Search students" aria-label="Search students" value="${esc(S.q)}">`:''}</div>
+ <main id="mn"><div class="tab-anim" data-tab-key="${esc(S.v)}-${S.tabTick}">${View()}</div></main></div></div>`
 }
 function View(){return({dash:S.u.role==='student'?Portal:Dash,mark:Mark,students:Studs,fees:Fees,reports:Reports,batches:Batches,settings:Settings})[S.v]()}
 
@@ -401,12 +573,12 @@ function Dash(){
  const dueCount=myStu().filter(s=>getFee(s.id,m).status!=='Paid').length;
  const days=Object.keys(db.att).sort().slice(-14).map(d=>({d,p:dayC(d,ids).pct})).filter(x=>x.p!==null);
  const pts=days.map((x,i)=>[30+i*(540/Math.max(days.length-1,1)),140-x.p*1.2]);
- const chart=days.length?`<svg viewBox="0 0 600 170" width="100%" role="img" aria-label="Attendance trend">${[50,75,100].map(v=>`<line x1="30" x2="590" y1="${140-v*1.2}" y2="${140-v*1.2}" stroke="var(--line)"/><text x="0" y="${144-v*1.2}" font-size="10" fill="var(--mut)">${v}</text>`).join('')}<polyline fill="none" stroke="var(--pri)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="${pts.map(p=>p.join(',')).join(' ')}"/>${pts.map((p,i)=>`<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="var(--pri)"><title>${fd(days[i].d)}: ${days[i].p}%</title></circle>`).join('')}${days.map((x,i)=>i%3===0?`<text x="${pts[i][0]-12}" y="162" font-size="10" fill="var(--mut)">${x.d.slice(5)}</text>`:'').join('')}</svg>`:'<div class="emp">No attendance recorded yet.</div>';
+ const chart=days.length?`<svg viewBox="0 0 600 170" width="100%" style="display:block;max-width:100%" role="img" aria-label="Attendance trend">${[50,75,100].map(v=>`<line x1="30" x2="590" y1="${140-v*1.2}" y2="${140-v*1.2}" stroke="var(--line)"/><text x="0" y="${144-v*1.2}" font-size="10" fill="var(--mut)">${v}</text>`).join('')}<polyline fill="none" stroke="var(--pri)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="${pts.map(p=>p.join(',')).join(' ')}"/>${pts.map((p,i)=>`<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="var(--pri)"><title>${fd(days[i].d)}: ${days[i].p}%</title></circle>`).join('')}${days.map((x,i)=>i%3===0?`<text x="${pts[i][0]-12}" y="162" font-size="10" fill="var(--mut)">${x.d.slice(5)}</text>`:'').join('')}</svg>`:'<div class="emp">No attendance recorded yet.</div>';
  const bb=mine().length?mine().map(b=>{const a=myStu().filter(s=>s.b===b.id).flatMap(s=>recs(s.id,addD(TODAY,-14)));const p=pctOf(a);return`<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span><b>${esc(b.name)}</b></span>${pc(p,b.th)}</div>${pbar(p,b.th)}</div>`}).join(''):'<div class="emp">No batches added yet.</div>';
- return`<div class="ph"><h1>${esc(orgName())} — ${canManage(S.u.role)?'Dashboard':'My batches'}</h1><div class="bar" style="margin:0"><button class="b sm" data-a="nav" data-v="mark">Mark today’s attendance</button>${canManage(S.u.role)?`<button class="b sm pri" data-a="nav" data-v="fees">Fee dues (${dueCount})</button>`:''}</div></div>
+ return`<div class="ph"><h1>${esc(orgName())} — ${canManage(S.u.role)?'Dashboard':'My batches'}</h1><div class="bar" style="margin:0"><button class="b sm" data-a="nav" data-v="mark">Mark today</button>${canManage(S.u.role)?`<button class="b sm pri" data-a="nav" data-v="fees">Fee dues (${dueCount})</button>`:''}</div></div>
  <div class="kp"><div class="card"><span class="mut">Today’s attendance</span><b>${t.pct===null?'–':t.pct+'%'}</b></div><div class="card"><span class="mut">Present today</span><b class="ok">${t.P}</b></div><div class="card"><span class="mut">Absent today</span><b class="bad">${t.A}</b></div><div class="card"><span class="mut">Late arrivals</span><b>${t.L}</b></div><div class="card"><span class="mut">At-risk students</span><b class="bad">${rk.length}</b></div>${canManage(S.u.role)?`<div class="card"><span class="mut">Unpaid fees (${m})</span><b class="${dueCount?'bad':'ok'}">${dueCount}</b></div>`:''}</div>
  <div class="g2"><div class="card"><h2>Attendance trend</h2>${chart}</div><div class="card"><h2 style="margin-bottom:12px">Batch comparison (14 days)</h2>${bb}</div></div>
- <div class="card"><h2 style="margin-bottom:10px">Low attendance</h2>${rk.length?`<div class="tw"><table><tr><th>Student</th><th>Batch</th><th>Attendance</th><th></th></tr>${rk.slice(0,10).map(x=>`<tr><td><a href="#" data-a="sp" data-id="${x.s.id}" style="color:var(--pri);font-weight:600">${esc(x.s.name)}</a></td><td>${esc((bOf(x.s.b)||{}).name||'')}</td><td>${pc(x.p,x.th)}</td><td>${x.s.par?`<a class="b sm" target="_blank" rel="noopener" href="${esc(waLow(x.s.par,x.s.name,x.p))}">WhatsApp</a>`:'<span class="mut sm">No parent no.</span>'}</td></tr>`).join('')}</table></div>`:'<div class="emp">No low-attendance alerts right now.</div>'}`
+ <div class="card"><h2 style="margin-bottom:10px">Low attendance</h2>${rk.length?`<div class="tw"><table><tr><th>Student</th><th>Batch</th><th>Attendance</th><th></th></tr>${rk.slice(0,10).map(x=>`<tr><td><a href="#" data-a="sp" data-id="${x.s.id}" style="color:var(--pri);font-weight:600;display:inline-flex;align-items:center;gap:8px">${avOf(x.s.name,x.s.photo)}<span>${esc(x.s.name)}</span></a></td><td>${esc((bOf(x.s.b)||{}).name||'')}</td><td>${pc(x.p,x.th)}</td><td>${x.s.par?`<a class="b sm" target="_blank" rel="noopener" href="${esc(waLow(x.s.par,x.s.name,x.p))}">WhatsApp</a>`:'<span class="mut sm">No parent no.</span>'}</td></tr>`).join('')}</table></div>`:'<div class="emp">No low-attendance alerts right now.</div>'}`
 }
 
 function openDraft(){const b=bOf(S.b);if(!b){S.dr=null;return}const ses=db.att[S.d]&&db.att[S.d][S.b],o={subject:ses?ses.subject:b.subs[0],rec:ses?ses.rec:{}};S.dr={b:S.b,d:S.d,subject:o.subject,rec:JSON.parse(JSON.stringify(o.rec)),orig:JSON.stringify(o)}}
@@ -432,12 +604,12 @@ function Mark(){
  <div class="cnt"><span style="background:var(--line)">Total ${all.length}</span><span class="sP">Present ${c.P}</span><span class="sA">Absent ${c.A}</span><span class="sL">Late ${c.L}</span><span class="sV">Leave ${c.V}</span><span class="sN">Unmarked ${all.length-c.P-c.A-c.L-c.V}</span></div>
  <div class="bar"><input id="q" placeholder="Name or roll no." value="${esc(S.q)}" aria-label="Filter students"><select data-f="f" aria-label="Status filter"><option value="">All statuses</option>${Object.entries(ST).map(([k,v])=>`<option value="${k}" ${S.f===k?'selected':''}>${v}</option>`).join('')}<option value="N" ${S.f==='N'?'selected':''}>Not marked</option></select>
  <button class="b" data-a="all" data-v="P" ${lock||!all.length?'disabled':''}>Mark all present</button><button class="b" data-a="all" data-v="A" ${lock||!all.length?'disabled':''}>Mark all absent</button><button class="b" data-a="clrDraft" ${lock||!Object.keys(dr.rec).length?'disabled':''}>Reset</button><button class="b pri" data-a="save" ${lock||!dirty()?'disabled':''}>Save attendance</button></div>
- ${rows.length?rows.map(s=>{const r=dr.rec[s.id]||{};return`<div class="row"><div class="nm" data-a="sp" data-id="${s.id}"><b>${esc(s.name)}</b><span class="mut sm">${esc(s.roll)}${s.par?' · Parent: '+esc(s.par):''}</span></div>${r.s==='L'?`<input class="mins" type="number" min="1" data-f="m" data-id="${s.id}" value="${r.m||''}" placeholder="min" aria-label="Late minutes">`:''}${r.s==='A'&&s.par?`<a class="b sm" target="_blank" rel="noopener" href="${esc(waAbsent(s.par,s.name,b.name,S.d,dr.subject))}">WA Absent</a>`:''}<div class="seg">${Object.keys(ST).map(k=>`<button class="${r.s===k?'o'+k:''}" data-a="mk" data-id="${s.id}" data-v="${k}" aria-label="${ST[k]}" aria-pressed="${r.s===k}" ${lock?'disabled':''}>${k}</button>`).join('')}</div></div>`}).join(''):'<div class="emp">No students in this batch match the filter.</div>'}`
+ ${rows.length?rows.map(s=>{const r=dr.rec[s.id]||{};return`<div class="row"><div class="nm" data-a="sp" data-id="${s.id}" style="display:flex;align-items:center;gap:10px">${avOf(s.name,s.photo)}<div><b>${esc(s.name)}</b><span class="mut sm">${esc(s.roll)}${s.par?' · Parent: '+esc(s.par):''}</span></div></div>${r.s==='L'?`<input class="mins" type="number" min="1" data-f="m" data-id="${s.id}" value="${r.m||''}" placeholder="min" aria-label="Late minutes">`:''}${r.s==='A'&&s.par?`<a class="b sm" target="_blank" rel="noopener" href="${esc(waAbsent(s.par,s.name,b.name,S.d,dr.subject))}">WA Absent</a>`:''}<div class="seg">${Object.keys(ST).map(k=>`<button class="${r.s===k?'o'+k:''}" data-a="mk" data-id="${s.id}" data-v="${k}" aria-label="${ST[k]}" aria-pressed="${r.s===k}" ${lock?'disabled':''}>${k}</button>`).join('')}</div></div>`}).join(''):'<div class="emp">No students in this batch match the filter.</div>'}`
 }
 
 function save(){
  const dr=S.dr;if(!dr)return;
- const go=async reason=>{db.att[dr.d]=db.att[dr.d]||{};const old=db.att[dr.d][dr.b];db.att[dr.d][dr.b]={subject:dr.subject,rec:dr.rec,by:S.u.name,upd:new Date().toISOString(),reason:reason||(old&&old.reason)||''};await persist();openDraft();render();toast('Attendance saved')};
+ const go=async reason=>{db.att[dr.d]=db.att[dr.d]||{};const old=db.att[dr.d][dr.b];db.att[dr.d][dr.b]={subject:dr.subject,rec:dr.rec,by:S.u.name,upd:new Date().toISOString(),reason:reason||(old&&old.reason)||''};await persist();openDraft();render(false);toast('Attendance saved')};
  if(!Object.keys(dr.rec).length){toast('Mark at least one student first');return}
  if(dr.d!==TODAY)modal('Confirm backdated edit',`<p class="mut">Changing ${fd(dr.d)} is logged with your name and time.</p><textarea id="rs" placeholder="Reason for edit (required)"></textarea>`,'Save edit',()=>{const r=val('rs').trim();if(!r){toast('Please enter a reason');return false}go(r)});
  else go('')
@@ -448,15 +620,14 @@ function Studs(){
  const q=S.q.toLowerCase(),L=myStu().filter(s=>(!S.rb||s.b===S.rb)&&(!q||s.name.toLowerCase().includes(q)||s.roll.toLowerCase().includes(q)));
  return`<div class="ph"><h1>Students <span class="mut sm">${L.length}</span></h1>${canManage(S.u.role)?`<div class="bar" style="margin:0"><button class="b" data-a="bulkS">Bulk paste</button><button class="b pri" data-a="addS">Add student</button></div>`:''}</div>
  <div class="bar"><input id="q" placeholder="Search name or roll no." value="${esc(S.q)}"><select data-f="rb" aria-label="Batch">${'<option value="">All batches</option>'+mine().map(b=>`<option value="${b.id}" ${S.rb===b.id?'selected':''}>${esc(b.name)}</option>`).join('')}</select></div>
- <div class="card tw" style="padding:0">${L.length?`<table><tr><th>Roll</th><th>Name</th><th>Batch</th><th>Parent phone</th><th>Attendance</th><th>Alert</th>${canManage(S.u.role)?'<th>Actions</th>':''}</tr>${L.map(s=>{const a=recs(s.id),p=pctOf(a),th=(bOf(s.b)||{}).th||75,n=streak(a);return`<tr class="cl" data-a="sp" data-id="${s.id}"><td>${esc(s.roll)}</td><td><b>${esc(s.name)}</b></td><td>${esc((bOf(s.b)||{}).name||'')}</td><td>${esc(s.par||'–')}</td><td>${pc(p,th)}</td><td>${n>=2?`<span class="bd sA">${n} absences in a row</span>`:p!==null&&p<th?'<span class="bd sL">Low</span>':''}</td>${canManage(S.u.role)?`<td><div style="display:flex;gap:6px"><button class="b sm" data-a="sLogin" data-id="${s.id}">Login</button><button class="b sm" data-a="moveS" data-id="${s.id}">Batch</button><button class="b sm del" data-a="delS" data-id="${s.id}">Remove</button></div></td>`:''}</tr>`}).join('')}</table>`:'<div class="emp">No students added yet.</div>'}</div>`
+ <div class="card tw" style="padding:0">${L.length?`<table><tr><th>Roll</th><th>Name</th><th>Batch</th><th>Parent phone</th><th>Attendance</th><th>Alert</th>${canManage(S.u.role)?'<th>Actions</th>':''}</tr>${L.map(s=>{const a=recs(s.id),p=pctOf(a),th=(bOf(s.b)||{}).th||75,n=streak(a);return`<tr class="cl" data-a="sp" data-id="${s.id}"><td>${esc(s.roll)}</td><td><span style="display:inline-flex;align-items:center;gap:8px">${avOf(s.name,s.photo)}<b>${esc(s.name)}</b></span></td><td>${esc((bOf(s.b)||{}).name||'')}</td><td>${esc(s.par||'–')}</td><td>${pc(p,th)}</td><td>${n>=2?`<span class="bd sA">${n} absences in a row</span>`:p!==null&&p<th?'<span class="bd sL">Low</span>':''}</td>${canManage(S.u.role)?`<td><div style="display:flex;gap:6px"><button class="b sm" data-a="sLogin" data-id="${s.id}">Login</button><button class="b sm" data-a="moveS" data-id="${s.id}">Batch</button><button class="b sm del" data-a="delS" data-id="${s.id}">Remove</button></div></td>`:''}</tr>`}).join('')}</table>`:'<div class="emp">No students added yet.</div>'}</div>`
 }
 
 function profile(id){
  const s=sOf(id),b=bOf(s.b)||{name:'Batch',th:75},a=recs(id),th=b.th,p=pctOf(a),n=streak(a),subs={};a.forEach(r=>(subs[r.sub]=subs[r.sub]||[]).push(r));
  const needed=p!==null&&p<th?Math.max(1,Math.ceil((th*a.filter(r=>r.s!=='V').length - 100*a.filter(r=>r.s==='P'||r.s==='L').length)/(100-th))):0;
  const fRec=getFee(id,curMonth());
- return`<div style="display:flex;justify-content:space-between;align-items:center"><h2>${esc(s.name)}</h2><button class="b sm" data-a="drx">Close</button></div>
- <div class="mut">${esc(s.roll)} · ${esc(b.name)}</div>
+ return`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div style="display:flex;align-items:center;gap:10px">${avOf(s.name,s.photo,'lg-av')}<div><h2>${esc(s.name)}</h2><div class="mut">${esc(s.roll)} · ${esc(b.name)}</div></div></div><button class="b sm" data-a="drx">Close</button></div>
  <div class="card"><span class="mut">Overall attendance</span><b style="font-size:28px;display:block" class="${p!==null&&p<th?'bad':'ok'}">${p===null?'–':p+'%'}</b>${pbar(p,th)}<div class="mut sm" style="margin-top:4px">Threshold ${th}%${needed?` · ~${needed} classes needed to reach ${th}%`:''}</div></div>
  ${n>=2?`<div class="al">${n} consecutive absences</div>`:''}
  <div class="card sm"><b>Monthly Fee (${curMonth()})</b><div style="margin-top:4px">Amount: <b>${fmtRs(fRec.amt)}</b> · Status: <span class="bd ${fRec.status==='Paid'?'sP':'sL'}">${esc(fRec.status)}</span></div></div>
@@ -474,9 +645,10 @@ function studForm(s){
 async function saveStud(id){
  const n=val('fn').trim();if(!n){toast('Name is required');return false}
  if(!db.bat.length){toast('Create a batch first');return false}
- const o={name:n,roll:val('fr').trim()||('R-'+(1001+db.stu.length)),b:val('fb'),fee:Math.max(0,Number(val('ffee'))||3500),phone:val('fp').trim(),par:val('fq').trim(),email:val('fe').trim()||(n.toLowerCase().replace(/\W+/g,'.')+'.'+Date.now()+'@ourcoaching.pk'),pw:val('fpw').trim()||'student123'};
- if(id)Object.assign(sOf(id),o);else db.stu.push({id:'s'+Date.now(),...o});
- await persist();if(S.drawerId===id)openDr(id);render();toast('Student saved')
+ const prev=id?sOf(id):null;
+ const o={name:n,roll:val('fr').trim()||('R-'+(1001+db.stu.length)),b:val('fb'),fee:Math.max(0,Number(val('ffee'))||3500),phone:val('fp').trim(),par:val('fq').trim(),email:val('fe').trim()||(n.toLowerCase().replace(/\W+/g,'.')+'.'+Date.now()+'@ourcoaching.pk'),pw:val('fpw').trim()||'student123',photo:(prev&&prev.photo)||''};
+ if(id)Object.assign(prev,o);else db.stu.push({id:'s'+Date.now(),...o});
+ await persist();if(S.drawerId===id)openDr(id);render(false);toast('Student saved')
 }
 
 function removeStudent(id){
@@ -494,7 +666,7 @@ function removeStudent(id){
   if(S.dr&&S.dr.rec&&S.dr.rec[id])delete S.dr.rec[id];
   if(S.drawerId===id)closeDr();
   await persist();
-  render();
+  render(false);
   toast('Student removed');
  });
 }
@@ -514,7 +686,7 @@ function Fees(){
  return`<div class="ph"><h1>Monthly Fees &amp; Dues</h1><input type="month" data-f="feeMonth" value="${esc(m)}" aria-label="Fee month"></div>
  <div class="kp"><div class="card"><span class="mut">Collected (${m})</span><b class="ok">${fmtRs(collected)}</b></div><div class="card"><span class="mut">Pending dues</span><b class="bad">${fmtRs(pendingAmt)}</b></div><div class="card"><span class="mut">Paid students</span><b class="ok">${paidCnt}</b></div><div class="card"><span class="mut">Unpaid / Due</span><b class="bad">${dueCnt}</b></div></div>
  <div class="bar"><input id="q" placeholder="Search name or roll no." value="${esc(S.q)}"><select data-f="rb" aria-label="Batch"><option value="">All batches</option>${db.bat.map(b=>`<option value="${b.id}" ${S.rb===b.id?'selected':''}>${esc(b.name)}</option>`).join('')}</select><select data-f="feeFilter" aria-label="Fee status"><option value="">All statuses</option><option value="Pending" ${S.feeFilter==='Pending'?'selected':''}>Pending</option><option value="Paid" ${S.feeFilter==='Paid'?'selected':''}>Paid</option></select></div>
- <div class="card tw" style="padding:0">${list.length?`<table><tr><th>Roll</th><th>Student</th><th>Batch</th><th>Fee</th><th>Status</th><th>Actions</th></tr>${list.map(s=>{const f=getFee(s.id,m);return`<tr><td>${esc(s.roll)}</td><td><b>${esc(s.name)}</b></td><td>${esc((bOf(s.b)||{}).name||'')}</td><td><b>${fmtRs(f.amt)}</b></td><td><span class="bd ${f.status==='Paid'?'sP':'sA'}">${esc(f.status)}</span></td><td><div style="display:flex;gap:6px"><button class="b sm ${f.status==='Paid'?'':'pri'}" data-a="toggleFee" data-id="${s.id}" data-m="${esc(m)}">${f.status==='Paid'?'Mark Pending':'Mark Paid'}</button>${s.par&&f.status!=='Paid'?`<a class="b sm" target="_blank" rel="noopener" href="${esc(waFee(s.par,s.name,m,f.amt))}">WA Reminder</a>`:''}</div></td></tr>`}).join('')}</table>`:'<div class="emp">No students match this filter.</div>'}</div>`
+ <div class="card tw" style="padding:0">${list.length?`<table><tr><th>Roll</th><th>Student</th><th>Batch</th><th>Fee</th><th>Status</th><th>Actions</th></tr>${list.map(s=>{const f=getFee(s.id,m);return`<tr><td>${esc(s.roll)}</td><td><span style="display:inline-flex;align-items:center;gap:8px">${avOf(s.name,s.photo)}<b>${esc(s.name)}</b></span></td><td>${esc((bOf(s.b)||{}).name||'')}</td><td><b>${fmtRs(f.amt)}</b></td><td><span class="bd ${f.status==='Paid'?'sP':'sA'}">${esc(f.status)}</span></td><td><div style="display:flex;gap:6px"><button class="b sm ${f.status==='Paid'?'':'pri'}" data-a="toggleFee" data-id="${s.id}" data-m="${esc(m)}">${f.status==='Paid'?'Mark Pending':'Mark Paid'}</button>${s.par&&f.status!=='Paid'?`<a class="b sm" target="_blank" rel="noopener" href="${esc(waFee(s.par,s.name,m,f.amt))}">WA Reminder</a>`:''}</div></td></tr>`}).join('')}</table>`:'<div class="emp">No students match this filter.</div>'}</div>`
 }
 
 function range(){const e=TODAY;if(S.rp==='week')return[addD(e,-6),e];if(S.rp==='month')return[e.slice(0,8)+'01',e];return[S.from||addD(e,-13),S.to||e]}
@@ -535,13 +707,14 @@ function csv(){const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';return
 function Batches(){
  return`<div class="ph"><h1>Batches &amp; teachers</h1><div class="bar" style="margin:0"><button class="b" data-a="addT">Add teacher</button><button class="b pri" data-a="addB">New batch</button></div></div>
  <div class="card tw" style="padding:0">${db.bat.length?`<table><tr><th>Batch</th><th>Timing</th><th>Teacher</th><th>Min. attendance</th><th>Students</th><th>Action</th></tr>${db.bat.map(b=>`<tr><td><b>${esc(b.name)}</b></td><td><input data-f="bt" data-id="${b.id}" value="${esc(b.time)}" style="width:130px" aria-label="Timing"></td><td><select data-f="bte" data-id="${b.id}" aria-label="Teacher"><option value="">Unassigned</option>${db.tch.map(t=>`<option value="${t.id}" ${t.id===b.teacher?'selected':''}>${esc(t.name)}</option>`).join('')}</select></td><td><input type="number" min="50" max="100" data-f="bth" data-id="${b.id}" value="${b.th}" style="width:70px" aria-label="Threshold"> %</td><td>${db.stu.filter(s=>s.b===b.id).length}</td><td><button class="b sm del" data-a="delB" data-id="${b.id}">Delete</button></td></tr>`).join('')}</table>`:'<div class="emp">No batches yet. Click "New batch" to start.</div>'}</div>
- <h2 style="margin:16px 0 8px">Teachers</h2><div class="card tw" style="padding:0">${db.tch.length?`<table><tr><th>Name</th><th>Email</th><th>Password</th><th>Batches</th><th>Action</th></tr>${db.tch.map(t=>`<tr><td>${esc(t.name)}</td><td>${esc(t.email)}</td><td>${esc(t.pw||'teach123')}</td><td>${db.bat.filter(b=>b.teacher===t.id).map(b=>esc(b.name)).join(', ')||'–'}</td><td><button class="b sm del" data-a="delT" data-id="${t.id}">Remove</button></td></tr>`).join('')}</table>`:'<div class="emp">No teachers added yet.</div>'}</div>`
+ <h2 style="margin:16px 0 8px">Teachers</h2><div class="card tw" style="padding:0">${db.tch.length?`<table><tr><th>Name</th><th>Email</th><th>Password</th><th>Batches</th><th>Action</th></tr>${db.tch.map(t=>`<tr><td><span style="display:inline-flex;align-items:center;gap:8px">${avOf(t.name,t.photo)}<span>${esc(t.name)}</span></span></td><td>${esc(t.email)}</td><td>${esc(t.pw||'teach123')}</td><td>${db.bat.filter(b=>b.teacher===t.id).map(b=>esc(b.name)).join(', ')||'–'}</td><td><button class="b sm del" data-a="delT" data-id="${t.id}">Remove</button></td></tr>`).join('')}</table>`:'<div class="emp">No teachers added yet.</div>'}</div>`
 }
 
 function Settings(){
  if(!canManage(S.u.role))return'<div class="emp">Admin / Owner access only.</div>';
  const selAcc=S.tempAccent||db.accent||'indigo';
  const isOwner=S.u.role==='owner';
+ const claimedList=Object.entries(db.trialClaimedIps||{});
  return`<div class="ph"><h1>Coaching settings</h1><span class="mut sm">Instance: <b>${esc(ROW_ID)}</b></span></div>
  <div class="g2">
   <div class="card fl">
@@ -558,6 +731,14 @@ function Settings(){
    <label>Admin password<input id="setAPw" type="text" value="${esc(db.admin.pw)}"></label>
   </div>
   <div class="card fl">
+   ${isOwner?`
+    <h2>Trial Anti-Abuse (1 IP = 1 Trial Account)</h2>
+    <p class="mut sm">Prevents a user from logging in with multiple Gmail/email accounts from the same IP address during trial.</p>
+    <label class="chk"><input type="checkbox" id="setTrialIpLock" ${db.trialIpLock?'checked':''}> Block multiple accounts on the same IP</label>
+    <div class="mut sm">Claimed trial IPs: <b>${claimedList.length}</b>${claimedList.length?' ('+claimedList.map(([ip,info])=>`${esc(ip)} [${esc(info.email||'')}]`).join(', ')+')':''}</div>
+    ${claimedList.length?`<div class="bar"><button type="button" class="b sm" data-a="resetTrialIps">Clear claimed IPs</button></div>`:''}
+    <hr style="border:0;border-top:1px solid var(--line);margin:4px 0">
+   `:''}
    <h2>Campus Wi-Fi / IP Access Lock</h2>
    <p class="mut sm">When enabled, <b>Students</b> can only sign in when connected to your coaching center’s Wi-Fi/internet IP. Admin and Teachers can still log in from anywhere.</p>
    <label class="chk"><input type="checkbox" id="setIpLock" ${db.ipLock?'checked':''}> Enable campus-only IP access for students</label>
@@ -582,7 +763,7 @@ function Portal(){
  if(!s)return'<div class="emp">Student record not found.</div>';
  const b=bOf(s.b)||{name:'Batch',th:75},a=recs(s.id),th=b.th,p=pctOf(a),n=streak(a),m=TODAY.slice(0,7),first=new Date(m+'-01T00:00:00'),days=new Date(first.getFullYear(),first.getMonth()+1,0).getDate(),map={};a.forEach(r=>map[r.d]=r.s);const subs={};a.forEach(r=>(subs[r.sub]=subs[r.sub]||[]).push(r));
  const fRec=getFee(s.id,m);
- return`<div class="ph"><h1>${esc(s.name)}</h1><span class="mut">${esc(b.name)} · ${esc(s.roll)}</span></div>
+ return`<div class="ph"><div style="display:flex;align-items:center;gap:12px">${avOf(s.name,s.photo,'lg-av')}<div><h1>${esc(s.name)}</h1><span class="mut">${esc(b.name)} · ${esc(s.roll)}</span></div></div><button class="b sm" data-a="myProfile">Edit profile &amp; photo</button></div>
  ${p!==null&&p<th?`<div class="al">Attendance is ${p}%, below the required ${th}%.</div>`:''}${n>=2?`<div class="al w">${n} absences in a row.</div>`:''}
  <div class="kp"><div class="card"><span class="mut">Overall</span><b class="${p!==null&&p<th?'bad':'ok'}">${p===null?'–':p+'%'}</b></div><div class="card"><span class="mut">Present / Late</span><b>${a.filter(r=>r.s==='P'||r.s==='L').length}</b></div><div class="card"><span class="mut">Absent</span><b class="bad">${a.filter(r=>r.s==='A').length}</b></div><div class="card"><span class="mut">Fee (${m})</span><b class="${fRec.status==='Paid'?'ok':'bad'}">${esc(fRec.status)}</b></div></div>
  <div class="g2"><div class="card"><h2 style="margin-bottom:8px">${first.toLocaleDateString('en-GB',{month:'long',year:'numeric'})}</h2><div class="cal">${'MTWTFSS'.split('').map(x=>`<div class="mut" style="background:none">${x}</div>`).join('')}${'.'.repeat((first.getDay()+6)%7).split('').map(()=>'<div style="background:none"></div>').join('')}${Array.from({length:days},(_,i)=>{const d=m+'-'+String(i+1).padStart(2,'0'),v=map[d];return`<div class="${v?'s'+v:''}" title="${v?ST[v]:''}">${i+1}</div>`}).join('')}</div></div>
@@ -594,8 +775,8 @@ async function seedDemoData(){
  const t1='t_demo_1',t2='t_demo_2';
  const b1='b_demo_1',b2='b_demo_2';
  db.tch=[
-  {id:t1,name:'Sir Kamran Ali',email:'kamran@ourcoaching.pk',pw:'teach123'},
-  {id:t2,name:'Ms. Hina Tariq',email:'hina@ourcoaching.pk',pw:'teach123'}
+  {id:t1,name:'Sir Kamran Ali',email:'kamran@ourcoaching.pk',pw:'teach123',photo:''},
+  {id:t2,name:'Ms. Hina Tariq',email:'hina@ourcoaching.pk',pw:'teach123',photo:''}
  ];
  db.bat=[
   {id:b1,name:'Matric Science',time:'16:00–17:30',teacher:t1,th:75,subs:['Math','Physics','Chemistry']},
@@ -605,7 +786,7 @@ async function seedDemoData(){
  db.stu=names.map((nm,i)=>{
   const bid=i<4?b1:b2;
   const slug=nm.toLowerCase().replace(/\W+/g,'.');
-  return{id:'s_demo_'+(i+1),name:nm,roll:'R-'+(101+i),b:bid,fee:i<4?3500:4500,phone:'0300111223'+i,par:'0321998877'+i,email:`${slug}@ourcoaching.pk`,pw:'student123'};
+  return{id:'s_demo_'+(i+1),name:nm,roll:'R-'+(101+i),b:bid,fee:i<4?3500:4500,phone:'0300111223'+i,par:'0321998877'+i,email:`${slug}@ourcoaching.pk`,pw:'student123',photo:''};
  });
  db.att={};
  const sts=['P','P','P','P','L','A'];
@@ -627,18 +808,37 @@ async function seedDemoData(){
   db.fees[m][s.id]={amt:s.fee,status:i%3===0?'Pending':'Paid',paidAt:i%3===0?'':TODAY};
  });
  await persist();
- render();
+ render(false);
  toast('Sample demo data loaded');
 }
 
-function render(){document.title=`${orgName()} — Attendance`;$('#app').innerHTML=S.u?Shell():Login();if(S.u&&S.drawerId&&sOf(S.drawerId)){$('#dr').innerHTML=`<aside class="dr" role="dialog" aria-label="Student profile">${profile(S.drawerId)}</aside>`}else{$('#dr').innerHTML=''}}
+function render(animateTab=true){
+ if(animateTab)S.tabTick++;
+ document.title=`${orgName()} — Attendance`;
+ $('#bg-fx').innerHTML=S.u?'<div class="grid-bg"></div><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>':'';
+ syncCursorFx();
+ $('#app').innerHTML=S.u?Shell():Login();
+ if(S.u&&S.drawerId&&sOf(S.drawerId)){$('#dr').innerHTML=`<aside class="dr" role="dialog" aria-label="Student profile">${profile(S.drawerId)}</aside>`}else{$('#dr').innerHTML=''}
+}
 
 document.addEventListener('click',async e=>{
+ if(S.mobMenuOpen && !e.target.closest('.mob-dots-wrap')){S.mobMenuOpen=false;render(false)}
  const el=e.target.closest('[data-a]');if(!el)return;
  if(el.tagName==='A'&&el.dataset.a==='sp')e.preventDefault();
  const a=el.dataset.a,id=el.dataset.id,v=el.dataset.v;
+ if(a==='mobDots'){e.stopPropagation();S.mobMenuOpen=!S.mobMenuOpen;render(false);return}
+ if(a!=='mobDots'&&S.mobMenuOpen)S.mobMenuOpen=false;
  if(a==='mx'){if(e.target===el||el.classList.contains('b'))closeM()}
  else if(a==='mok'){if(modal.cb&&await modal.cb()===false)return;closeM()}
+ else if(a==='myProfile'){openMyProfileModal()}
+ else if(a==='clearMyPhoto'){
+  S.tempPhoto='';
+  const nm=val('profNameInput').trim()||getCurrentUserProfile().name;
+  const box=$('#myProfPreview');
+  if(box)box.innerHTML=`${avOf(nm,'','lg-av')}<div style="display:grid;gap:6px"><div><b>${esc(nm)}</b> <span class="role">${esc(S.u.role)}</span></div><label class="b sm" style="cursor:pointer;margin:0">Upload Photo<input type="file" id="profPhotoInput" accept="image/*" style="display:none"></label></div>`;
+  const fin=$('#profPhotoInput');
+  if(fin)fin.addEventListener('change',()=>{if(fin.files&&fin.files[0])readPhotoFile(fin.files[0],url=>{S.tempPhoto=url;const curN=val('profNameInput').trim()||nm;if(box)box.innerHTML=`${avOf(curN,S.tempPhoto,'lg-av')}<div style="display:grid;gap:6px"><div><b>${esc(curN)}</b> <span class="role">${esc(S.u.role)}</span></div><label class="b sm" style="cursor:pointer;margin:0">Change Photo<input type="file" id="profPhotoInput" accept="image/*" style="display:none"></label><button type="button" class="b sm" data-a="clearMyPhoto">Remove photo</button></div>`})});
+ }
  else if(a==='login'){
   await loadCloud(true);
   const em=val('le').trim().toLowerCase(),pw=val('lp');
@@ -647,6 +847,20 @@ document.addEventListener('click',async e=>{
   if(db.appLocked && u.role!=='owner'){
    toast(db.lockMsg||'Access is paused');
    return;
+  }
+  if(db.trialIpLock && u.role!=='owner' && u.role!=='admin'){
+   toast('Checking trial IP...');
+   const ip=await fetchPublicIp();
+   if(!ip){toast('Could not verify IP address');return}
+   const claimed=db.trialClaimedIps[ip];
+   if(claimed && claimed.email && claimed.email.toLowerCase()!==u.e){
+    toast('Trial already claimed on this IP ('+ip+') with another account');
+    return;
+   }
+   if(!claimed){
+    db.trialClaimedIps[ip]={email:u.e,claimedAt:new Date().toISOString()};
+    await persist();
+   }
   }
   if(u.role==='student'&&db.ipLock){
    const allowed=String(db.allowedIps||'').split(',').map(x=>x.trim()).filter(Boolean);
@@ -659,11 +873,11 @@ document.addEventListener('click',async e=>{
     }
    }
   }
-  S.u=u;saveSession(u);S.v='dash';S.dr=null;S.drawerId=null;render();toast('Welcome, '+u.name);
+  S.u=u;saveSession(u);S.v='dash';S.dr=null;S.drawerId=null;render(true);toast('Welcome, '+u.name);
  }
- else if(a==='logout'){guard(()=>{S.u=null;saveSession(null);S.dr=null;S.drawerId=null;S.q='';S.f='';render()})}
+ else if(a==='logout'){guard(()=>{S.u=null;saveSession(null);S.dr=null;S.drawerId=null;S.q='';S.f='';render(false)})}
  else if(a==='syncNow'){await loadCloud(false);toast('Synced with cloud')}
- else if(a==='pickAcc'){S.tempAccent=v;db.accent=v;applyAccent();render()}
+ else if(a==='pickAcc'){S.tempAccent=v;db.accent=v;applyAccent();render(false)}
  else if(a==='grabIp'){
   toast('Detecting IP...');
   const ip=await fetchPublicIp();
@@ -677,6 +891,13 @@ document.addEventListener('click',async e=>{
   const lbl=$('#curIpTxt');if(lbl)lbl.textContent='Detected IP: '+ip;
   toast('IP added: '+ip);
  }
+ else if(a==='resetTrialIps'){
+  if(S.u.role!=='owner'){toast('Owner access only');return}
+  db.trialClaimedIps={};
+  await persist();
+  render(false);
+  toast('Claimed trial IPs cleared');
+ }
  else if(a==='saveSettings'){
   const nm=val('setOrg').trim(),anm=val('setAName').trim()||'Principal (Admin)',aem=val('setAEmail').trim().toLowerCase(),apw=val('setAPw').trim();
   const lock=!!($('#setIpLock')&&$('#setIpLock').checked);
@@ -685,10 +906,11 @@ document.addEventListener('click',async e=>{
   if(lock&&!ips){toast('Please add at least one allowed IP or disable IP lock');return}
   db.orgName=nm;
   db.accent=S.tempAccent||db.accent||'indigo';
-  db.admin={name:anm,email:aem,pw:apw};
+  db.admin={...db.admin,name:anm,email:aem,pw:apw};
   db.ipLock=lock;
   db.allowedIps=ips;
   if(S.u.role==='owner'){
+   db.trialIpLock=!!($('#setTrialIpLock')&&$('#setTrialIpLock').checked);
    db.appLocked=!!($('#setAppLock')&&$('#setAppLock').checked);
    db.lockMsg=val('setLockMsg').trim()||'This coaching portal is currently paused. Please contact the service provider.';
   }else if(S.u.role==='admin'){
@@ -696,7 +918,7 @@ document.addEventListener('click',async e=>{
    saveSession(S.u);
   }
   await persist();
-  render();
+  render(false);
   toast('Coaching settings saved');
  }
  else if(a==='loadDemo'){
@@ -704,13 +926,13 @@ document.addEventListener('click',async e=>{
  }
  else if(a==='clearAllData'){
   modal('Clear all coaching records?','<p class="mut">Batches, teachers, students, attendance, and fees will be cleared. Admin login stays intact.</p>','Clear Records',async()=>{
-   const keepOrg=orgName(),keepAcc=db.accent,keepAdm={...db.admin},keepLock=db.appLocked,keepMsg=db.lockMsg,keepIpLock=db.ipLock,keepIps=db.allowedIps;
-   db={...emptyDb(),orgName:keepOrg,accent:keepAcc,admin:keepAdm,appLocked:keepLock,lockMsg:keepMsg,ipLock:keepIpLock,allowedIps:keepIps};
-   S.dr=null;closeDr();await persist();render();toast('All records cleared');
+   const keepOrg=orgName(),keepAcc=db.accent,keepAdm={...db.admin},keepOwn={...db.ownerProfile},keepLock=db.appLocked,keepMsg=db.lockMsg,keepIpLock=db.ipLock,keepIps=db.allowedIps,keepTLock=db.trialIpLock,keepTIps={...db.trialClaimedIps};
+   db={...emptyDb(),orgName:keepOrg,accent:keepAcc,admin:keepAdm,ownerProfile:keepOwn,appLocked:keepLock,lockMsg:keepMsg,ipLock:keepIpLock,allowedIps:keepIps,trialIpLock:keepTLock,trialClaimedIps:keepTIps};
+   S.dr=null;closeDr();await persist();render(false);toast('All records cleared');
   });
  }
  else if(a==='theme'){const nx=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=nx;try{localStorage.setItem(THEME_KEY,nx)}catch(err){}toast(nx==='dark'?'Dark mode':'Light mode')}
- else if(a==='nav'){guard(()=>{closeDr();S.v=v;S.f='';if(v==='settings')S.tempAccent=db.accent;render()})}
+ else if(a==='nav'){guard(()=>{closeDr();S.v=v;S.f='';if(v==='settings')S.tempAccent=db.accent;render(true)})}
  else if(a==='sp'){openDr(id)}
  else if(a==='drx'){closeDr()}
  else if(a==='sLogin'){e.stopPropagation();const st=sOf(id);if(!st)return;const pw=st.pw||'student123';modal('Student login details',`<div class="card sm"><div><b>Student:</b> ${esc(st.name)} (${esc(st.roll)})</div><div><b>Email:</b> ${esc(st.email)}</div><div><b>Password:</b> ${esc(pw)}</div></div><div class="bar"><button class="b sm" data-a="copyCred" data-txt="${esc(`Email: ${st.email}\nPassword: ${pw}`)}">Copy credentials</button></div>`)}
@@ -719,7 +941,7 @@ document.addEventListener('click',async e=>{
   const st=sOf(id);if(!st||!db.bat.length)return;
   modal('Transfer student batch',`<div class="fl"><label>Student<b>${esc(st.name)} (${esc(st.roll)})</b></label><label>Select new batch<select id="mvBat">${db.bat.map(b=>`<option value="${b.id}" ${b.id===st.b?'selected':''}>${esc(b.name)}</option>`).join('')}</select></label></div>`,'Transfer',async()=>{
    const nb=val('mvBat');if(!nb)return false;
-   st.b=nb;await persist();if(S.drawerId===id)openDr(id);render();toast('Batch transferred');
+   st.b=nb;await persist();if(S.drawerId===id)openDr(id);render(false);toast('Batch transferred');
   });
  }
  else if(a==='delS'){e.stopPropagation();removeStudent(id)}
@@ -728,72 +950,72 @@ document.addEventListener('click',async e=>{
   db.fees[m]=db.fees[m]||{};
   const nextSt=f.status==='Paid'?'Pending':'Paid';
   db.fees[m][id]={amt:f.amt,status:nextSt,paidAt:nextSt==='Paid'?TODAY:''};
-  await persist();render();toast(`Marked ${nextSt}`);
+  await persist();render(false);toast(`Marked ${nextSt}`);
  }
  else if(a==='bulkWaAbs'){
   const b=bOf(S.b),abs=db.stu.filter(s=>s.b===S.b&&(S.dr.rec[s.id]||{}).s==='A');
   const txt=abs.map(s=>`${s.name} (${s.roll}) — Parent: ${s.par||'N/A'}`).join('\n');
   modal(`Absent students (${fd(S.d)})`,`<p class="mut sm">Batch: <b>${esc((b||{}).name||'')}</b> · Subject: <b>${esc(S.dr.subject||'')}</b></p><textarea readonly>${esc(txt)}</textarea><div class="bar"><button class="b sm" data-a="copyCred" data-txt="${esc(txt)}">Copy list</button></div>`);
  }
- else if(a==='clrDraft'){if(!S.dr)return;S.dr.rec={};render();toast('Draft reset')}
+ else if(a==='clrDraft'){if(!S.dr)return;S.dr.rec={};render(false);toast('Draft reset')}
  else if(a==='copyCred'){copyText(el.dataset.txt||'','Copied to clipboard')}
- else if(a==='bell'){const rk=risk();modal('Low attendance alerts',rk.length?rk.map(x=>`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)"><div><b>${esc(x.s.name)}</b> <span class="mut sm">(${esc(x.s.roll)})</span><div class="mut sm">${esc((bOf(x.s.b)||{}).name||'')}</div></div><div style="display:flex;align-items:center;gap:8px"><span class="bad"><b>${x.p}%</b></span>${x.s.par?`<a class="b sm" target="_blank" rel="noopener" href="${esc(waLow(x.s.par,x.s.name,x.p))}">WA</a>`:''}</div></div>`).join(''):'<div class="emp">No alerts.</div>')}
- else if(a==='mk'){if(!S.dr)return;const cur=(S.dr.rec[id]||{}).s;if(cur===v)delete S.dr.rec[id];else S.dr.rec[id]={s:v,m:v==='L'?((S.dr.rec[id]||{}).m||10):'',n:''};render()}
- else if(a==='all'){if(!S.dr)return;db.stu.filter(s=>s.b===S.b).forEach(s=>{S.dr.rec[s.id]={s:v,m:'',n:''}});render();toast(v==='P'?'Marked all present':'Marked all absent')}
+ else if(a==='bell'){const rk=risk();modal('Low attendance alerts',rk.length?rk.map(x=>`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)"><div style="display:flex;align-items:center;gap:8px">${avOf(x.s.name,x.s.photo)}<div><b>${esc(x.s.name)}</b> <span class="mut sm">(${esc(x.s.roll)})</span><div class="mut sm">${esc((bOf(x.s.b)||{}).name||'')}</div></div></div><div style="display:flex;align-items:center;gap:8px"><span class="bad"><b>${x.p}%</b></span>${x.s.par?`<a class="b sm" target="_blank" rel="noopener" href="${esc(waLow(x.s.par,x.s.name,x.p))}">WA</a>`:''}</div></div>`).join(''):'<div class="emp">No alerts.</div>')}
+ else if(a==='mk'){if(!S.dr)return;const cur=(S.dr.rec[id]||{}).s;if(cur===v)delete S.dr.rec[id];else S.dr.rec[id]={s:v,m:v==='L'?((S.dr.rec[id]||{}).m||10):'',n:''};render(false)}
+ else if(a==='all'){if(!S.dr)return;db.stu.filter(s=>s.b===S.b).forEach(s=>{S.dr.rec[s.id]={s:v,m:'',n:''}});render(false);toast(v==='P'?'Marked all present':'Marked all absent')}
  else if(a==='save'){save()}
  else if(a==='addS'){if(!db.bat.length){toast('Create a batch first');return}modal('Add student',studForm({b:db.bat[0].id}),'Add student',()=>saveStud(null))}
  else if(a==='editS'){const st=sOf(id);if(!st)return;modal('Edit student',studForm(st),'Save changes',()=>saveStud(id))}
- else if(a==='bulkS'){if(!db.bat.length){toast('Create a batch first');return}modal('Bulk add students',`<p class="mut sm">One student per line: <b>Name, Roll No, Parent Phone, Fee (optional)</b></p><div class="fl"><label>Batch<select id="bkb">${db.bat.map(b=>`<option value="${b.id}">${esc(b.name)}</option>`).join('')}</select></label><label>Rows<textarea id="bkt" placeholder="Ali Raza, R-101, 03001234567, 3500&#10;Sara Khan, R-102, 03219876543, 3500"></textarea></label></div>`,'Import',async()=>{const lines=val('bkt').split(/\r?\n/).map(x=>x.trim()).filter(Boolean),b=val('bkb');if(!lines.length){toast('Paste at least one line');return false}lines.forEach((ln,i)=>{const p=ln.split(',').map(x=>x.trim());const name=p[0];if(!name)return;const roll=p[1]||('R-'+(1001+db.stu.length+i));const par=p[2]||'';const fee=Number(p[3])||3500;db.stu.push({id:'s'+Date.now()+'_'+i,name,roll,b,fee,phone:'',par,email:name.toLowerCase().replace(/\W+/g,'.')+'.'+Date.now()+'_'+i+'@ourcoaching.pk',pw:'student123'})});await persist();render();toast(lines.length+' students added')},true)}
- else if(a==='addB'){modal('Create new batch',`<div class="fl"><label>Batch name<input id="bn" placeholder="e.g. Matric Science"></label><label>Class timing<input id="bt" placeholder="e.g. 16:00–18:00"></label><label>Assigned teacher<select id="btea"><option value="">Unassigned</option>${db.tch.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('')}</select></label><label>Minimum attendance (%)<input id="bth" type="number" min="50" max="100" value="75"></label><label>Subjects (comma separated)<input id="bsub" value="Math, Physics, Chemistry"></label></div>`,'Create batch',async()=>{const name=val('bn').trim();if(!name){toast('Batch name is required');return false}const subs=val('bsub').split(',').map(x=>x.trim()).filter(Boolean);db.bat.push({id:'b'+Date.now(),name,time:val('bt').trim()||'16:00–18:00',teacher:val('btea'),th:Math.min(100,Math.max(50,Number(val('bth'))||75)),subs:subs.length?subs:['General']});await persist();render();toast('Batch created')})}
+ else if(a==='bulkS'){if(!db.bat.length){toast('Create a batch first');return}modal('Bulk add students',`<p class="mut sm">One student per line: <b>Name, Roll No, Parent Phone, Fee (optional)</b></p><div class="fl"><label>Batch<select id="bkb">${db.bat.map(b=>`<option value="${b.id}">${esc(b.name)}</option>`).join('')}</select></label><label>Rows<textarea id="bkt" placeholder="Ali Raza, R-101, 03001234567, 3500&#10;Sara Khan, R-102, 03219876543, 3500"></textarea></label></div>`,'Import',async()=>{const lines=val('bkt').split(/\r?\n/).map(x=>x.trim()).filter(Boolean),b=val('bkb');if(!lines.length){toast('Paste at least one line');return false}lines.forEach((ln,i)=>{const p=ln.split(',').map(x=>x.trim());const name=p[0];if(!name)return;const roll=p[1]||('R-'+(1001+db.stu.length+i));const par=p[2]||'';const fee=Number(p[3])||3500;db.stu.push({id:'s'+Date.now()+'_'+i,name,roll,b,fee,phone:'',par,email:name.toLowerCase().replace(/\W+/g,'.')+'.'+Date.now()+'_'+i+'@ourcoaching.pk',pw:'student123',photo:''})});await persist();render(false);toast(lines.length+' students added')},true)}
+ else if(a==='addB'){modal('Create new batch',`<div class="fl"><label>Batch name<input id="bn" placeholder="e.g. Matric Science"></label><label>Class timing<input id="bt" placeholder="e.g. 16:00–18:00"></label><label>Assigned teacher<select id="btea"><option value="">Unassigned</option>${db.tch.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('')}</select></label><label>Minimum attendance (%)<input id="bth" type="number" min="50" max="100" value="75"></label><label>Subjects (comma separated)<input id="bsub" value="Math, Physics, Chemistry"></label></div>`,'Create batch',async()=>{const name=val('bn').trim();if(!name){toast('Batch name is required');return false}const subs=val('bsub').split(',').map(x=>x.trim()).filter(Boolean);db.bat.push({id:'b'+Date.now(),name,time:val('bt').trim()||'16:00–18:00',teacher:val('btea'),th:Math.min(100,Math.max(50,Number(val('bth'))||75)),subs:subs.length?subs:['General']});await persist();render(false);toast('Batch created')})}
  else if(a==='delB'){
   const b=bOf(id);if(!b)return;
   modal('Delete batch?',`<p class="mut">Delete <b>${esc(b.name)}</b>? Assigned students will stay in database without this batch.</p>`,'Delete',async()=>{
    db.bat=db.bat.filter(x=>x.id!==id);
    for(const d in db.att){if(db.att[d]&&db.att[d][id])delete db.att[d][id]}
    if(S.b===id)S.b='';
-   await persist();render();toast('Batch deleted');
+   await persist();render(false);toast('Batch deleted');
   });
  }
- else if(a==='addT'){modal('Add teacher',`<div class="fl"><label>Full name<input id="tn" placeholder="e.g. Sir Kamran"></label><label>Email<input id="te" type="email" placeholder="kamran@ourcoaching.pk"></label><label>Password<input id="tpw" type="text" value="teach123"></label></div>`,'Add teacher',async()=>{const name=val('tn').trim(),email=val('te').trim();if(!name||!email){toast('Name and email are required');return false}db.tch.push({id:'t'+Date.now(),name,email,pw:val('tpw').trim()||'teach123'});await persist();render();toast('Teacher added')})}
+ else if(a==='addT'){modal('Add teacher',`<div class="fl"><label>Full name<input id="tn" placeholder="e.g. Sir Kamran"></label><label>Email<input id="te" type="email" placeholder="kamran@ourcoaching.pk"></label><label>Password<input id="tpw" type="text" value="teach123"></label></div>`,'Add teacher',async()=>{const name=val('tn').trim(),email=val('te').trim();if(!name||!email){toast('Name and email are required');return false}db.tch.push({id:'t'+Date.now(),name,email,pw:val('tpw').trim()||'teach123',photo:''});await persist();render(false);toast('Teacher added')})}
  else if(a==='delT'){
   const t=tOf(id);if(!t)return;
   modal('Remove teacher?',`<p class="mut">Remove <b>${esc(t.name)}</b> from teachers?</p>`,'Remove',async()=>{
    db.tch=db.tch.filter(x=>x.id!==id);
    db.bat.forEach(b=>{if(b.teacher===id)b.teacher=''});
-   await persist();render();toast('Teacher removed');
+   await persist();render(false);toast('Teacher removed');
   });
  }
  else if(a==='csv'){const blob=new Blob([csv()],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download=`${orgName().toLowerCase().replace(/\W+/g,'-')}-attendance-${range()[0]}-to-${range()[1]}.csv`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('CSV exported')}
  else if(a==='backupJson'){const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download=`${orgName().toLowerCase().replace(/\W+/g,'-')}-backup-${TODAY}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Backup downloaded')}
- else if(a==='restoreJson'){modal('Restore backup JSON','<p class="mut sm">Paste a previously exported JSON backup to restore data.</p><textarea id="jrestore" placeholder=\'{"bat":...}\'></textarea>','Restore',async()=>{try{const parsed=JSON.parse(val('jrestore'));if(!parsed||!Array.isArray(parsed.bat)||!Array.isArray(parsed.stu))throw 0;db=parsed;normalizeDb();applyAccent();await persist();render();toast('Backup restored')}catch(err){toast('Invalid JSON backup');return false}})}
+ else if(a==='restoreJson'){modal('Restore backup JSON','<p class="mut sm">Paste a previously exported JSON backup to restore data.</p><textarea id="jrestore" placeholder=\'{"bat":...}\'></textarea>','Restore',async()=>{try{const parsed=JSON.parse(val('jrestore'));if(!parsed||!Array.isArray(parsed.bat)||!Array.isArray(parsed.stu))throw 0;db=parsed;normalizeDb();applyAccent();await persist();render(false);toast('Backup restored')}catch(err){toast('Invalid JSON backup');return false}})}
  else if(a==='print'){window.print()}
 });
 
 document.addEventListener('input',e=>{
  const el=e.target;
- if(el.id==='q'||el.id==='gq'){S.q=el.value;const pos=el.selectionStart;render();const nx=$('#'+el.id);if(nx){nx.focus();if(pos!=null)nx.setSelectionRange(pos,pos)}}
+ if(el.id==='q'||el.id==='gq'){S.q=el.value;const pos=el.selectionStart;render(false);const nx=$('#'+el.id);if(nx){nx.focus();if(pos!=null)nx.setSelectionRange(pos,pos)}}
  else if(el.dataset.f==='m'&&S.dr){const id=el.dataset.id;if(S.dr.rec[id])S.dr.rec[id].m=el.value}
 });
 
 document.addEventListener('change',async e=>{
  const el=e.target,f=el.dataset.f;if(!f)return;
- if(f==='b'){guard(()=>{S.b=el.value;openDraft();render()})}
- else if(f==='sub'&&S.dr){S.dr.subject=el.value;render()}
- else if(f==='d'){guard(()=>{S.d=el.value||TODAY;openDraft();render()})}
- else if(f==='f'){S.f=el.value;render()}
- else if(f==='rb'){S.rb=el.value;render()}
- else if(f==='rf'){S.rf=el.value;render()}
- else if(f==='rp'){S.rp=el.value;render()}
- else if(f==='from'){S.from=el.value;render()}
- else if(f==='to'){S.to=el.value;render()}
- else if(f==='feeMonth'){S.feeMonth=el.value||curMonth();render()}
- else if(f==='feeFilter'){S.feeFilter=el.value;render()}
+ if(f==='b'){guard(()=>{S.b=el.value;openDraft();render(false)})}
+ else if(f==='sub'&&S.dr){S.dr.subject=el.value;render(false)}
+ else if(f==='d'){guard(()=>{S.d=el.value||TODAY;openDraft();render(false)})}
+ else if(f==='f'){S.f=el.value;render(false)}
+ else if(f==='rb'){S.rb=el.value;render(false)}
+ else if(f==='rf'){S.rf=el.value;render(false)}
+ else if(f==='rp'){S.rp=el.value;render(false)}
+ else if(f==='from'){S.from=el.value;render(false)}
+ else if(f==='to'){S.to=el.value;render(false)}
+ else if(f==='feeMonth'){S.feeMonth=el.value||curMonth();render(false)}
+ else if(f==='feeFilter'){S.feeFilter=el.value;render(false)}
  else if(f==='bt'){const b=bOf(el.dataset.id);if(b){b.time=el.value;await persist();toast('Timing updated')}}
- else if(f==='bte'){const b=bOf(el.dataset.id);if(b){b.teacher=el.value;await persist();render();toast('Teacher assigned')}}
- else if(f==='bth'){const b=bOf(el.dataset.id);if(b){b.th=Math.min(100,Math.max(50,Number(el.value)||75));await persist();render();toast('Threshold updated')}}
+ else if(f==='bte'){const b=bOf(el.dataset.id);if(b){b.teacher=el.value;await persist();render(false);toast('Teacher assigned')}}
+ else if(f==='bth'){const b=bOf(el.dataset.id);if(b){b.th=Math.min(100,Math.max(50,Number(el.value)||75));await persist();render(false);toast('Threshold updated')}}
 });
 
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeM();closeDr()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeM();closeDr();if(S.mobMenuOpen){S.mobMenuOpen=false;render(false)}}});
 
 /* =========================================================
    COACHING CLIENT CONFIG (Har naye client ke liye sirf ye badlein)
@@ -812,7 +1034,7 @@ S.tempAccent = db.accent;
 S.u = (()=>{try{return JSON.parse(localStorage.getItem(SESSION_KEY))}catch(e){return null}})();
 
 subscribeRealtime();
-render();
+render(true);
 loadCloud(false);
 </script>
 </body>
