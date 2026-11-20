@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>OUR COACHING — Attendance &amp; Operations</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
@@ -40,7 +43,6 @@
 html{scroll-padding-top:env(safe-area-inset-top,0px);width:100%;max-width:100%;overflow-x:hidden}
 body{margin:0;width:100%;max-width:100%;background:var(--bg);color:var(--ink);font:14px/1.55 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative}
 
-/* Lively animated background after login */
 #bg-fx{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 #bg-fx .grid-bg{position:absolute;inset:0;background-image:radial-gradient(color-mix(in srgb,var(--pri) 22%,transparent) 1px,transparent 1px);background-size:28px 28px;opacity:.45}
 #bg-fx .orb{position:absolute;border-radius:50%;filter:blur(54px);opacity:.48;will-change:transform}
@@ -48,7 +50,6 @@ body{margin:0;width:100%;max-width:100%;background:var(--bg);color:var(--ink);fo
 #bg-fx .o2{width:360px;height:360px;bottom:-80px;right:-60px;background:radial-gradient(circle,var(--P),transparent 70%);animation:orbDrift2 17s ease-in-out infinite}
 #bg-fx .o3{width:240px;height:240px;top:42%;left:45%;background:radial-gradient(circle,var(--pri2),transparent 72%);opacity:.3;animation:orbDrift3 22s linear infinite}
 
-/* PC mouse-following trailing aura & ring */
 #cursor-fx{display:none;position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 #cursor-fx .cur-aura{position:fixed;width:240px;height:240px;margin:-120px 0 0 -120px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--pri) 26%,transparent),color-mix(in srgb,var(--pri2) 10%,transparent) 55%,transparent 72%);filter:blur(18px);opacity:0;transition:opacity .25s ease;will-change:transform}
 #cursor-fx .cur-ring{position:fixed;width:36px;height:36px;margin:-18px 0 0 -18px;border-radius:50%;border:1.5px solid color-mix(in srgb,var(--pri) 55%,transparent);background:color-mix(in srgb,var(--pri) 6%,transparent);opacity:0;transition:opacity .25s ease;will-change:transform}
@@ -84,6 +85,7 @@ textarea{width:100%;min-height:90px}
 .sync{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--pbg);color:var(--pri);white-space:nowrap;flex-shrink:0}
 .sync i{width:7px;height:7px;border-radius:50%;background:var(--P);display:inline-block;animation:pulseDot 2s infinite}
 .sync.err i{background:var(--A);animation:none}
+.ver-pill{font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:var(--card2);border:1px solid var(--line);color:var(--mut)}
 
 .shell{display:grid;grid-template-columns:228px minmax(0,1fr);min-height:100dvh;width:100%;max-width:100%}
 .shell > div{min-width:0;width:100%;max-width:100%}
@@ -132,11 +134,11 @@ tr.cl{cursor:pointer;transition:background .14s}tr.cl:hover{background:var(--pbg
 .al{border-radius:12px;padding:11px 14px;margin-bottom:12px;background:var(--Ab);color:var(--A);font-weight:600;border:1px solid rgba(225,29,72,.2);word-break:break-word}.al.w{background:var(--Lb);color:var(--L);border-color:rgba(180,83,9,.2)}
 .dirty{color:var(--L);font-weight:700}
 .emp{text-align:center;padding:24px 14px;color:var(--mut);border:1px dashed var(--line);border-radius:14px}
-.ov{position:fixed;inset:0;background:rgba(7,11,20,.6);backdrop-filter:blur(4px);display:grid;place-items:center;padding:12px;z-index:20}
-.md{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;width:100%;max-width:500px;max-height:88dvh;overflow:auto;display:grid;gap:12px;box-shadow:var(--sh-lg);animation:popIn .2s ease}
+.ov{position:fixed;inset:0;background:rgba(7,11,20,.65);backdrop-filter:blur(5px);display:grid;place-items:center;padding:12px;z-index:25}
+.md{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;width:100%;max-width:500px;max-height:88dvh;overflow:auto;display:grid;gap:12px;box-shadow:var(--sh-lg);animation:popIn .2s ease}
 .md.w{max-width:680px}.mf{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:4px}
 .dr{position:fixed;top:0;right:0;bottom:0;width:min(440px,100vw);background:var(--card);border-left:1px solid var(--line);z-index:15;padding:16px;overflow:auto;display:grid;gap:12px;align-content:start;box-shadow:var(--sh-lg);animation:slideLeft .22s ease}
-#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:600;z-index:30;transition:opacity .2s;pointer-events:none;box-shadow:var(--sh-lg);max-width:calc(100vw - 24px);text-align:center;font-size:13px}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:600;z-index:35;transition:opacity .2s;pointer-events:none;box-shadow:var(--sh-lg);max-width:calc(100vw - 24px);text-align:center;font-size:13px}
 .cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;text-align:center}.cal div{padding:7px 0;border-radius:9px;font-size:12px;font-weight:600;background:var(--card2)}
 .fl{display:grid;gap:10px;min-width:0}.fl label{display:grid;gap:4px;font-size:13px;font-weight:500;color:var(--mut);min-width:0}
 .swatches{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
@@ -146,6 +148,7 @@ tr.cl{cursor:pointer;transition:background .14s}tr.cl:hover{background:var(--pbg
 .chk input{width:17px;height:17px;accent-color:var(--pri);flex-shrink:0}
 .own-box{border:1px solid color-mix(in srgb,var(--pri) 35%,var(--line));background:color-mix(in srgb,var(--pbg) 55%,var(--card2));border-radius:14px;padding:12px;display:grid;gap:8px}
 .id-card{border:1px solid var(--line);border-radius:16px;padding:16px;background:linear-gradient(135deg,color-mix(in srgb,var(--pbg) 70%,var(--card)),var(--card2));display:grid;gap:10px}
+.exp-box{border:1px solid rgba(225,29,72,.35);background:var(--Ab);color:var(--ink);border-radius:14px;padding:14px;display:grid;gap:8px}
 
 .mob-dots-wrap{display:none;position:relative}
 .mob-dots-btn{width:36px;min-height:36px;padding:0;border-radius:10px;font-size:19px;line-height:1}
@@ -186,6 +189,33 @@ tr.cl{cursor:pointer;transition:background .14s}tr.cl:hover{background:var(--pbg
 <body>
 <div id="bg-fx" aria-hidden="true"></div><div id="cursor-fx" aria-hidden="true"></div><div id="app"></div><div id="m"></div><div id="dr"></div><div id="toast" style="opacity:0"></div>
 <script>
+const APP_VERSION = '1.6';
+const VERSION_KEY = 'our_coaching_app_ver';
+const OWNER_CONTACT_PHONE = '03213091550';
+
+(async function checkAppVersion(){
+ try{
+  const prevVer = localStorage.getItem(VERSION_KEY);
+  if(prevVer !== APP_VERSION){
+   localStorage.setItem(VERSION_KEY, APP_VERSION);
+   if('serviceWorker' in navigator){
+    const regs = await navigator.serviceWorker.getRegistrations();
+    for(const r of regs) await r.unregister();
+   }
+   if('caches' in window){
+    const keys = await caches.keys();
+    for(const k of keys) await caches.delete(k);
+   }
+   if(prevVer){
+    const u = new URL(location.href);
+    u.searchParams.set('v', APP_VERSION);
+    location.replace(u.toString());
+    return;
+   }
+  }
+ }catch(e){}
+})();
+
 const SUPABASE_URL = 'https://cukxgzrnbiinkzmolipj.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_hfUzvb1uykYMoRVKPY4laQ_1xqGnv-4';
 
@@ -209,6 +239,7 @@ const ACCENTS = {
 };
 
 const $= (s,r=document)=>r.querySelector(s);
+const $$= (s,r=document)=>Array.from(r.querySelectorAll(s));
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const iso=d=>d.toLocaleDateString('en-CA'),TODAY=iso(new Date());
 const addD=(s,n)=>{const d=new Date(s+'T00:00:00');d.setDate(d.getDate()+n);return iso(d)};
@@ -226,6 +257,8 @@ function emptyDb(){
   orgName: DEFAULT_ORG,
   orgTagline: DEFAULT_TAGLINE,
   orgLogo: '',
+  clientPhone: '',
+  autoSubMsg: true,
   accent: 'indigo',
   appLocked: false,
   lockMsg: 'This coaching portal is currently paused. Please contact the service provider.',
@@ -253,6 +286,8 @@ function normalizeDb(){
  if(!db.orgName)db.orgName=DEFAULT_ORG;
  if(db.orgTagline==null)db.orgTagline=DEFAULT_TAGLINE;
  if(!db.orgLogo)db.orgLogo='';
+ if(db.clientPhone==null)db.clientPhone='';
+ if(typeof db.autoSubMsg!=='boolean')db.autoSubMsg=true;
  if(!db.accent||!ACCENTS[db.accent])db.accent='indigo';
  if(!db.ownerProfile)db.ownerProfile={name:OWNER_ACCOUNT.name,photo:''};
  if(!db.admin)db.admin={name:'Principal (Admin)',email:'admin@ourcoaching.pk',pw:'admin123',photo:''};
@@ -279,6 +314,7 @@ function wipeTrialRecords(){
  db.fees={};
  db.flags={};
  S.dr=null;
+ S.selectedFeeIds=[];
  closeDr();
 }
 
@@ -297,6 +333,33 @@ function isTrialExpiredOrRemoved(email,ip){
  const info=(ip&&db.trialClaimedIps&&db.trialClaimedIps[ip])||null;
  if(info&&info.claimedAt&&trialDaysElapsed(info.claimedAt)>=limit)return 'expired';
  return '';
+}
+
+function showTrialExpiredPopup(reasonText='Aapka trial khatam ho gaya hai.'){
+ const waUrl=waOwnerBuy(reasonText);
+ modal('Trial Expired — Buy Subscription',`
+  <div class="exp-box">
+   <b style="color:var(--A);font-size:15px">${esc(reasonText)}</b>
+   <div class="sm">Aapka 1 week / trial period khatam ho chuka hai. Agar aap ne service buy karni hai ya continue rakhna hai to contact karein:</div>
+   <div style="font-size:16px;font-weight:800">Phone / WhatsApp: <a href="tel:${esc(OWNER_CONTACT_PHONE)}" style="color:var(--pri)">${esc(OWNER_CONTACT_PHONE)}</a></div>
+  </div>
+  <div class="bar" style="margin-bottom:0">
+   <a class="b pri" target="_blank" rel="noopener" href="${esc(waUrl)}">WhatsApp ${esc(OWNER_CONTACT_PHONE)}</a>
+   <button type="button" class="b sm" data-a="copyCred" data-txt="${esc(OWNER_CONTACT_PHONE)}">Copy Number</button>
+  </div>
+ `);
+}
+
+function waOwnerBuy(note=''){
+ const msg=encodeURIComponent(`Assalam-o-Alaikum, ${orgName()} (${ROW_ID}) ke liye subscription buy / renew karni hai. ${note}`);
+ return `https://wa.me/92${OWNER_CONTACT_PHONE.replace(/^0/,'')}?text=${msg}`;
+}
+
+function waClientRenewal(){
+ const digits=String(db.clientPhone||'').replace(/\D/g,'');
+ const intl=digits.startsWith('03')?'92'+digits.slice(1):digits;
+ const msg=encodeURIComponent(`Assalam-o-Alaikum ${db.admin.name||'Client'}, aapki ${orgName()} (${ROW_ID}) subscription ka renewal/payment time aa gaya hai. Kindly fee clear kar dein taake service smoothly chalti rahe. Contact: ${OWNER_CONTACT_PHONE}`);
+ return {intl,url:`https://wa.me/${intl}?text=${msg}`,text:decodeURIComponent(msg)};
 }
 
 const orgName=()=>db.orgName||DEFAULT_ORG;
@@ -329,7 +392,7 @@ async function fetchPublicIp(){
  return '';
 }
 
-let S={u:null,v:'dash',b:'',d:TODAY,q:'',f:'',dr:null,rp:'month',from:'',to:'',rb:'',rf:'',drawerId:null,tempAccent:db.accent,feeMonth:curMonth(),feeFilter:'',mobMenuOpen:false,tabTick:0,tempPhoto:'',tempLogo:''};
+let S={u:null,v:'dash',b:'',d:TODAY,q:'',f:'',dr:null,rp:'month',from:'',to:'',rb:'',rf:'',drawerId:null,tempAccent:db.accent,feeMonth:curMonth(),feeFilter:'',selectedFeeIds:[],mobMenuOpen:false,tabTick:0,tempPhoto:'',tempLogo:'',expiredShownOnce:false};
 function saveSession(u){try{if(u)localStorage.setItem(SESSION_KEY,JSON.stringify(u));else localStorage.removeItem(SESSION_KEY)}catch(e){}}
 try{const t=localStorage.getItem(THEME_KEY);if(t)document.documentElement.dataset.theme=t}catch(e){}
 
@@ -449,7 +512,6 @@ function openStudentIdCard(id){
  `,'Print Card',()=>{window.print();return false});
 }
 
-/* PC smooth cursor follower */
 let curTarget={x:-400,y:-400,active:false},curPos={x:-400,y:-400},ringPos={x:-400,y:-400};
 function syncCursorFx(){
  const wrap=$('#cursor-fx');
@@ -574,7 +636,7 @@ const fmtRs=n=>'Rs. '+Number(n||0).toLocaleString('en-PK');
 function getFee(sid,m){
  const defFee=Number((sOf(sid)||{}).fee)||3500;
  const rec=(db.fees[m]&&db.fees[m][sid])||{};
- return{amt:Number(rec.amt||defFee),status:rec.status||'Pending',paidAt:rec.paidAt||''};
+ return{amt:rec.amt!=null&&rec.amt!==''?Number(rec.amt):defFee,status:rec.status||'Pending',paidAt:rec.paidAt||''};
 }
 
 function waAbsent(phone,stuName,batchName,dateStr,sub){
@@ -620,10 +682,10 @@ function LockedScreen(){
 function Login(){
  if(db.appLocked)return LockedScreen();
  const pendingFees=db.stu.filter(s=>getFee(s.id,curMonth()).status==='Pending').length;
- return`<div class="lg"><div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">${brandHtml()}<span class="sync ${syncStatus==='Sync error'?'err':''}"><i></i>${esc(syncStatus)}</span></div>${db.orgTagline?`<div class="mut sm">${esc(db.orgTagline)}</div>`:''}<h2>Sign in</h2>
+ return`<div class="lg"><div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">${brandHtml()}<div style="display:flex;align-items:center;gap:6px"><span class="ver-pill">v${esc(APP_VERSION)}</span><span class="sync ${syncStatus==='Sync error'?'err':''}"><i></i>${esc(syncStatus)}</span></div></div>${db.orgTagline?`<div class="mut sm">${esc(db.orgTagline)}</div>`:''}<h2>Sign in</h2>
  <div class="fl"><label>Email<input id="le" type="email" autocomplete="username" placeholder="admin@ourcoaching.pk"></label><label>Password<input id="lp" type="password" autocomplete="current-password" placeholder="••••••••"></label></div>
  <button class="b pri" data-a="login">Sign in</button>
- ${db.trialIpLock?`<div class="mut sm">Trial protection active (${Number(db.trialDays)||7} days · 1 IP = 1 account).</div>`:''}
+ ${db.trialIpLock?`<div class="mut sm">Trial active: <b>${Number(db.trialDays)||7} days</b> from first login on IP (multi-device on same IP allowed).</div>`:''}
  ${db.ipLock?'<div class="mut sm">Campus Wi-Fi/IP restriction is active for students.</div>':''}
  ${pendingFees?`<div class="mut sm">Active students: <b>${db.stu.length}</b> · Pending fees (${curMonth()}): <b>${pendingFees}</b></div>`:''}
  <div class="mut sm">Default admin: <b>admin@ourcoaching.pk</b> / <b>admin123</b></div>
@@ -640,7 +702,7 @@ function Shell(){
  const u=S.u,curProf=getCurrentUserProfile(),n=NAV[u.role].map(x=>`<button class="nv ${S.v===x[0]?'on':''}" data-a="nav" data-v="${x[0]}">${x[1]}</button>`).join('');
  const mobNav=NAV[u.role].map(x=>`<button type="button" class="${S.v===x[0]?'on':''}" data-a="nav" data-v="${x[0]}"><span>${x[1]}</span>${S.v===x[0]?'<span>●</span>':''}</button>`).join('');
  const ctx=S.v==='mark'?`${esc((bOf(S.b)||{}).name||'')} · ${fd(S.d)}`:`${fd(TODAY)}`,nr=risk().length;
- return`<div class="shell"><aside class="side">${brandHtml()}${db.orgTagline?`<div class="tagline">${esc(db.orgTagline)}</div>`:''}${n}<div style="flex:1"></div><button class="nv" data-a="myProfile">Edit profile</button><button class="nv" data-a="syncNow">Sync now</button><button class="nv" data-a="theme">Dark / Light mode</button><button class="nv" data-a="backupJson">Export backup</button><button class="nv" data-a="logout">Log out</button></aside>
+ return`<div class="shell"><aside class="side">${brandHtml()}${db.orgTagline?`<div class="tagline">${esc(db.orgTagline)}</div>`:''}${n}<div style="flex:1"></div><button class="nv" data-a="myProfile">Edit profile</button><button class="nv" data-a="syncNow">Sync now</button><button class="nv" data-a="theme">Dark / Light mode</button><button class="nv" data-a="backupJson">Export backup</button><button class="nv" data-a="logout">Log out</button><div class="mut sm" style="padding:6px 12px 0">Version ${esc(APP_VERSION)}</div></aside>
  <div><div class="top"><b class="mut sm rl">${esc(ctx)}</b><span class="sync ${syncStatus==='Sync error'?'err':''}"><i></i>${esc(syncStatus)}</span><div class="sp"></div>
  ${isStaff(u.role)?`<button class="b sm" data-a="bell" aria-label="Alerts">Alerts ${nr?`<b class="bad">${nr}</b>`:''}</button>`:''}
  <button type="button" class="chip" data-a="myProfile" title="Edit profile & photo">${avOf(curProf.name,curProf.photo)}<span class="role">${esc(u.role)}</span></button><button class="b sm" data-a="logout">Log out</button>
@@ -753,6 +815,7 @@ function removeStudent(id){
   for(const m in db.fees){
    if(db.fees[m]&&db.fees[m][id])delete db.fees[m][id];
   }
+  S.selectedFeeIds=(S.selectedFeeIds||[]).filter(x=>x!==id);
   if(S.dr&&S.dr.rec&&S.dr.rec[id])delete S.dr.rec[id];
   if(S.drawerId===id)closeDr();
   await persist();
@@ -768,15 +831,28 @@ function Fees(){
   const f=getFee(s.id,m);
   return (!S.rb||s.b===S.rb) && (!S.feeFilter||f.status===S.feeFilter) && (!q||s.name.toLowerCase().includes(q)||s.roll.toLowerCase().includes(q));
  });
+ const validIds=new Set(list.map(x=>x.id));
+ S.selectedFeeIds=(S.selectedFeeIds||[]).filter(id=>validIds.has(id));
+ const allSelected=list.length>0 && list.every(s=>S.selectedFeeIds.includes(s.id));
+
  let collected=0,pendingAmt=0,paidCnt=0,dueCnt=0;
  list.forEach(s=>{
   const f=getFee(s.id,m);
   if(f.status==='Paid'){collected+=f.amt;paidCnt++}else{pendingAmt+=f.amt;dueCnt++}
  });
+
  return`<div class="ph"><h1>Monthly Fees &amp; Dues</h1><input type="month" data-f="feeMonth" value="${esc(m)}" aria-label="Fee month"></div>
  <div class="kp"><div class="card"><span class="mut">Collected (${m})</span><b class="ok">${fmtRs(collected)}</b></div><div class="card"><span class="mut">Pending dues</span><b class="bad">${fmtRs(pendingAmt)}</b></div><div class="card"><span class="mut">Paid students</span><b class="ok">${paidCnt}</b></div><div class="card"><span class="mut">Unpaid / Due</span><b class="bad">${dueCnt}</b></div></div>
  <div class="bar"><input id="q" placeholder="Search name or roll no." value="${esc(S.q)}"><select data-f="rb" aria-label="Batch"><option value="">All batches</option>${db.bat.map(b=>`<option value="${b.id}" ${S.rb===b.id?'selected':''}>${esc(b.name)}</option>`).join('')}</select><select data-f="feeFilter" aria-label="Fee status"><option value="">All statuses</option><option value="Pending" ${S.feeFilter==='Pending'?'selected':''}>Pending</option><option value="Paid" ${S.feeFilter==='Paid'?'selected':''}>Paid</option></select></div>
- <div class="card tw" style="padding:0">${list.length?`<table><tr><th>Roll</th><th>Student</th><th>Batch</th><th>Fee</th><th>Status</th><th>Actions</th></tr>${list.map(s=>{const f=getFee(s.id,m);return`<tr><td>${esc(s.roll)}</td><td><span style="display:inline-flex;align-items:center;gap:8px">${avOf(s.name,s.photo)}<b>${esc(s.name)}</b></span></td><td>${esc((bOf(s.b)||{}).name||'')}</td><td><b>${fmtRs(f.amt)}</b></td><td><span class="bd ${f.status==='Paid'?'sP':'sA'}">${esc(f.status)}</span></td><td><div style="display:flex;gap:6px"><button class="b sm ${f.status==='Paid'?'':'pri'}" data-a="toggleFee" data-id="${s.id}" data-m="${esc(m)}">${f.status==='Paid'?'Mark Pending':'Mark Paid'}</button><button class="b sm" data-a="idCard" data-id="${s.id}">Slip</button>${s.par&&f.status!=='Paid'?`<a class="b sm" target="_blank" rel="noopener" href="${esc(waFee(s.par,s.name,m,f.amt))}">WA Reminder</a>`:''}</div></td></tr>`}).join('')}</table>`:'<div class="emp">No students match this filter.</div>'}</div>`
+ <div class="card" style="margin-bottom:12px;padding:12px 14px">
+  <div class="bar" style="margin:0">
+   <span class="sm"><b>Selected: ${S.selectedFeeIds.length}</b></span>
+   <input type="number" id="bulkFeeAmt" min="0" placeholder="Set fee amount (PKR)" style="width:170px">
+   <select id="bulkFeeSt" aria-label="Bulk status"><option value="">Keep current status</option><option value="Pending">Mark Pending</option><option value="Paid">Mark Paid</option></select>
+   <button type="button" class="b sm pri" data-a="applyBulkFee" data-m="${esc(m)}" ${!S.selectedFeeIds.length?'disabled':''}>Set Fee for Selected</button>
+  </div>
+ </div>
+ <div class="card tw" style="padding:0">${list.length?`<table><tr><th style="width:42px"><input type="checkbox" data-f="feeSelAll" ${allSelected?'checked':''} aria-label="Select all"></th><th>Roll</th><th>Student</th><th>Batch</th><th>Fee</th><th>Status</th><th>Actions</th></tr>${list.map(s=>{const f=getFee(s.id,m);const chk=S.selectedFeeIds.includes(s.id);return`<tr><td><input type="checkbox" data-f="feeSelOne" data-id="${s.id}" ${chk?'checked':''} aria-label="Select ${esc(s.name)}"></td><td>${esc(s.roll)}</td><td><span style="display:inline-flex;align-items:center;gap:8px">${avOf(s.name,s.photo)}<b>${esc(s.name)}</b></span></td><td>${esc((bOf(s.b)||{}).name||'')}</td><td><b>${fmtRs(f.amt)}</b></td><td><span class="bd ${f.status==='Paid'?'sP':'sA'}">${esc(f.status)}</span></td><td><div style="display:flex;gap:6px"><button class="b sm ${f.status==='Paid'?'':'pri'}" data-a="toggleFee" data-id="${s.id}" data-m="${esc(m)}">${f.status==='Paid'?'Mark Pending':'Mark Paid'}</button><button class="b sm" data-a="idCard" data-id="${s.id}">Slip</button>${s.par&&f.status!=='Paid'?`<a class="b sm" target="_blank" rel="noopener" href="${esc(waFee(s.par,s.name,m,f.amt))}">WA Reminder</a>`:''}</div></td></tr>`}).join('')}</table>`:'<div class="emp">No students match this filter.</div>'}</div>`
 }
 
 function range(){const e=TODAY;if(S.rp==='week')return[addD(e,-6),e];if(S.rp==='month')return[e.slice(0,8)+'01',e];return[S.from||addD(e,-13),S.to||e]}
@@ -811,11 +887,12 @@ function Settings(){
  const limitDays=Number(db.trialDays)||7;
  const revokedEntries=Object.entries(db.revokedTrials||{});
  const recentLogs=(db.loginLogs||[]).slice(-12).reverse();
- return`<div class="ph"><h1>Coaching settings</h1><span class="mut sm">Instance: <b>${esc(ROW_ID)}</b></span></div>
+ const ren=waClientRenewal();
+ return`<div class="ph"><h1>Coaching settings</h1><span class="mut sm">Instance: <b>${esc(ROW_ID)}</b> · App <b>v${esc(APP_VERSION)}</b></span></div>
  ${isOwner?`
   <div class="card own-box" style="margin-bottom:14px">
    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
-    <h2>Owner Trial &amp; Client Access Control</h2>
+    <h2>Owner Trial, Client WhatsApp &amp; Access Control</h2>
     <span class="role">Owner Only</span>
    </div>
    <div class="sm">
@@ -824,10 +901,15 @@ function Settings(){
     Email: <b>${esc(db.admin.email||'–')}</b> ·
     Password: <b>${esc(db.admin.pw||'–')}</b>
    </div>
+   <div class="fl" style="max-width:480px">
+    <label>Client WhatsApp Number (for subscription / renewal reminders)<input id="setClientPhone" value="${esc(db.clientPhone||'')}" placeholder="e.g. 03001234567"></label>
+    <label class="chk"><input type="checkbox" id="setAutoSubMsg" ${db.autoSubMsg?'checked':''}> Auto-prompt client renewal WhatsApp reminder when trial expires</label>
+    ${db.clientPhone?`<div class="bar" style="margin:0"><a class="b sm pri" target="_blank" rel="noopener" href="${esc(ren.url)}">Send Renewal Msg to ${esc(db.clientPhone)}</a></div>`:''}
+   </div>
    <div class="mut sm"><b>Remove Trial</b> dabane par user ka trial block hoga aur uska demo/coaching data (batches, students, attendance, fees) bhi saath hi remove ho jayega.</div>
    <div>
-    <b class="sm">Trial Accounts &amp; Claimed IPs (${claimedList.length}):</b>
-    ${claimedList.length?`<div class="tw" style="margin-top:6px"><table><tr><th>User Email</th><th>IP Address</th><th>Usage / Days</th><th>Status</th><th>Manage</th></tr>${claimedList.map(([ip,info])=>{
+    <b class="sm">Trial Accounts &amp; Claimed IPs (${claimedList.length}) — Same IP multi-device allowed, 1 week from first IP login:</b>
+    ${claimedList.length?`<div class="tw" style="margin-top:6px"><table><tr><th>User Email</th><th>IP Address</th><th>First Login / Days</th><th>Status</th><th>Manage</th></tr>${claimedList.map(([ip,info])=>{
      const em=(info&&info.email)||'';
      const used=trialDaysElapsed(info&&info.claimedAt);
      const st=isTrialExpiredOrRemoved(em,ip);
@@ -870,9 +952,9 @@ function Settings(){
   <div class="card fl">
    ${isOwner?`
     <h2>Trial Anti-Abuse &amp; Duration</h2>
-    <p class="mut sm">Set trial period in days (default 7 days = 1 week) and block multiple accounts on the same IP.</p>
+    <p class="mut sm">1 week (7 days) trial starts on first login from an IP; multiple devices on the same IP can log in until the trial period ends.</p>
     <label>Trial duration (days)<input id="setTrialDays" type="number" min="1" max="365" value="${esc(limitDays)}"></label>
-    <label class="chk"><input type="checkbox" id="setTrialIpLock" ${db.trialIpLock?'checked':''}> Enforce trial check &amp; 1 IP = 1 account</label>
+    <label class="chk"><input type="checkbox" id="setTrialIpLock" ${db.trialIpLock?'checked':''}> Enforce trial timer per IP &amp; expiry lock</label>
     ${claimedList.length?`<div class="bar"><button type="button" class="b sm" data-a="resetTrialIps">Clear all claimed IPs</button></div>`:''}
     <hr style="border:0;border-top:1px solid var(--line);margin:4px 0">
    `:''}
@@ -884,11 +966,11 @@ function Settings(){
    <hr style="border:0;border-top:1px solid var(--line);margin:4px 0">
    <h2>Owner Kill Switch</h2>
    ${isOwner?`
-    <p class="mut sm">Only <b>${esc(OWNER_ACCOUNT.email)}</b> can lock or unlock this coaching portal.</p>
+    <p class="mut sm">Only <b>${esc(OWNER_ACCOUNT.email)}</b> can lock or unlock this coaching portal. Buy/support contact: <b>${esc(OWNER_CONTACT_PHONE)}</b></p>
     <label class="chk"><input type="checkbox" id="setAppLock" ${db.appLocked?'checked':''}> Lock coaching portal (pause access)</label>
     <label>Lock message shown to users<input id="setLockMsg" value="${esc(db.lockMsg||'')}"></label>
    `:`
-    <div class="mut sm">Portal lock is controlled exclusively by the platform owner.</div>
+    <div class="mut sm">Portal lock is controlled exclusively by the platform owner (${esc(OWNER_CONTACT_PHONE)}).</div>
    `}
   </div>
  </div>
@@ -974,6 +1056,32 @@ function render(animateTab=true){
  if(S.u&&S.drawerId&&sOf(S.drawerId)){$('#dr').innerHTML=`<aside class="dr" role="dialog" aria-label="Student profile">${profile(S.drawerId)}</aside>`}else{$('#dr').innerHTML=''}
 }
 
+async function checkExpiryOnLoad(){
+ if(db.appLocked && (!S.u || S.u.role!=='owner'))return;
+ let ip='';
+ try{ip=await fetchPublicIp()}catch(e){}
+ const adminEm=(db.admin&&db.admin.email||'').toLowerCase();
+ const reason=isTrialExpiredOrRemoved(adminEm,ip);
+ if(reason){
+  if(S.u && S.u.role!=='owner'){
+   S.u=null;
+   saveSession(null);
+   render(false);
+  }
+  const msg=reason==='expired'?'Aapka 1 week / trial khatam ho gaya hai.':'Aapka trial access khatam/remove kar diya gaya hai.';
+  if(db.autoSubMsg && db.clientPhone){
+   const ren=waClientRenewal();
+   if(ren.intl){
+    try{window.open(ren.url,'_blank','noopener')}catch(e){}
+   }
+  }
+  if(!S.expiredShownOnce){
+   S.expiredShownOnce=true;
+   showTrialExpiredPopup(msg);
+  }
+ }
+}
+
 document.addEventListener('click',async e=>{
  if(S.mobMenuOpen && !e.target.closest('.mob-dots-wrap')){S.mobMenuOpen=false;render(false)}
  const el=e.target.closest('[data-a]');if(!el)return;
@@ -1015,17 +1123,14 @@ document.addEventListener('click',async e=>{
    detectedIp=ip;
    const badTrial=isTrialExpiredOrRemoved(u.e,ip);
    if(badTrial){
-    toast(badTrial==='expired'?'Trial period has expired. Please contact owner.':'Trial access has been removed. Please contact owner.');
+    const msg=badTrial==='expired'?'Aapka 1 week / trial khatam ho gaya hai.':'Aapka trial khatam ho gaya hai.';
+    showTrialExpiredPopup(msg);
     return;
    }
-   if(db.trialIpLock && u.role!=='admin'){
-    toast('Checking trial IP...');
+   if(db.trialIpLock){
+    toast('Checking trial timer...');
     if(!ip){toast('Could not verify IP address');return}
     const claimed=db.trialClaimedIps[ip];
-    if(claimed && claimed.email && claimed.email.toLowerCase()!==u.e){
-     toast('Trial already claimed on this IP ('+ip+') with another account');
-     return;
-    }
     if(!claimed){
      db.trialClaimedIps[ip]={email:u.e,claimedAt:new Date().toISOString()};
     }
@@ -1130,6 +1235,8 @@ document.addEventListener('click',async e=>{
    db.trialIpLock=!!($('#setTrialIpLock')&&$('#setTrialIpLock').checked);
    db.appLocked=!!($('#setAppLock')&&$('#setAppLock').checked);
    db.lockMsg=val('setLockMsg').trim()||'This coaching portal is currently paused. Please contact the service provider.';
+   db.clientPhone=val('setClientPhone').trim();
+   db.autoSubMsg=!!($('#setAutoSubMsg')&&$('#setAutoSubMsg').checked);
   }else if(S.u.role==='admin'){
    S.u={...S.u,e:aem,name:anm};
    saveSession(S.u);
@@ -1144,8 +1251,8 @@ document.addEventListener('click',async e=>{
  }
  else if(a==='clearAllData'){
   modal('Clear all coaching records?','<p class="mut">Batches, teachers, students, attendance, and fees will be cleared. Admin login stays intact.</p>','Clear Records',async()=>{
-   const keepOrg=orgName(),keepTag=db.orgTagline,keepLogo=db.orgLogo,keepAcc=db.accent,keepAdm={...db.admin},keepOwn={...db.ownerProfile},keepLock=db.appLocked,keepMsg=db.lockMsg,keepIpLock=db.ipLock,keepIps=db.allowedIps,keepTLock=db.trialIpLock,keepTDays=db.trialDays,keepTIps={...db.trialClaimedIps},keepRev={...db.revokedTrials},keepLogs=[...(db.loginLogs||[])];
-   db={...emptyDb(),orgName:keepOrg,orgTagline:keepTag,orgLogo:keepLogo,accent:keepAcc,admin:keepAdm,ownerProfile:keepOwn,appLocked:keepLock,lockMsg:keepMsg,ipLock:keepIpLock,allowedIps:keepIps,trialIpLock:keepTLock,trialDays:keepTDays,trialClaimedIps:keepTIps,revokedTrials:keepRev,loginLogs:keepLogs};
+   const keepOrg=orgName(),keepTag=db.orgTagline,keepLogo=db.orgLogo,keepPhone=db.clientPhone,keepAuto=db.autoSubMsg,keepAcc=db.accent,keepAdm={...db.admin},keepOwn={...db.ownerProfile},keepLock=db.appLocked,keepMsg=db.lockMsg,keepIpLock=db.ipLock,keepIps=db.allowedIps,keepTLock=db.trialIpLock,keepTDays=db.trialDays,keepTIps={...db.trialClaimedIps},keepRev={...db.revokedTrials},keepLogs=[...(db.loginLogs||[])];
+   db={...emptyDb(),orgName:keepOrg,orgTagline:keepTag,orgLogo:keepLogo,clientPhone:keepPhone,autoSubMsg:keepAuto,accent:keepAcc,admin:keepAdm,ownerProfile:keepOwn,appLocked:keepLock,lockMsg:keepMsg,ipLock:keepIpLock,allowedIps:keepIps,trialIpLock:keepTLock,trialDays:keepTDays,trialClaimedIps:keepTIps,revokedTrials:keepRev,loginLogs:keepLogs};
    addAudit('Records Cleared','Wiped batches, students, attendance & fees');
    S.dr=null;closeDr();await persist();render(false);toast('All records cleared');
   });
@@ -1164,6 +1271,28 @@ document.addEventListener('click',async e=>{
   });
  }
  else if(a==='delS'){e.stopPropagation();removeStudent(id)}
+ else if(a==='applyBulkFee'){
+  const m=el.dataset.m||curMonth();
+  const ids=[...(S.selectedFeeIds||[])];
+  if(!ids.length){toast('Select at least one student');return}
+  const rawAmt=val('bulkFeeAmt').trim();
+  const bulkSt=val('bulkFeeSt');
+  const amtNum=rawAmt!==''?Math.max(0,Number(rawAmt)||0):null;
+  if(amtNum===null && !bulkSt){toast('Enter fee amount or choose status');return}
+  db.fees[m]=db.fees[m]||{};
+  ids.forEach(sid=>{
+   const prev=getFee(sid,m);
+   const nextAmt=amtNum!==null?amtNum:prev.amt;
+   const nextSt=bulkSt||prev.status;
+   db.fees[m][sid]={amt:nextAmt,status:nextSt,paidAt:nextSt==='Paid'?(prev.paidAt||TODAY):''};
+   const stObj=sOf(sid);
+   if(stObj && amtNum!==null)stObj.fee=nextAmt;
+  });
+  addAudit('Bulk Fee Set',`${ids.length} students (${m})${amtNum!==null?' · '+fmtRs(amtNum):''}${bulkSt?' · '+bulkSt:''}`);
+  await persist();
+  render(false);
+  toast(`Updated fee for ${ids.length} students`);
+ }
  else if(a==='toggleFee'){
   const m=el.dataset.m||curMonth(),f=getFee(id,m),stObj=sOf(id);
   db.fees[m]=db.fees[m]||{};
@@ -1268,6 +1397,20 @@ document.addEventListener('change',async e=>{
  else if(f==='to'){S.to=el.value;render(false)}
  else if(f==='feeMonth'){S.feeMonth=el.value||curMonth();render(false)}
  else if(f==='feeFilter'){S.feeFilter=el.value;render(false)}
+ else if(f==='feeSelAll'){
+  const m=S.feeMonth||curMonth(),q=S.q.toLowerCase();
+  const ids=db.stu.filter(s=>{const fc=getFee(s.id,m);return(!S.rb||s.b===S.rb)&&(!S.feeFilter||fc.status===S.feeFilter)&&(!q||s.name.toLowerCase().includes(q)||s.roll.toLowerCase().includes(q))}).map(x=>x.id);
+  S.selectedFeeIds=el.checked?ids:[];
+  render(false);
+ }
+ else if(f==='feeSelOne'){
+  const sid=el.dataset.id;
+  if(!sid)return;
+  const cur=new Set(S.selectedFeeIds||[]);
+  if(el.checked)cur.add(sid);else cur.delete(sid);
+  S.selectedFeeIds=Array.from(cur);
+  render(false);
+ }
  else if(f==='bt'){const b=bOf(el.dataset.id);if(b){b.time=el.value;await persist();toast('Timing updated')}}
  else if(f==='bte'){const b=bOf(el.dataset.id);if(b){b.teacher=el.value;await persist();render(false);toast('Teacher assigned')}}
  else if(f==='bth'){const b=bOf(el.dataset.id);if(b){b.th=Math.min(100,Math.max(50,Number(el.value)||75));await persist();render(false);toast('Threshold updated')}}
@@ -1294,7 +1437,7 @@ S.u = (()=>{try{return JSON.parse(localStorage.getItem(SESSION_KEY))}catch(e){re
 
 subscribeRealtime();
 render(true);
-loadCloud(false);
+loadCloud(true).then(()=>checkExpiryOnLoad());
 </script>
 </body>
 </html>
