@@ -166,6 +166,10 @@ tr.cl{cursor:pointer;transition:background .12s}tr.cl:hover{background:var(--pbg
 .kill-box{border:1px solid rgba(225,29,72,.38);background:color-mix(in srgb,var(--Ab) 65%,var(--card2));border-radius:16px;padding:14px;display:grid;gap:10px;min-width:0;max-width:100%}
 .id-card{border:1px solid var(--glass-b);border-radius:18px;padding:18px;background:linear-gradient(135deg,color-mix(in srgb,var(--pbg) 72%,var(--card)),var(--card2));box-shadow:var(--sh-lg);display:grid;gap:10px}
 .exp-box{border:1px solid rgba(225,29,72,.38);background:var(--Ab);color:var(--ink);border-radius:14px;padding:14px;display:grid;gap:8px}
+.portal-pick-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:4px}
+.portal-pick-card{border:1px solid var(--glass-b);background:var(--card2);border-radius:14px;padding:12px;display:grid;gap:6px;text-align:start;cursor:pointer;transition:border-color .14s,background .14s,transform .12s}
+.portal-pick-card:hover{border-color:var(--pri);background:var(--pbg);transform:translate3d(0,-1px,0)}
+.portal-pick-card.active{border-color:var(--pri);background:var(--pbg);box-shadow:0 0 0 2px var(--pbg)}
 
 .mob-dots-wrap{display:none}
 .mob-dots-btn{width:36px;min-height:36px;padding:0;border-radius:10px;font-size:19px;line-height:1}
@@ -481,6 +485,13 @@ function setActiveScope(scopeRow){
  try{localStorage.setItem(ACTIVE_SCOPE_KEY, ROW_ID)}catch(e){}
 }
 
+function getClientEntries(){
+ return Object.entries(ownerMaster.clients||{}).filter(([em,cfg])=>{
+  const low=String(em||'').trim().toLowerCase();
+  return cfg && low && low!==getOwnerEmail() && low!==getTrialAdminEmail();
+ });
+}
+
 function findBestLegacyDb(targetEmail=''){
  const em=String(targetEmail||'').trim().toLowerCase();
  const isPaidClient = !!(em && ownerMaster.clients && ownerMaster.clients[em]);
@@ -571,7 +582,7 @@ function syncOwnerMasterToDb(){
  db.trialAccounts = ownerMaster.trialAccounts||{};
  db.revokedTrials = ownerMaster.revokedTrials||{};
  db.loginLogs = ownerMaster.loginLogs||[];
- if(S.u && S.u.role==='owner'){
+ if(S.u && S.u.role==='owner' && ROW_ID===emailToScopeRow(getOwnerEmail())){
   if(ownerMaster.ownerOrgName && ownerMaster.ownerOrgName!==DEFAULT_ORG)db.orgName=ownerMaster.ownerOrgName;
   if(ownerMaster.ownerTagline && ownerMaster.ownerTagline!==DEFAULT_TAGLINE)db.orgTagline=ownerMaster.ownerTagline;
   if(ownerMaster.ownerLogo)db.orgLogo=ownerMaster.ownerLogo;
@@ -811,6 +822,78 @@ function openMyProfileModal(){
    });
   });
  }
+}
+
+function getActivePortalLabel(){
+ const ownScope=emailToScopeRow(getOwnerEmail());
+ if(ROW_ID===ownScope)return 'Owner Master';
+ const matched=getClientEntries().find(([em,cfg])=>(cfg.scope||emailToScopeRow(em))===ROW_ID);
+ if(matched){
+  const [em,cfg]=matched;
+  return (db.orgName && db.orgName!==DEFAULT_ORG ? db.orgName : (cfg.orgName||cfg.name||em));
+ }
+ return db.orgName || ROW_ID;
+}
+
+async function switchOwnerToScope(targetScope, labelText=''){
+ if(!S.u || S.u.role!=='owner')return;
+ if(dirty()){
+  const ok=confirm('Unsaved attendance changes will be discarded. Switch portal?');
+  if(!ok)return;
+ }
+ closeDr();
+ S.dr=null;
+ S.b='';
+ S.rb='';
+ S.q='';
+ S.f='';
+ S.selectedFeeIds=[];
+ setActiveScope(targetScope);
+ S.u={...S.u,scope:targetScope};
+ saveSession(S.u);
+ loadLocalScopeDb(targetScope, S.u.e);
+ await loadCloud(false);
+ S.tempAccent=db.accent;
+ S.tempLogo=db.orgLogo||'';
+ applyAccent();
+ subscribeRealtime();
+ render(true);
+ toast('Switched to: '+(labelText||getActivePortalLabel()));
+}
+
+function openOwnerPortalPicker(fromLogin=false){
+ if(!S.u || S.u.role!=='owner')return;
+ const ownEmail=getOwnerEmail();
+ const ownScope=emailToScopeRow(ownEmail);
+ const clients=getClientEntries();
+ const ownActive=ROW_ID===ownScope;
+ modal(fromLogin?'Select Portal to Open':'Switch Client Portal',`
+  <p class="mut sm">Choose where you want to go right now. You can inspect or edit any client's students, batches, attendance, fees, and settings.</p>
+  <div class="portal-pick-grid">
+   <button type="button" class="portal-pick-card ${ownActive?'active':''}" data-a="pickScope" data-scope="${esc(ownScope)}" data-label="Owner Master">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
+     <b>Owner Master</b>
+     <span class="role">Master</span>
+    </div>
+    <div class="mut sm">${esc(ownEmail)}</div>
+    <div class="sm">${ownActive?'<span class="ok">● Active now</span>':'Open master workspace'}</div>
+   </button>
+   ${clients.map(([em,cfg])=>{
+    const sc=cfg.scope||emailToScopeRow(em);
+    const active=ROW_ID===sc;
+    const title=cfg.orgName||cfg.name||em;
+    return`<button type="button" class="portal-pick-card ${active?'active':''}" data-a="pickScope" data-scope="${esc(sc)}" data-label="${esc(title)}">
+     <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
+      <b>${esc(title)}</b>
+      <span class="bd ${cfg.paused?'sA':'sP'}">${cfg.paused?'Paused':'Client'}</span>
+     </div>
+     <div class="mut sm">${esc(cfg.name||'Client')} · ${esc(em)}</div>
+     <div class="sm">${active?'<span class="ok">● Active now</span>':'Open client portal →'}</div>
+    </button>`;
+   }).join('')}
+  </div>
+  ${!clients.length?'<div class="emp" style="margin-top:8px">No clients added yet. Open Settings → Clients Add to add Ali or other clients.</div>':''}
+ `,null,null,true);
 }
 
 function openStudentIdCard(id){
@@ -1181,17 +1264,39 @@ function Shell(){
  const u=S.u,curProf=getCurrentUserProfile(),n=NAV[u.role].map(x=>`<button class="nv ${S.v===x[0]?'on':''}" data-a="nav" data-v="${x[0]}">${esc(T(x[1]))}</button>`).join('');
  const mobNav=NAV[u.role].map(x=>`<button type="button" class="${S.v===x[0]?'on':''}" data-a="nav" data-v="${x[0]}"><span>${esc(T(x[1]))}</span>${S.v===x[0]?'<span>●</span>':''}</button>`).join('');
  const ctx=S.v==='mark'?`${esc((bOf(S.b)||{}).name||'')} · ${fd(S.d)}`:`${fd(TODAY)}`,nr=risk().length;
- return`<div class="shell"><aside class="side">${brandHtml()}${db.orgTagline?`<div class="tagline">${esc(db.orgTagline)}</div>`:''}${n}<div style="flex:1"></div><button class="nv" data-a="myProfile">${esc(T('editProf'))}</button><button class="nv" data-a="syncNow">${esc(T('syncNow'))}</button><button class="nv" data-a="theme">${esc(T('themeBtn'))}</button><button class="nv" data-a="backupJson">${esc(T('exportBak'))}</button><button class="nv" data-a="logout">${esc(T('logout'))}</button><div class="mut sm" style="padding:6px 12px 0">Version ${esc(APP_VERSION)}</div></aside>
- <div><div class="top"><b class="mut sm rl">${esc(ctx)}</b><span class="sync ${syncStatus==='Sync error'?'err':''}"><i></i>${esc(syncStatus)}</span><div class="sp"></div>
+ const portalBadge=u.role==='owner'?`<button type="button" class="b sm pri" data-a="openPortalPicker">Portal: ${esc(getActivePortalLabel())} ▾</button>`:'';
+ return`<div class="shell"><aside class="side">${brandHtml()}${db.orgTagline?`<div class="tagline">${esc(db.orgTagline)}</div>`:''}${n}<div style="flex:1"></div>${u.role==='owner'?`<button class="nv" data-a="openPortalPicker">⇄ Switch Client Portal</button>`:''}<button class="nv" data-a="myProfile">${esc(T('editProf'))}</button><button class="nv" data-a="syncNow">${esc(T('syncNow'))}</button><button class="nv" data-a="theme">${esc(T('themeBtn'))}</button><button class="nv" data-a="backupJson">${esc(T('exportBak'))}</button><button class="nv" data-a="logout">${esc(T('logout'))}</button><div class="mut sm" style="padding:6px 12px 0">Version ${esc(APP_VERSION)}</div></aside>
+ <div><div class="top"><b class="mut sm rl">${esc(ctx)}</b>${portalBadge}<span class="sync ${syncStatus==='Sync error'?'err':''}"><i></i>${esc(syncStatus)}</span><div class="sp"></div>
  ${langSelectHtml()}
  ${isStaff(u.role)?`<button class="b sm" data-a="bell" aria-label="${esc(T('alerts'))}">${esc(T('alerts'))} ${nr?`<b class="bad">${nr}</b>`:''}</button>`:''}
  <button type="button" class="chip" data-a="myProfile" title="${esc(T('editProf'))}">${avOf(curProf.name,curProf.photo)}<span class="role">${esc(u.role)}</span></button><button class="b sm" data-a="logout">${esc(T('logout'))}</button>
- <div class="mob-dots-wrap"><button type="button" class="b sm mob-dots-btn" data-a="mobDots" aria-label="Menu" aria-expanded="${S.mobMenuOpen?'true':'false'}">⋮</button>${S.mobMenuOpen?`<div class="mob-dots-backdrop" data-a="mobDotsClose"></div><div class="mob-dots-menu" role="menu">${mobNav}<hr><button type="button" data-a="myProfile">${esc(T('editProf'))}</button><button type="button" data-a="syncNow">${esc(T('syncNow'))}</button><button type="button" data-a="theme">${esc(T('themeBtn'))}</button><button type="button" data-a="backupJson">${esc(T('exportBak'))}</button></div>`:''}</div>
+ <div class="mob-dots-wrap"><button type="button" class="b sm mob-dots-btn" data-a="mobDots" aria-label="Menu" aria-expanded="${S.mobMenuOpen?'true':'false'}">⋮</button>${S.mobMenuOpen?`<div class="mob-dots-backdrop" data-a="mobDotsClose"></div><div class="mob-dots-menu" role="menu">${mobNav}${u.role==='owner'?`<button type="button" data-a="openPortalPicker">⇄ Switch Client Portal</button>`:''}<hr><button type="button" data-a="myProfile">${esc(T('editProf'))}</button><button type="button" data-a="syncNow">${esc(T('syncNow'))}</button><button type="button" data-a="theme">${esc(T('themeBtn'))}</button><button type="button" data-a="backupJson">${esc(T('exportBak'))}</button></div>`:''}</div>
  ${isStaff(u.role)?`<input id="gq" placeholder="${esc(T('searchStu'))}" aria-label="${esc(T('searchStu'))}" value="${esc(S.q)}">`:''}</div>
  <main id="mn"><div class="tab-anim" data-tab-key="${esc(S.v)}-${S.tabTick}">${View()}</div></main></div></div>`
 }
 function View(){
  return({dash:S.u.role==='student'?Portal:Dash,mark:Mark,students:Studs,fees:Fees,reports:Reports,batches:Batches,settings:Settings})[S.v]();
+}
+
+function OwnerPortalSwitchStrip(){
+ if(!S.u || S.u.role!=='owner')return '';
+ const ownEmail=getOwnerEmail();
+ const ownScope=emailToScopeRow(ownEmail);
+ const clients=getClientEntries();
+ return`<div class="card" style="margin-bottom:14px;padding:12px 14px">
+  <div class="bar" style="margin:0">
+   <span class="sm"><b>Active Portal:</b> <span class="role">${esc(getActivePortalLabel())}</span></span>
+   <select data-f="ownerPortalSel" aria-label="Select client portal" style="min-width:210px">
+    <option value="${esc(ownScope)}" ${ROW_ID===ownScope?'selected':''}>Owner Master (${esc(ownEmail)})</option>
+    ${clients.map(([em,cfg])=>{
+     const sc=cfg.scope||emailToScopeRow(em);
+     const lbl=cfg.orgName||cfg.name||em;
+     return`<option value="${esc(sc)}" ${ROW_ID===sc?'selected':''}>${esc(lbl)} (${esc(em)})</option>`;
+    }).join('')}
+   </select>
+   <button type="button" class="b sm" data-a="openPortalPicker">All Portals (${clients.length+1})</button>
+  </div>
+ </div>`;
 }
 
 function Dash(){
@@ -1202,7 +1307,7 @@ function Dash(){
  const pts=days.map((x,i)=>[30+i*(540/Math.max(days.length-1,1)),140-x.p*1.2]);
  const chart=days.length?`<svg viewBox="0 0 600 170" width="100%" style="display:block;max-width:100%" role="img" aria-label="${esc(T('attTrend'))}">${[50,75,100].map(v=>`<line x1="30" x2="590" y1="${140-v*1.2}" y2="${140-v*1.2}" stroke="var(--line)"/><text x="0" y="${144-v*1.2}" font-size="10" fill="var(--mut)">${v}</text>`).join('')}<polyline fill="none" stroke="var(--pri)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="${pts.map(p=>p.join(',')).join(' ')}"/>${pts.map((p,i)=>`<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="var(--pri)"><title>${fd(days[i].d)}: ${days[i].p}%</title></circle>`).join('')}${days.map((x,i)=>i%3===0?`<text x="${pts[i][0]-12}" y="162" font-size="10" fill="var(--mut)">${x.d.slice(5)}</text>`:'').join('')}</svg>`:'<div class="emp">No attendance recorded yet.</div>';
  const bb=mine().length?mine().map(b=>{const a=myStu().filter(s=>s.b===b.id).flatMap(s=>recs(s.id,addD(TODAY,-14)));const p=pctOf(a);return`<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span><b>${esc(b.name)}</b></span>${pc(p,b.th)}</div>${pbar(p,b.th)}</div>`}).join(''):'<div class="emp">No batches added yet.</div>';
- return`<div class="ph"><h1>${esc(orgName())} — ${canManage(S.u.role)?esc(T('dash')):esc(T('batches'))}</h1><div class="bar" style="margin:0"><button class="b sm" data-a="nav" data-v="mark">${esc(T('markToday'))}</button>${canManage(S.u.role)?`<button class="b sm pri" data-a="nav" data-v="fees">${esc(T('feeDues'))} (${dueCount})</button>`:''}</div></div>
+ return`${OwnerPortalSwitchStrip()}<div class="ph"><h1>${esc(orgName())} — ${canManage(S.u.role)?esc(T('dash')):esc(T('batches'))}</h1><div class="bar" style="margin:0"><button class="b sm" data-a="nav" data-v="mark">${esc(T('markToday'))}</button>${canManage(S.u.role)?`<button class="b sm pri" data-a="nav" data-v="fees">${esc(T('feeDues'))} (${dueCount})</button>`:''}</div></div>
  <div class="kp"><div class="card tilt-3d"><span class="mut">${esc(T('todayAtt'))}</span><b>${t.pct===null?'–':t.pct+'%'}</b></div><div class="card tilt-3d"><span class="mut">${esc(T('presentToday'))}</span><b class="ok">${t.P}</b></div><div class="card tilt-3d"><span class="mut">${esc(T('absentToday'))}</span><b class="bad">${t.A}</b></div><div class="card tilt-3d"><span class="mut">${esc(T('lateArr'))}</span><b>${t.L}</b></div><div class="card tilt-3d"><span class="mut">${esc(T('atRisk'))}</span><b class="bad">${rk.length}</b></div>${canManage(S.u.role)?`<div class="card tilt-3d"><span class="mut">${esc(T('unpaidFees'))} (${m})</span><b class="${dueCount?'bad':'ok'}">${dueCount}</b></div>`:''}</div>
  <div class="g2"><div class="card tilt-3d"><h2>${esc(T('attTrend'))}</h2>${chart}</div><div class="card tilt-3d"><h2 style="margin-bottom:12px">${esc(T('batchComp'))}</h2>${bb}</div></div>
  <div class="card tilt-3d"><h2 style="margin-bottom:10px">${esc(T('lowAtt'))}</h2>${rk.length?`<div class="tw"><table><tr><th>Student</th><th>Batch</th><th>Attendance</th><th></th></tr>${rk.slice(0,10).map(x=>`<tr><td><a href="#" data-a="sp" data-id="${x.s.id}" style="color:var(--pri);font-weight:600;display:inline-flex;align-items:center;gap:8px">${avOf(x.s.name,x.s.photo)}<span>${esc(x.s.name)}</span></a></td><td>${esc((bOf(x.s.b)||{}).name||'')}</td><td>${pc(x.p,x.th)}</td><td>${x.s.par?`<a class="b sm" target="_blank" rel="noopener" href="${esc(waLow(x.s.par,x.s.name,x.p))}">WhatsApp</a>`:'<span class="mut sm">No parent no.</span>'}</td></tr>`).join('')}</table></div>`:'<div class="emp">No low-attendance alerts right now.</div>'}`
@@ -1365,7 +1470,7 @@ function Settings(){
  const selAcc=S.tempAccent||db.accent||'indigo';
  const logoCur=S.tempLogo!==undefined?S.tempLogo:(db.orgLogo||'');
  const isOwner=S.u.role==='owner';
- const clients=Object.entries(ownerMaster.clients||{});
+ const clients=getClientEntries();
  const trialAccList=Object.values(ownerMaster.trialAccounts||{}).sort((a,b)=>new Date(b.firstLoginAt||0)-new Date(a.firstLoginAt||0));
  const claimedList=Object.entries(ownerMaster.trialClaimedIps||{});
  const limitDays=Number(ownerMaster.trialDays)||7;
@@ -1375,11 +1480,15 @@ function Settings(){
  ${isOwner?`
   <div class="card own-box" style="margin-bottom:14px">
    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
-    <h2>Clients Add</h2>
-    <button type="button" class="b sm pri" data-a="addClientModal">+ Add Client</button>
+    <h2>Clients Add &amp; Portal Switcher</h2>
+    <div class="bar" style="margin:0"><button type="button" class="b sm" data-a="openPortalPicker">⇄ Switch Portal (${esc(getActivePortalLabel())})</button><button type="button" class="b sm pri" data-a="addClientModal">+ Add Client</button></div>
    </div>
-   <div class="mut sm">Only Owner can add or manage client accounts. Each email keeps its own data, profile picture, logo, and settings across all mobiles and IPs.</div>
-   ${clients.length?`<div class="tw" style="margin-top:6px"><table><tr><th>Client Email</th><th>Institute / Name</th><th>Password</th><th>WhatsApp</th><th>Status</th><th>Manage</th></tr>${clients.map(([em,c])=>`<tr><td><b>${esc(em)}</b></td><td><b>${esc(c.orgName||c.name||em)}</b><div class="mut sm">${esc(c.name||'')}</div></td><td>${esc(c.pw||'')}</td><td>${esc(c.phone||'–')}</td><td>${c.paused?'<span class="bd sA">Paused</span>':'<span class="bd sP">Active</span>'}</td><td><div style="display:flex;gap:6px"><button type="button" class="b sm" data-a="editClientModal" data-em="${esc(em)}">Edit</button><button type="button" class="b sm" data-a="toggleClientPause" data-em="${esc(em)}">${c.paused?'Activate':'Pause'}</button><button type="button" class="b sm del" data-a="delClient" data-em="${esc(em)}">Remove</button></div></td></tr>`).join('')}</table></div>`:'<div class="emp">No clients added yet. Click "+ Add Client" to add a client email.</div>'}
+   <div class="mut sm">Click <b>Open Portal</b> on any client (e.g., Ali) to view or edit their students, batches, attendance, fees, and settings directly.</div>
+   ${clients.length?`<div class="tw" style="margin-top:6px"><table><tr><th>Client Email</th><th>Institute / Name</th><th>Password</th><th>WhatsApp</th><th>Status</th><th>Manage</th></tr>${clients.map(([em,c])=>{
+    const sc=c.scope||emailToScopeRow(em);
+    const isCur=ROW_ID===sc;
+    return`<tr><td><b>${esc(em)}</b></td><td><b>${esc(c.orgName||c.name||em)}</b><div class="mut sm">${esc(c.name||'')}</div></td><td>${esc(c.pw||'')}</td><td>${esc(c.phone||'–')}</td><td>${isCur?'<span class="bd sP">Viewing Now</span>':c.paused?'<span class="bd sA">Paused</span>':'<span class="bd sP">Active</span>'}</td><td><div style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="b sm pri" data-a="pickScope" data-scope="${esc(sc)}" data-label="${esc(c.orgName||c.name||em)}">Open Portal</button><button type="button" class="b sm" data-a="editClientModal" data-em="${esc(em)}">Edit</button><button type="button" class="b sm" data-a="toggleClientPause" data-em="${esc(em)}">${c.paused?'Activate':'Pause'}</button><button type="button" class="b sm del" data-a="delClient" data-em="${esc(em)}">Remove</button></div></td></tr>`;
+   }).join('')}</table></div>`:'<div class="emp">No clients added yet. Click "+ Add Client" to add a client email.</div>'}
    <hr style="border:0;border-top:1px solid var(--line);margin:4px 0">
    <div style="min-width:0;max-width:100%">
     <b class="sm">Trial Logins (${trialAccList.length}):</b>
@@ -1580,6 +1689,13 @@ document.addEventListener('click',async e=>{
  if(a==='mx'){if(e.target===el||el.classList.contains('b'))closeM()}
  else if(a==='mok'){if(modal.cb&&await modal.cb()===false)return;closeM()}
  else if(a==='myProfile'){openMyProfileModal()}
+ else if(a==='openPortalPicker'){openOwnerPortalPicker(false)}
+ else if(a==='pickScope'){
+  const sc=el.dataset.scope;
+  const lbl=el.dataset.label||'';
+  closeM();
+  if(sc)await switchOwnerToScope(sc,lbl);
+ }
  else if(a==='idCard'){e.stopPropagation();openStudentIdCard(id)}
  else if(a==='clearOrgLogo'){
   S.tempLogo='';
@@ -1600,8 +1716,8 @@ document.addEventListener('click',async e=>{
    <div class="fl">
     <label>Client Email<input id="ncEmail" type="email" value="client.${nextNum}@ourcoaching.pk" placeholder="client.1@ourcoaching.pk"></label>
     <label>Client Password<input id="ncPw" type="text" value="client123"></label>
-    <label>Client Name<input id="ncName" placeholder="e.g. Sir Ahmed"></label>
-    <label>Coaching Name<input id="ncOrg" placeholder="e.g. Apex Science Academy"></label>
+    <label>Client Name<input id="ncName" placeholder="e.g. Ali"></label>
+    <label>Coaching Name<input id="ncOrg" placeholder="e.g. Ali Coaching Academy"></label>
     <label>Client WhatsApp Number<input id="ncPhone" placeholder="e.g. 03001234567"></label>
    </div>
   `,'Add Client',async()=>{
@@ -1662,6 +1778,7 @@ document.addEventListener('click',async e=>{
     clientData.admin={...(clientData.admin||{}),name:newName,email:newEm,pw:newPw};
     await sb.from('app_state').upsert({id:newScope,data:clientData,updated_at:new Date().toISOString()},{onConflict:'id'});
    }
+   if(ROW_ID===oldScope && newScope!==oldScope)setActiveScope(newScope);
    render(false);
    toast('Client updated: '+newEm);
   });
@@ -1690,9 +1807,11 @@ document.addEventListener('click',async e=>{
   const em=(el.dataset.em||'').toLowerCase();
   if(!ownerMaster.clients||!ownerMaster.clients[em])return;
   modal('Remove Client?',`<p class="mut">Remove <b>${esc(em)}</b> from client list?</p>`,'Remove',async()=>{
+   const delScope=emailToScopeRow(em);
    delete ownerMaster.clients[em];
    await persistOwnerMaster();
-   render(false);
+   if(ROW_ID===delScope)await switchOwnerToScope(emailToScopeRow(getOwnerEmail()),'Owner Master');
+   else render(false);
    toast('Client removed');
   });
  }
@@ -1717,6 +1836,9 @@ document.addEventListener('click',async e=>{
    render(true);
    toast('Signed in: '+ownName);
    persist();
+   if(getClientEntries().length>0){
+    openOwnerPortalPicker(true);
+   }
    return;
   }
 
@@ -1875,36 +1997,46 @@ document.addEventListener('click',async e=>{
   db.allowedIps=ips;
 
   if(S.u.role==='owner'){
-   const tAdmEm=val('setTAdminEmail').trim().toLowerCase();
-   const tAdmPw=val('setTAdminPw').trim();
-   const tAdmNm=val('setTAdminName').trim()||'Principal (Admin)';
-   if(!tAdmEm||!tAdmEm.includes('@')||!tAdmPw){toast('Valid Trial Admin email and password required');return}
-   if(tAdmEm===aem){toast('Owner and Trial Admin emails must be different');return}
+   const isViewingOwnMaster = ROW_ID===emailToScopeRow(getOwnerEmail());
+   if(isViewingOwnMaster){
+    const tAdmEm=val('setTAdminEmail').trim().toLowerCase();
+    const tAdmPw=val('setTAdminPw').trim();
+    const tAdmNm=val('setTAdminName').trim()||'Principal (Admin)';
+    if(!tAdmEm||!tAdmEm.includes('@')||!tAdmPw){toast('Valid Trial Admin email and password required');return}
+    if(tAdmEm===aem){toast('Owner and Trial Admin emails must be different');return}
 
-   ownerMaster.ownerEmail=aem;
-   ownerMaster.ownerOrgName=nm;
-   ownerMaster.ownerTagline=tag;
-   if(S.tempLogo!==undefined)ownerMaster.ownerLogo=S.tempLogo;
-   ownerMaster.ownerAccent=db.accent;
-   ownerMaster.ownerProfile={...(ownerMaster.ownerProfile||{}),name:anm,photo:(ownerMaster.ownerProfile&&ownerMaster.ownerProfile.photo)||''};
-   ownerMaster.ownerPw=apw;
+    ownerMaster.ownerEmail=aem;
+    ownerMaster.ownerOrgName=nm;
+    ownerMaster.ownerTagline=tag;
+    if(S.tempLogo!==undefined)ownerMaster.ownerLogo=S.tempLogo;
+    ownerMaster.ownerAccent=db.accent;
+    ownerMaster.ownerProfile={...(ownerMaster.ownerProfile||{}),name:anm,photo:(ownerMaster.ownerProfile&&ownerMaster.ownerProfile.photo)||''};
+    ownerMaster.ownerPw=apw;
 
-   ownerMaster.trialAdminEmail=tAdmEm;
-   ownerMaster.trialAdminPw=tAdmPw;
-   ownerMaster.trialAdminName=tAdmNm;
+    ownerMaster.trialAdminEmail=tAdmEm;
+    ownerMaster.trialAdminPw=tAdmPw;
+    ownerMaster.trialAdminName=tAdmNm;
 
-   ownerMaster.globalAppLocked=!!($('#setGlobalLock')&&$('#setGlobalLock').checked);
-   ownerMaster.globalLockMsg=val('setGlobalLockMsg').trim()||'This coaching portal is currently paused by the owner. Please contact the service provider.';
+    ownerMaster.globalAppLocked=!!($('#setGlobalLock')&&$('#setGlobalLock').checked);
+    ownerMaster.globalLockMsg=val('setGlobalLockMsg').trim()||'This coaching portal is currently paused by the owner. Please contact the service provider.';
 
-   const tDays=Math.max(1,Math.min(365,Number(val('setTrialDays'))||7));
-   ownerMaster.trialDays=tDays;
-   ownerMaster.trialIpLock=!!($('#setTrialIpLock')&&$('#setTrialIpLock').checked);
+    const tDays=Math.max(1,Math.min(365,Number(val('setTrialDays'))||7));
+    ownerMaster.trialDays=tDays;
+    ownerMaster.trialIpLock=!!($('#setTrialIpLock')&&$('#setTrialIpLock').checked);
 
-   const newOwnerScope=emailToScopeRow(aem);
-   if(newOwnerScope!==ROW_ID){
-    setActiveScope(newOwnerScope);
+    const newOwnerScope=emailToScopeRow(aem);
+    if(newOwnerScope!==ROW_ID){
+     setActiveScope(newOwnerScope);
+    }
+    S.u={...S.u,e:aem,name:anm,scope:newOwnerScope};
+   }else{
+    db.admin={...db.admin,name:anm,email:aem,pw:apw};
+    const matchedClient=getClientEntries().find(([em,cfg])=>(cfg.scope||emailToScopeRow(em))===ROW_ID);
+    if(matchedClient){
+     const [cem,ccfg]=matchedClient;
+     ownerMaster.clients[cem]={...ccfg,orgName:nm,name:anm,pw:apw};
+    }
    }
-   S.u={...S.u,e:aem,name:anm,scope:newOwnerScope};
   }else{
    db.admin={...db.admin,name:anm,email:S.u.role==='client'?S.u.e:aem,pw:apw};
    if(S.u.role==='admin'){
@@ -2089,6 +2221,7 @@ document.addEventListener('input',e=>{
 document.addEventListener('change',async e=>{
  const el=e.target,f=el.dataset.f;if(!f)return;
  if(f==='lang'){if(LANGS[el.value]){currentLang=el.value;applyLanguage();render(false);toast(LANGS[currentLang].label)}}
+ else if(f==='ownerPortalSel'){if(el.value)await switchOwnerToScope(el.value)}
  else if(f==='b'){guard(()=>{S.b=el.value;openDraft();render(false)})}
  else if(f==='sub'&&S.dr){S.dr.subject=el.value;render(false)}
  else if(f==='d'){guard(()=>{S.d=el.value||TODAY;openDraft();render(false)})}
