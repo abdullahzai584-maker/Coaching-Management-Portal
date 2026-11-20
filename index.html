@@ -38,13 +38,37 @@
 :root[lang="ur"] h1,:root[lang="ur"] h2,:root[lang="ur"] h3{letter-spacing:0}
 
 @keyframes fadeUp{from{opacity:0;transform:translate3d(0,8px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
-@keyframes tabEnter3d{from{opacity:0;transform:perspective(900px) rotateX(2deg) translate3d(0,6px,0)}to{opacity:1;transform:perspective(900px) rotateX(0deg) translate3d(0,0,0)}}
-@keyframes orbDrift1{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(24px,-18px,0)}}
-@keyframes orbDrift2{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(-22px,18px,0)}}
-@keyframes float3dRing{0%,100%{transform:perspective(700px) rotateX(58deg) rotateY(14deg) translateY(0)}50%{transform:perspective(700px) rotateX(62deg) rotateY(-12deg) translateY(-10px)}}
-@keyframes popIn3d{from{opacity:0;transform:perspective(800px) scale(.97) translate3d(0,6px,0)}to{opacity:1;transform:perspective(800px) scale(1) translate3d(0,0,0)}}
-@keyframes slideLeft{from{opacity:0;transform:translate3d(20px,0,0)}to{opacity:1;transform:translate3d(0,0,0)}}
-@keyframes pulseDot{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes waveGlideA{
+  0%{transform:translate3d(-12%,6%,0) rotate(-3deg) scale(1)}
+  50%{transform:translate3d(10%,-7%,0) rotate(2.5deg) scale(1.06)}
+  100%{transform:translate3d(-12%,6%,0) rotate(-3deg) scale(1)}
+}
+@keyframes waveGlideB{
+  0%{transform:translate3d(12%,-5%,0) rotate(3deg) scale(1.04)}
+  50%{transform:translate3d(-11%,7%,0) rotate(-3deg) scale(.98)}
+  100%{transform:translate3d(12%,-5%,0) rotate(3deg) scale(1.04)}
+}
+@keyframes orbitSweep{
+  0%{transform:translate3d(0,0,0) rotate(0deg)}
+  50%{transform:translate3d(-26px,22px,0) rotate(180deg)}
+  100%{transform:translate3d(0,0,0) rotate(360deg)}
+}
+@keyframes nodeFloat1{
+  0%,100%{transform:translate3d(0,0,0) scale(1)}
+  50%{transform:translate3d(28px,-24px,0) scale(1.18)}
+}
+@keyframes nodeFloat2{
+  0%,100%{transform:translate3d(0,0,0) scale(1)}
+  50%{transform:translate3d(-32px,20px,0) scale(.88)}
+}
+@keyframes nodeFloat3{
+  0%,100%{transform:translate3d(0,0,0) scale(.95)}
+  50%{transform:translate3d(20px,28px,0) scale(1.15)}
+}
+@keyframes scanRibbon{
+  0%{transform:translate3d(-45%,-20%,0) rotate(-18deg)}
+  100%{transform:translate3d(145%,25%,0) rotate(-18deg)}
+}
 
 *,*::before,*::after{box-sizing:border-box}
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -52,11 +76,16 @@ html{scroll-padding-top:env(safe-area-inset-top,0px);width:100%;max-width:100%;o
 body{margin:0;width:100%;max-width:100%;background:var(--bg);color:var(--ink);font:14px/1.55 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;overflow-x:clip;position:relative}
 
 #bg-fx{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;contain:strict}
-#bg-fx .grid-bg{position:absolute;inset:0;background-image:radial-gradient(color-mix(in srgb,var(--pri) 20%,transparent) 1px,transparent 1px);background-size:28px 28px;opacity:.38}
-#bg-fx .orb{position:absolute;border-radius:50%;opacity:.25;will-change:transform}
-#bg-fx .o1{width:300px;height:300px;top:-60px;left:-50px;background:radial-gradient(circle,var(--pri),transparent 70%);animation:orbDrift1 18s ease-in-out infinite}
-#bg-fx .o2{width:340px;height:340px;bottom:-80px;right:-60px;background:radial-gradient(circle,var(--P),transparent 70%);animation:orbDrift2 22s ease-in-out infinite}
-#bg-fx .shape-3d-ring{position:absolute;top:14%;right:12%;width:120px;height:120px;border-radius:50%;border:2px solid color-mix(in srgb,var(--pri) 28%,transparent);box-shadow:inset 0 0 14px rgba(255,255,255,.14);animation:float3dRing 20s ease-in-out infinite;will-change:transform}
+#bg-fx .dot-field{position:absolute;inset:-24px;background-image:radial-gradient(circle,color-mix(in srgb,var(--pri) 26%,transparent) 1.35px,transparent 1.35px);background-size:28px 28px;opacity:.42;will-change:transform;animation:waveGlideA 14s ease-in-out infinite}
+#bg-fx .mesh-wave-1{position:absolute;width:135vw;height:44vh;top:8%;left:-18vw;border-radius:46% 54% 48% 52%/62% 38% 62% 38%;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--pri) 15%,transparent),color-mix(in srgb,var(--pri2) 17%,transparent),transparent);will-change:transform;animation:waveGlideA 11s ease-in-out infinite}
+#bg-fx .mesh-wave-2{position:absolute;width:135vw;height:42vh;bottom:6%;right:-18vw;border-radius:54% 46% 52% 48%/40% 60% 42% 58%;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--P) 14%,transparent),color-mix(in srgb,var(--pri) 14%,transparent),transparent);will-change:transform;animation:waveGlideB 13s ease-in-out infinite}
+#bg-fx .scan-ribbon{position:absolute;top:-20%;left:0;width:24%;height:150vh;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--pri2) 11%,transparent),transparent);will-change:transform;animation:scanRibbon 12s linear infinite}
+#bg-fx .geo-orbit{position:absolute;top:16%;right:10%;width:180px;height:180px;border-radius:44% 56% 62% 38%/48% 42% 58% 52%;border:1.5px dashed color-mix(in srgb,var(--pri) 36%,transparent);will-change:transform;animation:orbitSweep 16s linear infinite}
+#bg-fx .geo-orbit::after{content:"";position:absolute;inset:24px;border-radius:50%;border:1.5px solid color-mix(in srgb,var(--pri2) 26%,transparent)}
+#bg-fx .glow-node{position:absolute;border-radius:50%;will-change:transform}
+#bg-fx .gn1{width:14px;height:14px;top:22%;left:18%;background:var(--pri);box-shadow:0 0 18px var(--pri);opacity:.48;animation:nodeFloat1 6.5s ease-in-out infinite}
+#bg-fx .gn2{width:18px;height:18px;bottom:24%;right:22%;background:var(--pri2);box-shadow:0 0 22px var(--pri2);opacity:.42;animation:nodeFloat2 8s ease-in-out infinite}
+#bg-fx .gn3{width:11px;height:11px;top:62%;left:12%;background:var(--P);box-shadow:0 0 16px var(--P);opacity:.45;animation:nodeFloat3 7.2s ease-in-out infinite}
 
 #cursor-fx{display:none;position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;contain:strict}
 #cursor-fx .cur-aura{position:fixed;width:210px;height:210px;margin:-105px 0 0 -105px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--pri) 20%,transparent),transparent 70%);opacity:0;transition:opacity .2s ease;will-change:transform}
@@ -171,7 +200,7 @@ tr.cl{cursor:pointer;transition:background .12s}tr.cl:hover{background:var(--pbg
 .portal-pick-card:hover{border-color:var(--pri);background:var(--pbg);transform:translate3d(0,-1px,0)}
 .portal-pick-card.active{border-color:var(--pri);background:var(--pbg);box-shadow:0 0 0 2px var(--pbg)}
 
-.mob-dots-wrap{display:none}
+.mob-dots-wrap{display:inline-flex;align-items:center}
 .mob-dots-btn{width:36px;min-height:36px;padding:0;border-radius:10px;font-size:19px;line-height:1}
 .mob-dots-backdrop{position:fixed;inset:0;z-index:28;background:rgba(7,11,20,.28)}
 .mob-dots-menu{position:fixed;top:62px;right:12px;left:auto;width:min(235px,calc(100vw - 24px));max-height:calc(100dvh - 82px);overflow-y:auto;background:var(--menu-bg);border:1px solid var(--glass-b);border-radius:16px;box-shadow:var(--sh-lg);padding:8px;display:grid;gap:3px;z-index:30;animation:popIn3d .14s ease-out}
@@ -1126,13 +1155,58 @@ function enforceRemoteLock(){
  }
 }
 
+function mergeOwnerMasterSnapshots(baseOm, incomingOm){
+ const a = {...emptyOwnerMaster(), ...(baseOm||{})};
+ const b = {...emptyOwnerMaster(), ...(incomingOm||{})};
+ const merged = {...a, ...b};
+ // Keep non-empty / customized owner identity & branding if one snapshot has defaults
+ if((!b.ownerEmail || b.ownerEmail===DEFAULT_OWNER_EMAIL) && a.ownerEmail && a.ownerEmail!==DEFAULT_OWNER_EMAIL){
+  merged.ownerEmail = a.ownerEmail;
+ }
+ if((!b.ownerPw || b.ownerPw===DEFAULT_OWNER_PW) && a.ownerPw && a.ownerPw!==DEFAULT_OWNER_PW){
+  merged.ownerPw = a.ownerPw;
+ }
+ const aName = (a.ownerProfile && a.ownerProfile.name) || '';
+ const bName = (b.ownerProfile && b.ownerProfile.name) || '';
+ const aPhoto = (a.ownerProfile && a.ownerProfile.photo) || '';
+ const bPhoto = (b.ownerProfile && b.ownerProfile.photo) || '';
+ merged.ownerProfile = {
+  name: (bName && bName!==DEFAULT_OWNER_NAME) ? bName : (aName || bName || DEFAULT_OWNER_NAME),
+  photo: bPhoto || aPhoto || ''
+ };
+ if((!b.ownerOrgName || b.ownerOrgName===DEFAULT_ORG) && a.ownerOrgName && a.ownerOrgName!==DEFAULT_ORG){
+  merged.ownerOrgName = a.ownerOrgName;
+ }
+ if((!b.ownerTagline || b.ownerTagline===DEFAULT_TAGLINE) && a.ownerTagline && a.ownerTagline!==DEFAULT_TAGLINE){
+  merged.ownerTagline = a.ownerTagline;
+ }
+ merged.ownerLogo = b.ownerLogo || a.ownerLogo || '';
+ if((!b.ownerAccent || b.ownerAccent==='indigo') && a.ownerAccent && a.ownerAccent!=='indigo'){
+  merged.ownerAccent = a.ownerAccent;
+ }
+ // Merge maps & arrays so neither device wipes out clients, trial logins, or logs
+ merged.clients = {...(a.clients||{}), ...(b.clients||{})};
+ merged.trialClaimedIps = {...(a.trialClaimedIps||{}), ...(b.trialClaimedIps||{})};
+ merged.trialAccounts = {...(a.trialAccounts||{}), ...(b.trialAccounts||{})};
+ merged.revokedTrials = {...(a.revokedTrials||{}), ...(b.revokedTrials||{})};
+ const seenLogs = new Set();
+ const combinedLogs = [];
+ [...(a.loginLogs||[]), ...(b.loginLogs||[])].forEach(lg=>{
+  if(!lg)return;
+  const k = `${lg.at||''}|${lg.email||''}|${lg.username||''}|${lg.ip||''}`;
+  if(!seenLogs.has(k)){seenLogs.add(k);combinedLogs.push(lg)}
+ });
+ merged.loginLogs = combinedLogs.slice(-80);
+ return merged;
+}
+
 async function loadOwnerMaster(silent=true){
  const sb=getSb();
  if(!sb)return ownerMaster;
  try{
   const {data,error}=await sb.from('app_state').select('data').eq('id',OWNER_GLOBAL_ROW).maybeSingle();
   if(!error && data && data.data){
-   ownerMaster={...emptyOwnerMaster(),...data.data};
+   ownerMaster = mergeOwnerMasterSnapshots(ownerMaster, data.data);
    normalizeOwnerMaster();
    try{localStorage.setItem(OWNER_STORE_KEY,JSON.stringify(ownerMaster))}catch(e){}
   }
@@ -1161,6 +1235,17 @@ async function loadCloud(silent=false){
   if(error)throw error;
   if(data && data.data){
    const cloudDb={...emptyDb(),...data.data};
+   ownerMaster = mergeOwnerMasterSnapshots(ownerMaster, {
+    ownerProfile: cloudDb.ownerProfile,
+    trialDays: cloudDb.trialDays,
+    trialIpLock: cloudDb.trialIpLock,
+    trialClaimedIps: cloudDb.trialClaimedIps,
+    trialAccounts: cloudDb.trialAccounts,
+    revokedTrials: cloudDb.revokedTrials,
+    loginLogs: cloudDb.loginLogs
+   });
+   normalizeOwnerMaster();
+   try{localStorage.setItem(OWNER_STORE_KEY,JSON.stringify(ownerMaster))}catch(e){}
    const hasCloudRich=((Array.isArray(cloudDb.bat)&&cloudDb.bat.length)||(Array.isArray(cloudDb.stu)&&cloudDb.stu.length)||(cloudDb.orgName&&cloudDb.orgName!==DEFAULT_ORG)||cloudDb.orgLogo);
    const hasLocalRich=((Array.isArray(db.bat)&&db.bat.length)||(Array.isArray(db.stu)&&db.stu.length)||(db.orgName&&db.orgName!==DEFAULT_ORG)||db.orgLogo);
    if(hasCloudRich || !hasLocalRich){
@@ -1254,7 +1339,7 @@ function subscribeRealtime(){
   })
   .on('postgres_changes',{event:'*',schema:'public',table:'app_state',filter:`id=eq.${OWNER_GLOBAL_ROW}`},payload=>{
    if(payload.new&&payload.new.data){
-    ownerMaster={...emptyOwnerMaster(),...payload.new.data};
+    ownerMaster=mergeOwnerMasterSnapshots(ownerMaster,payload.new.data);
     normalizeOwnerMaster();
     try{localStorage.setItem(OWNER_STORE_KEY,JSON.stringify(ownerMaster))}catch(e){}
     enforceRemoteLock();
@@ -1369,7 +1454,7 @@ function LockedScreen(){
 
 function Login(){
  if(ownerMaster.globalAppLocked || db.appLocked)return LockedScreen();
- return`<div class="lg"><div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">${brandHtml()}<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">${langSelectHtml()}<span class="ver-pill">v${esc(APP_VERSION)}</span><span class="sync ${syncStatus==='Sync error'?'err':''}"><i></i>${esc(syncStatus)}</span></div></div>${db.orgTagline?`<div class="mut sm">${esc(db.orgTagline)}</div>`:''}<h2>${esc(T('signIn'))}</h2>
+ return`<div class="lg"><div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">${brandHtml()}<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span class="ver-pill">v${esc(APP_VERSION)}</span><span class="sync ${syncStatus==='Sync error'?'err':''}"><i></i>${esc(syncStatus)}</span></div></div>${db.orgTagline?`<div class="mut sm">${esc(db.orgTagline)}</div>`:''}<h2>${esc(T('signIn'))}</h2>
  <div class="fl">
   <label>${esc(T('email'))}<input id="le" type="email" autocomplete="username" placeholder="${esc(getTrialAdminEmail())}"></label>
   <label id="loginUserWrap">${esc(T('usernameLabel'))}<input id="luser" type="text" autocomplete="name" placeholder="${esc(T('usernamePh'))}"></label>
@@ -1394,10 +1479,8 @@ function Shell(){
  const portalBadge=u.role==='owner'?`<button type="button" class="b sm pri" data-a="openPortalPicker">Portal: ${esc(getActivePortalLabel())} ▾</button>`:'';
  return`<div class="shell"><aside class="side">${brandHtml()}${db.orgTagline?`<div class="tagline">${esc(db.orgTagline)}</div>`:''}${n}<div style="flex:1"></div>${u.role==='owner'?`<button class="nv" data-a="openPortalPicker">⇄ Switch Client Portal</button>`:''}<button class="nv" data-a="myProfile">${esc(T('editProf'))}</button><button class="nv" data-a="syncNow">${esc(T('syncNow'))}</button><button class="nv" data-a="theme">${esc(T('themeBtn'))}</button><button class="nv" data-a="backupJson">${esc(T('exportBak'))}</button><button class="nv" data-a="logout">${esc(T('logout'))}</button><div class="mut sm" style="padding:6px 12px 0">Version ${esc(APP_VERSION)}</div></aside>
  <div><div class="top"><b class="mut sm rl">${esc(ctx)}</b>${portalBadge}<span class="sync ${syncStatus==='Sync error'?'err':''}"><i></i>${esc(syncStatus)}</span><div class="sp"></div>
- ${langSelectHtml()}
- ${isStaff(u.role)?`<button class="b sm" data-a="bell" aria-label="${esc(T('alerts'))}">${esc(T('alerts'))} ${nr?`<b class="bad">${nr}</b>`:''}</button>`:''}
  <button type="button" class="chip" data-a="myProfile" title="${esc(T('editProf'))}">${avOf(curProf.name,curProf.photo)}<span class="role">${esc(u.role)}</span></button><button class="b sm" data-a="logout">${esc(T('logout'))}</button>
- <div class="mob-dots-wrap"><button type="button" class="b sm mob-dots-btn" data-a="mobDots" aria-label="Menu" aria-expanded="${S.mobMenuOpen?'true':'false'}">⋮</button>${S.mobMenuOpen?`<div class="mob-dots-backdrop" data-a="mobDotsClose"></div><div class="mob-dots-menu" role="menu">${mobNav}${u.role==='owner'?`<button type="button" data-a="openPortalPicker">⇄ Switch Client Portal</button>`:''}<hr><button type="button" data-a="myProfile">${esc(T('editProf'))}</button><button type="button" data-a="syncNow">${esc(T('syncNow'))}</button><button type="button" data-a="theme">${esc(T('themeBtn'))}</button><button type="button" data-a="backupJson">${esc(T('exportBak'))}</button></div>`:''}</div>
+ <div class="mob-dots-wrap"><button type="button" class="b sm mob-dots-btn" data-a="mobDots" aria-label="Menu" aria-expanded="${S.mobMenuOpen?'true':'false'}">⋮</button>${S.mobMenuOpen?`<div class="mob-dots-backdrop" data-a="mobDotsClose"></div><div class="mob-dots-menu" role="menu">${mobNav}${isStaff(u.role)?`<button type="button" data-a="bell"><span>${esc(T('alerts'))}</span>${nr?`<b class="bad">${nr}</b>`:''}</button>`:''}${u.role==='owner'?`<button type="button" data-a="openPortalPicker">⇄ Switch Client Portal</button>`:''}<hr><button type="button" data-a="myProfile">${esc(T('editProf'))}</button><button type="button" data-a="syncNow">${esc(T('syncNow'))}</button><button type="button" data-a="theme">${esc(T('themeBtn'))}</button><button type="button" data-a="backupJson">${esc(T('exportBak'))}</button></div>`:''}</div>
  ${isStaff(u.role)?`<input id="gq" placeholder="${esc(T('searchStu'))}" aria-label="${esc(T('searchStu'))}" value="${esc(S.q)}">`:''}</div>
  <main id="mn"><div class="tab-anim" data-tab-key="${esc(S.v)}-${S.tabTick}">${View()}</div></main></div></div>`
 }
@@ -1671,7 +1754,7 @@ function Settings(){
      </div>
     </div>
    </div>
-   <label>${esc(T('language'))}${langSelectHtml('')}</label>
+   
    <label>Coaching institute name<input id="setOrg" value="${esc(orgName())}" placeholder="e.g. Apex Science Academy"></label>
    <label>Tagline / subtitle<input id="setTag" value="${esc(db.orgTagline||'')}" placeholder="e.g. Excellence in Science & Math"></label>
    <div><span class="mut sm">Theme accent color</span>
@@ -1790,7 +1873,7 @@ function render(animateTab=true){
   document.title=`${orgName()} — Attendance`;
   const bgEl=$('#bg-fx');
   if(bgEl){
-   const bgHtml=S.u?'<div class="grid-bg"></div><div class="orb o1"></div><div class="orb o2"></div><div class="shape-3d-ring"></div>':'<div class="grid-bg"></div><div class="orb o1"></div><div class="orb o2"></div>';
+   const bgHtml=S.u?'<div class="dot-field"></div><div class="mesh-wave-1"></div><div class="mesh-wave-2"></div><div class="scan-ribbon"></div><div class="geo-orbit"></div><div class="glow-node gn1"></div><div class="glow-node gn2"></div><div class="glow-node gn3"></div>':'<div class="dot-field"></div><div class="mesh-wave-1"></div><div class="mesh-wave-2"></div><div class="geo-orbit"></div><div class="glow-node gn1"></div><div class="glow-node gn2"></div>';
    const mode=S.u?'app':'login';
    if(bgEl.dataset.mode!==mode){bgEl.innerHTML=bgHtml;bgEl.dataset.mode=mode}
   }
