@@ -247,7 +247,7 @@ tr.cl{cursor:pointer;transition:background .12s}tr.cl:hover{background:var(--pbg
 <body>
 <div id="bg-fx" aria-hidden="true"></div><div id="cursor-fx" aria-hidden="true"></div><div id="app"></div><div id="m"></div><div id="dr"></div><div id="toast" style="opacity:0"></div>
 <script>
-const APP_VERSION = '2.9';
+const APP_VERSION = '3.0';
 const VERSION_KEY = 'our_coaching_app_ver';
 const LANG_KEY = 'our_coaching_lang';
 const OWNER_CONTACT_PHONE = '03213091550';
@@ -401,7 +401,7 @@ const DEFAULT_OWNER_NAME = 'Abdullah (Owner)';
 
 const TRIAL_ADMIN_EMAIL = 'admin@ourcoaching.pk';
 const OWNER_GLOBAL_ROW = 'owner_global_master';
-const ACTIVE_SCOPE_KEY = 'our_coaching_active_scope_v29';
+const ACTIVE_SCOPE_KEY = 'our_coaching_active_scope_v30';
 
 const DEFAULT_ORG = 'OUR COACHING';
 const DEFAULT_TAGLINE = 'Smart Attendance, Fees & Batch Operations';
@@ -855,8 +855,7 @@ function openMyProfileModal(){
 
 
 function isOwnerViewingCoachingData(){
- if(!S.u || S.u.role !== 'owner') return true;
- return !!S.ownerSelectedPortal;
+ return true;
 }
 
 function getTrialPortalCandidates(){
@@ -1476,8 +1475,8 @@ function Shell(){
  const u=S.u,curProf=getCurrentUserProfile(),n=NAV[u.role].map(x=>`<button class="nv ${S.v===x[0]?'on':''}" data-a="nav" data-v="${x[0]}">${esc(T(x[1]))}</button>`).join('');
  const mobNav=NAV[u.role].map(x=>`<button type="button" class="${S.v===x[0]?'on':''}" data-a="nav" data-v="${x[0]}"><span>${esc(T(x[1]))}</span>${S.v===x[0]?'<span>●</span>':''}</button>`).join('');
  const ctx=S.v==='mark'?`${esc((bOf(S.b)||{}).name||'')} · ${fd(S.d)}`:`${fd(TODAY)}`,nr=risk().length;
- const portalBadge=u.role==='owner'?`<button type="button" class="b sm pri" data-a="openPortalPicker">Portal: ${esc(getActivePortalLabel())} ▾</button>`:'';
- return`<div class="shell"><aside class="side">${brandHtml()}${db.orgTagline?`<div class="tagline">${esc(db.orgTagline)}</div>`:''}${n}<div style="flex:1"></div>${u.role==='owner'?`<button class="nv" data-a="openPortalPicker">⇄ Switch Client Portal</button>`:''}<button class="nv" data-a="myProfile">${esc(T('editProf'))}</button><button class="nv" data-a="syncNow">${esc(T('syncNow'))}</button><button class="nv" data-a="theme">${esc(T('themeBtn'))}</button><button class="nv" data-a="backupJson">${esc(T('exportBak'))}</button><button class="nv" data-a="logout">${esc(T('logout'))}</button><div class="mut sm" style="padding:6px 12px 0">Version ${esc(APP_VERSION)}</div></aside>
+ const portalBadge='';
+ return`<div class="shell"><aside class="side">${brandHtml()}${db.orgTagline?`<div class="tagline">${esc(db.orgTagline)}</div>`:''}${n}<div style="flex:1"></div><button class="nv" data-a="myProfile">${esc(T('editProf'))}</button><button class="nv" data-a="syncNow">${esc(T('syncNow'))}</button><button class="nv" data-a="theme">${esc(T('themeBtn'))}</button><button class="nv" data-a="backupJson">${esc(T('exportBak'))}</button><button class="nv" data-a="logout">${esc(T('logout'))}</button><div class="mut sm" style="padding:6px 12px 0">Version ${esc(APP_VERSION)}</div></aside>
  <div><div class="top"><b class="mut sm rl">${esc(ctx)}</b>${portalBadge}<span class="sync ${syncStatus==='Sync error'?'err':''}"><i></i>${esc(syncStatus)}</span><div class="sp"></div>
  <button type="button" class="chip" data-a="myProfile" title="${esc(T('editProf'))}">${avOf(curProf.name,curProf.photo)}<span class="role">${esc(u.role)}</span></button><button class="b sm" data-a="logout">${esc(T('logout'))}</button>
  <div class="mob-dots-wrap"><button type="button" class="b sm mob-dots-btn" data-a="mobDots" aria-label="Menu" aria-expanded="${S.mobMenuOpen?'true':'false'}">⋮</button>${S.mobMenuOpen?`<div class="mob-dots-backdrop" data-a="mobDotsClose"></div><div class="mob-dots-menu" role="menu">${mobNav}${isStaff(u.role)?`<button type="button" data-a="bell"><span>${esc(T('alerts'))}</span>${nr?`<b class="bad">${nr}</b>`:''}</button>`:''}${u.role==='owner'?`<button type="button" data-a="openPortalPicker">⇄ Switch Client Portal</button>`:''}<hr><button type="button" data-a="myProfile">${esc(T('editProf'))}</button><button type="button" data-a="syncNow">${esc(T('syncNow'))}</button><button type="button" data-a="theme">${esc(T('themeBtn'))}</button><button type="button" data-a="backupJson">${esc(T('exportBak'))}</button></div>`:''}</div>
@@ -1492,7 +1491,7 @@ function View(){
 }
 
 function OwnerPortalSwitchStrip(){
- if(!S.u || S.u.role!=='owner')return '';
+ return '';
  const clients=getClientEntries();
  const trials=getTrialPortalCandidates();
  const activeLabel = S.ownerSelectedPortal ? getActivePortalLabel() : 'None Selected (Coaching Data Hidden)';
@@ -1699,17 +1698,7 @@ function Settings(){
  return`<div class="ph"><h1>${esc(T('settings'))}</h1><span class="mut sm">Account: <b>${esc((S.u&&S.u.e)||'')}</b> · App <b>v${esc(APP_VERSION)}</b></span></div>
  ${isOwner?`
   <div class="card own-box" style="margin-bottom:14px">
-   <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
-    <h2>Clients Add &amp; Portal Switcher</h2>
-    <div class="bar" style="margin:0"><button type="button" class="b sm" data-a="openPortalPicker">⇄ Switch Portal (${esc(getActivePortalLabel())})</button><button type="button" class="b sm pri" data-a="addClientModal">+ Add Client</button></div>
-   </div>
-   <div class="mut sm">Click <b>Open Portal</b> on any client (e.g., Ali) to view or edit their students, batches, attendance, fees, and settings directly.</div>
-   ${clients.length?`<div class="tw" style="margin-top:6px"><table><tr><th>Client Email</th><th>Institute / Name</th><th>Password</th><th>WhatsApp</th><th>Status</th><th>Manage</th></tr>${clients.map(([em,c])=>{
-    const sc=c.scope||emailToScopeRow(em);
-    const isCur=ROW_ID===sc;
-    return`<tr><td><b>${esc(em)}</b></td><td><b>${esc(c.orgName||c.name||em)}</b><div class="mut sm">${esc(c.name||'')}</div></td><td>${esc(c.pw||'')}</td><td>${esc(c.phone||'–')}</td><td>${isCur?'<span class="bd sP">Viewing Now</span>':c.paused?'<span class="bd sA">Paused</span>':'<span class="bd sP">Active</span>'}</td><td><div style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="b sm pri" data-a="pickScope" data-scope="${esc(sc)}" data-label="${esc(c.orgName||c.name||em)}">Open Portal</button><button type="button" class="b sm" data-a="editClientModal" data-em="${esc(em)}">Edit</button><button type="button" class="b sm" data-a="toggleClientPause" data-em="${esc(em)}">${c.paused?'Activate':'Pause'}</button><button type="button" class="b sm del" data-a="delClient" data-em="${esc(em)}">Remove</button></div></td></tr>`;
-   }).join('')}</table></div>`:'<div class="emp">No clients added yet. Click "+ Add Client" to add a client email.</div>'}
-   <hr style="border:0;border-top:1px solid var(--line);margin:4px 0">
+
    <div style="min-width:0;max-width:100%">
     <b class="sm">Trial Logins (${trialAccList.length}):</b>
     ${trialAccList.length?`<div class="tw" style="margin-top:6px"><table><tr><th>Username</th><th>Account Email</th><th>Role</th><th>IP</th><th>Logged In Since</th><th>First Login</th><th>Status</th><th>Manage</th></tr>${trialAccList.map(acc=>{
@@ -2073,11 +2062,8 @@ document.addEventListener('click',async e=>{
    S.v='dash';S.dr=null;S.drawerId=null;
    subscribeRealtime();
    render(true);
-   toast('Signed in: '+ownName+'. Select a client coaching or trial to view coaching data.');
+   toast('Signed in: '+ownName);
    persist();
-   if(getClientEntries().length>0 || getTrialPortalCandidates().length>0){
-    openOwnerPortalPicker(true);
-   }
    return;
   }
 
