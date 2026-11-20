@@ -823,6 +823,7 @@ function openMyProfileModal(){
   if(S.u.role==='owner'){
    ownerMaster.ownerProfile={...(ownerMaster.ownerProfile||{}),name:newName,photo:newPhoto};
    db.ownerProfile={...ownerMaster.ownerProfile};
+   await persistOwnerMaster();
   }else if(S.u.role==='client'||S.u.role==='admin'){
    db.admin={...db.admin,name:newName,photo:newPhoto};
    if(S.u.role==='admin')ownerMaster.trialAdminName=newName;
@@ -836,6 +837,8 @@ function openMyProfileModal(){
   S.u={...S.u,name:newName};
   saveSession(S.u);
   await persist();
+  // Pull latest from cloud so other devices see it immediately on next open
+  await loadOwnerMaster(true);
   render(false);
   toast('Profile synced across all devices & IPs');
  });
@@ -1205,7 +1208,30 @@ async function loadOwnerMaster(silent=true){
  try{
   const {data,error}=await sb.from('app_state').select('data').eq('id',OWNER_GLOBAL_ROW).maybeSingle();
   if(!error && data && data.data){
-   ownerMaster = mergeOwnerMasterSnapshots(ownerMaster, data.data);
+   // Cloud is source of truth for owner identity; local only fills missing maps
+   const cloud = data.data;
+   const local = ownerMaster;
+   ownerMaster = mergeOwnerMasterSnapshots(local, cloud);
+   // Force cloud owner profile / credentials when cloud has them (fixes PC→mobile drift)
+   if(cloud.ownerProfile){
+    const cName=(cloud.ownerProfile.name||'').trim();
+    const cPhoto=cloud.ownerProfile.photo||'';
+    if(cName)ownerMaster.ownerProfile={name:cName,photo:cPhoto||(ownerMaster.ownerProfile&&ownerMaster.ownerProfile.photo)||''};
+    else if(cPhoto)ownerMaster.ownerProfile={...(ownerMaster.ownerProfile||{}),photo:cPhoto};
+   }
+   if(cloud.ownerEmail)ownerMaster.ownerEmail=String(cloud.ownerEmail).trim().toLowerCase();
+   if(cloud.ownerPw)ownerMaster.ownerPw=cloud.ownerPw;
+   if(cloud.ownerOrgName)ownerMaster.ownerOrgName=cloud.ownerOrgName;
+   if(cloud.ownerTagline!=null)ownerMaster.ownerTagline=cloud.ownerTagline;
+   if(cloud.ownerLogo)ownerMaster.ownerLogo=cloud.ownerLogo;
+   if(cloud.ownerAccent)ownerMaster.ownerAccent=cloud.ownerAccent;
+   if(typeof cloud.globalAppLocked==='boolean')ownerMaster.globalAppLocked=cloud.globalAppLocked;
+   if(cloud.globalLockMsg)ownerMaster.globalLockMsg=cloud.globalLockMsg;
+   if(cloud.trialAdminEmail)ownerMaster.trialAdminEmail=String(cloud.trialAdminEmail).trim().toLowerCase();
+   if(cloud.trialAdminPw)ownerMaster.trialAdminPw=cloud.trialAdminPw;
+   if(cloud.trialAdminName)ownerMaster.trialAdminName=cloud.trialAdminName;
+   if(Number(cloud.trialDays)>0)ownerMaster.trialDays=Number(cloud.trialDays);
+   if(typeof cloud.trialIpLock==='boolean')ownerMaster.trialIpLock=cloud.trialIpLock;
    normalizeOwnerMaster();
    try{localStorage.setItem(OWNER_STORE_KEY,JSON.stringify(ownerMaster))}catch(e){}
   }
@@ -1217,11 +1243,15 @@ async function persistOwnerMaster(){
  normalizeOwnerMaster();
  try{localStorage.setItem(OWNER_STORE_KEY,JSON.stringify(ownerMaster))}catch(e){}
  const sb=getSb();
- if(!sb)return;
+ if(!sb)return false;
  try{
   const {error}=await sb.from('app_state').upsert({id:OWNER_GLOBAL_ROW,data:ownerMaster,updated_at:new Date().toISOString()},{onConflict:'id'});
   if(error)throw error;
- }catch(e){}
+  return true;
+ }catch(e){
+  console.warn('persistOwnerMaster failed',e);
+  return false;
+ }
 }
 
 async function loadCloud(silent=false){
@@ -1338,9 +1368,26 @@ function subscribeRealtime(){
   })
   .on('postgres_changes',{event:'*',schema:'public',table:'app_state',filter:`id=eq.${OWNER_GLOBAL_ROW}`},payload=>{
    if(payload.new&&payload.new.data){
-    ownerMaster=mergeOwnerMasterSnapshots(ownerMaster,payload.new.data);
+    const cloud=payload.new.data;
+    ownerMaster=mergeOwnerMasterSnapshots(ownerMaster,cloud);
+    if(cloud.ownerProfile){
+     const cName=(cloud.ownerProfile.name||'').trim();
+     const cPhoto=cloud.ownerProfile.photo||'';
+     if(cName)ownerMaster.ownerProfile={name:cName,photo:cPhoto||(ownerMaster.ownerProfile&&ownerMaster.ownerProfile.photo)||''};
+     else if(cPhoto)ownerMaster.ownerProfile={...(ownerMaster.ownerProfile||{}),photo:cPhoto};
+    }
+    if(cloud.ownerPw)ownerMaster.ownerPw=cloud.ownerPw;
+    if(cloud.ownerOrgName)ownerMaster.ownerOrgName=cloud.ownerOrgName;
+    if(cloud.ownerLogo)ownerMaster.ownerLogo=cloud.ownerLogo;
+    if(cloud.ownerAccent)ownerMaster.ownerAccent=cloud.ownerAccent;
+    if(typeof cloud.globalAppLocked==='boolean')ownerMaster.globalAppLocked=cloud.globalAppLocked;
     normalizeOwnerMaster();
     try{localStorage.setItem(OWNER_STORE_KEY,JSON.stringify(ownerMaster))}catch(e){}
+    if(S.u && S.u.role==='owner' && ownerMaster.ownerProfile){
+     S.u={...S.u,name:ownerMaster.ownerProfile.name||S.u.name};
+     saveSession(S.u);
+    }
+    syncOwnerMasterToDb();
     enforceRemoteLock();
     if(!dirty())render(false);
    }
@@ -2055,14 +2102,19 @@ document.addEventListener('click',async e=>{
   if(isOwnerEmail){
    const validOwnerPw = pw===(ownerMaster.ownerPw||DEFAULT_OWNER_PW) || pw===DEFAULT_OWNER_PW;
    if(!validOwnerPw){toast('Invalid owner password');return}
+   // Re-pull owner master so mobile always gets latest PC changes
+   await loadOwnerMaster(true);
+   syncOwnerMasterToDb();
    const ownName=(ownerMaster.ownerProfile&&ownerMaster.ownerProfile.name)||DEFAULT_OWNER_NAME;
    S.ownerSelectedPortal=false;
    S.u={e:getOwnerEmail(),role:'owner',name:ownName,scope:targetScope,ownerSelectedPortal:false};
    saveSession(S.u);
    S.v='dash';S.dr=null;S.drawerId=null;
    subscribeRealtime();
+   applyAccent();
    render(true);
    toast('Signed in: '+ownName);
+   // Do NOT seed demo for owner — keep empty or their own data
    persist();
    return;
   }
@@ -2087,8 +2139,10 @@ document.addEventListener('click',async e=>{
    saveSession(S.u);
    S.v='dash';S.dr=null;S.drawerId=null;
    subscribeRealtime();
+   applyAccent();
    render(true);
    toast('Welcome, '+activeClientName);
+   // Clients never get auto-demo — only their own / empty data
    persist();
    return;
   }
@@ -2136,8 +2190,20 @@ document.addEventListener('click',async e=>{
   }
   S.u={...u,name:activeUsername,scope:targetScope};saveSession(S.u);S.v='dash';S.dr=null;S.drawerId=null;
   subscribeRealtime();
-  render(true);toast('Welcome, '+activeUsername);
-  persist();
+  // Trial admin only: auto-load demo data if coaching is empty
+  if(u.role==='admin'){
+   const emptyTrial = !(Array.isArray(db.bat)&&db.bat.length) && !(Array.isArray(db.stu)&&db.stu.length);
+   if(emptyTrial){
+    await seedDemoData();
+    toast('Welcome, '+activeUsername+' · Demo data loaded');
+   }else{
+    render(true);toast('Welcome, '+activeUsername);
+    persist();
+   }
+  }else{
+   render(true);toast('Welcome, '+activeUsername);
+   persist();
+  }
  }
  else if(a==='logout'){guard(()=>{S.u=null;saveSession(null);S.dr=null;S.drawerId=null;S.q='';S.f='';render(false)})}
  else if(a==='syncNow'){await loadCloud(false);toast('Synced with cloud')}
