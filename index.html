@@ -218,7 +218,7 @@ tr.cl{cursor:pointer;transition:background .12s}tr.cl:hover{background:var(--pbg
 <body>
 <div id="bg-fx" aria-hidden="true"></div><div id="cursor-fx" aria-hidden="true"></div><div id="app"></div><div id="m"></div><div id="dr"></div><div id="toast" style="opacity:0"></div>
 <script>
-const APP_VERSION = '2.5';
+const APP_VERSION = '2.9';
 const VERSION_KEY = 'our_coaching_app_ver';
 const LANG_KEY = 'our_coaching_lang';
 const OWNER_CONTACT_PHONE = '03213091550';
@@ -372,7 +372,7 @@ const DEFAULT_OWNER_NAME = 'Abdullah (Owner)';
 
 const TRIAL_ADMIN_EMAIL = 'admin@ourcoaching.pk';
 const OWNER_GLOBAL_ROW = 'owner_global_master';
-const ACTIVE_SCOPE_KEY = 'our_coaching_active_scope_v25';
+const ACTIVE_SCOPE_KEY = 'our_coaching_active_scope_v29';
 
 const DEFAULT_ORG = 'OUR COACHING';
 const DEFAULT_TAGLINE = 'Smart Attendance, Fees & Batch Operations';
@@ -824,6 +824,114 @@ function openMyProfileModal(){
  }
 }
 
+
+function isOwnerViewingCoachingData(){
+ if(!S.u || S.u.role !== 'owner') return true;
+ return !!S.ownerSelectedPortal;
+}
+
+function getTrialPortalCandidates(){
+ const list = [];
+ const tEm = getTrialAdminEmail();
+ const tScope = emailToScopeRow(tEm);
+ const tName = ownerMaster.trialAdminName || (db.admin && db.admin.name) || 'Principal (Admin)';
+ if(tEm){
+  list.push({
+   kind: 'trial',
+   email: tEm,
+   name: tName,
+   orgName: 'Trial Coaching (' + tName + ')',
+   scope: tScope,
+   status: 'Trial Admin'
+  });
+ }
+ const accs = Object.values(ownerMaster.trialAccounts || {});
+ accs.forEach(acc=>{
+  const em = String((acc && acc.email) || '').trim().toLowerCase();
+  if(!em || em === getOwnerEmail()) return;
+  const sc = emailToScopeRow(em);
+  if(!list.some(x=>x.scope === sc && x.email === em)){
+   list.push({
+    kind: 'trial',
+    email: em,
+    name: (acc && (acc.username || acc.role)) || em,
+    orgName: 'Trial Account (' + ((acc && acc.username) || em) + ')',
+    scope: sc,
+    status: 'Trial (' + ((acc && acc.ip) || 'IP') + ')'
+   });
+  }
+ });
+ return list;
+}
+
+function OwnerWorkspaceGate(){
+ const clients = getClientEntries();
+ const trials = getTrialPortalCandidates();
+ return `<div class="card" style="display:grid;gap:14px">
+  <div>
+   <h2>Owner Workspace — Select a Client Coaching or Trial Admin</h2>
+   <p class="mut sm">Coaching data (students, batches, attendance, and fees) is hidden until you select a specific <b>Client Coaching</b> or a <b>Trial Admin</b> below.</p>
+  </div>
+  <div style="display:grid;gap:8px">
+   <b>Client Coachings (${clients.length})</b>
+   ${clients.length ? `<div class="portal-pick-grid">${clients.map(([em,cfg])=>{
+    const sc = cfg.scope || emailToScopeRow(em);
+    const title = cfg.orgName || cfg.name || em;
+    return `<button type="button" class="portal-pick-card" data-a="pickScope" data-scope="${esc(sc)}" data-label="${esc(title)}" data-portal-kind="client">
+     <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
+      <b>${esc(title)}</b>
+      <span class="bd ${cfg.paused?'sA':'sP'}">${cfg.paused?'Paused':'Client'}</span>
+     </div>
+     <div class="mut sm">${esc(cfg.name||'Client')} · ${esc(em)}</div>
+     <div class="sm" style="color:var(--pri);font-weight:600">Select Client Coaching →</div>
+    </button>`;
+   }).join('')}</div>` : '<div class="emp">No client coachings added yet. Add a client in Settings to select their coaching.</div>'}
+  </div>
+  <div style="display:grid;gap:8px">
+   <b>Trial Admins / Trial Accounts (${trials.length})</b>
+   ${trials.length ? `<div class="portal-pick-grid">${trials.map(tr=>{
+    return `<button type="button" class="portal-pick-card" data-a="pickScope" data-scope="${esc(tr.scope)}" data-label="${esc(tr.orgName)}" data-portal-kind="trial">
+     <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
+      <b>${esc(tr.orgName)}</b>
+      <span class="role">Trial</span>
+     </div>
+     <div class="mut sm">${esc(tr.email)}</div>
+     <div class="sm" style="color:var(--pri);font-weight:600">Select Trial Admin →</div>
+    </button>`;
+   }).join('')}</div>` : '<div class="emp">No trial admins found yet.</div>'}
+  </div>
+ </div>`;
+}
+
+
+async function returnToOwnerMasterGate(){
+ if(!S.u || S.u.role !== 'owner') return;
+ if(dirty()){
+  const ok = confirm('Unsaved attendance changes will be discarded. Return to Owner Master?');
+  if(!ok) return;
+ }
+ closeDr();
+ S.dr = null;
+ S.b = '';
+ S.rb = '';
+ S.q = '';
+ S.f = '';
+ S.selectedFeeIds = [];
+ S.ownerSelectedPortal = false;
+ const ownScope = emailToScopeRow(getOwnerEmail());
+ setActiveScope(ownScope);
+ S.u = {...S.u, scope: ownScope, ownerSelectedPortal: false};
+ saveSession(S.u);
+ loadLocalScopeDb(ownScope, S.u.e);
+ await loadCloud(false);
+ S.tempAccent = db.accent;
+ S.tempLogo = db.orgLogo || '';
+ applyAccent();
+ subscribeRealtime();
+ render(true);
+ toast('Returned to Owner Master (coaching data hidden)');
+}
+
 function getActivePortalLabel(){
  const ownScope=emailToScopeRow(getOwnerEmail());
  if(ROW_ID===ownScope)return 'Owner Master';
@@ -848,8 +956,9 @@ async function switchOwnerToScope(targetScope, labelText=''){
  S.q='';
  S.f='';
  S.selectedFeeIds=[];
+ S.ownerSelectedPortal=true;
  setActiveScope(targetScope);
- S.u={...S.u,scope:targetScope};
+ S.u={...S.u,scope:targetScope,ownerSelectedPortal:true};
  saveSession(S.u);
  loadLocalScopeDb(targetScope, S.u.e);
  await loadCloud(false);
@@ -863,24 +972,28 @@ async function switchOwnerToScope(targetScope, labelText=''){
 
 function openOwnerPortalPicker(fromLogin=false){
  if(!S.u || S.u.role!=='owner')return;
- const ownEmail=getOwnerEmail();
- const ownScope=emailToScopeRow(ownEmail);
  const clients=getClientEntries();
- const ownActive=ROW_ID===ownScope;
- modal(fromLogin?'Select Portal to Open':'Switch Client Portal',`
-  <p class="mut sm">Choose where you want to go right now. You can inspect or edit any client's students, batches, attendance, fees, and settings.</p>
+ const trials=getTrialPortalCandidates();
+ const ownEm=getOwnerEmail();
+ const isMasterView=!S.ownerSelectedPortal;
+ modal(fromLogin?'Select Client Coaching or Trial':'Select Coaching / Trial Portal',`
+  <p class="mut sm">Coaching data is hidden until you select a specific <b>Client Coaching</b> or a <b>Trial Admin</b>.</p>
+  <b class="sm">Owner Master Workspace</b>
   <div class="portal-pick-grid">
-   <button type="button" class="portal-pick-card ${ownActive?'active':''}" data-a="pickScope" data-scope="${esc(ownScope)}" data-label="Owner Master">
+   <button type="button" class="portal-pick-card ${isMasterView?'active':''}" data-a="goOwnerMaster">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
      <b>Owner Master</b>
      <span class="role">Master</span>
     </div>
-    <div class="mut sm">${esc(ownEmail)}</div>
-    <div class="sm">${ownActive?'<span class="ok">● Active now</span>':'Open master workspace'}</div>
+    <div class="mut sm">${esc(ownEm)}</div>
+    <div class="sm">${isMasterView?'<span class="ok">● Active now (Data Hidden)</span>':'Back to Owner Master →'}</div>
    </button>
+  </div>
+  <b class="sm" style="margin-top:6px">Client Coachings (${clients.length})</b>
+  <div class="portal-pick-grid">
    ${clients.map(([em,cfg])=>{
     const sc=cfg.scope||emailToScopeRow(em);
-    const active=ROW_ID===sc;
+    const active=S.ownerSelectedPortal && ROW_ID===sc;
     const title=cfg.orgName||cfg.name||em;
     return`<button type="button" class="portal-pick-card ${active?'active':''}" data-a="pickScope" data-scope="${esc(sc)}" data-label="${esc(title)}">
      <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
@@ -888,11 +1001,25 @@ function openOwnerPortalPicker(fromLogin=false){
       <span class="bd ${cfg.paused?'sA':'sP'}">${cfg.paused?'Paused':'Client'}</span>
      </div>
      <div class="mut sm">${esc(cfg.name||'Client')} · ${esc(em)}</div>
-     <div class="sm">${active?'<span class="ok">● Active now</span>':'Open client portal →'}</div>
+     <div class="sm">${active?'<span class="ok">● Selected</span>':'Select client →'}</div>
     </button>`;
    }).join('')}
   </div>
-  ${!clients.length?'<div class="emp" style="margin-top:8px">No clients added yet. Open Settings → Clients Add to add Ali or other clients.</div>':''}
+  ${!clients.length?'<div class="emp" style="margin-top:6px">No client coachings added yet.</div>':''}
+  <b class="sm" style="margin-top:6px">Trial Admins / Trial Accounts (${trials.length})</b>
+  <div class="portal-pick-grid">
+   ${trials.map(tr=>{
+    const active=S.ownerSelectedPortal && ROW_ID===tr.scope;
+    return`<button type="button" class="portal-pick-card ${active?'active':''}" data-a="pickScope" data-scope="${esc(tr.scope)}" data-label="${esc(tr.orgName)}">
+     <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
+      <b>${esc(tr.orgName)}</b>
+      <span class="role">Trial</span>
+     </div>
+     <div class="mut sm">${esc(tr.email)}</div>
+     <div class="sm">${active?'<span class="ok">● Selected</span>':'Select trial →'}</div>
+    </button>`;
+   }).join('')}
+  </div>
  `,null,null,true);
 }
 
@@ -1275,31 +1402,41 @@ function Shell(){
  <main id="mn"><div class="tab-anim" data-tab-key="${esc(S.v)}-${S.tabTick}">${View()}</div></main></div></div>`
 }
 function View(){
+ if(S.u && S.u.role==='owner' && !isOwnerViewingCoachingData() && ['mark','students','fees','reports','batches'].includes(S.v)){
+  return `${OwnerPortalSwitchStrip()}${OwnerWorkspaceGate()}`;
+ }
  return({dash:S.u.role==='student'?Portal:Dash,mark:Mark,students:Studs,fees:Fees,reports:Reports,batches:Batches,settings:Settings})[S.v]();
 }
 
 function OwnerPortalSwitchStrip(){
  if(!S.u || S.u.role!=='owner')return '';
- const ownEmail=getOwnerEmail();
- const ownScope=emailToScopeRow(ownEmail);
  const clients=getClientEntries();
+ const trials=getTrialPortalCandidates();
+ const activeLabel = S.ownerSelectedPortal ? getActivePortalLabel() : 'None Selected (Coaching Data Hidden)';
  return`<div class="card" style="margin-bottom:14px;padding:12px 14px">
   <div class="bar" style="margin:0">
-   <span class="sm"><b>Active Portal:</b> <span class="role">${esc(getActivePortalLabel())}</span></span>
-   <select data-f="ownerPortalSel" aria-label="Select client portal" style="min-width:210px">
-    <option value="${esc(ownScope)}" ${ROW_ID===ownScope?'selected':''}>Owner Master (${esc(ownEmail)})</option>
+   <span class="sm"><b>Selected Portal:</b> <span class="role">${esc(activeLabel)}</span></span>
+   <select data-f="ownerPortalSel" aria-label="Select client coaching or trial admin" style="min-width:220px">
+    <option value="__OWNER_MASTER__" ${!S.ownerSelectedPortal?'selected':''}>[Master] Owner Master (Hide Coaching Data)</option>
     ${clients.map(([em,cfg])=>{
      const sc=cfg.scope||emailToScopeRow(em);
      const lbl=cfg.orgName||cfg.name||em;
-     return`<option value="${esc(sc)}" ${ROW_ID===sc?'selected':''}>${esc(lbl)} (${esc(em)})</option>`;
+     return`<option value="${esc(sc)}" ${S.ownerSelectedPortal && ROW_ID===sc?'selected':''}>[Client] ${esc(lbl)} (${esc(em)})</option>`;
+    }).join('')}
+    ${trials.map(tr=>{
+     return`<option value="${esc(tr.scope)}" ${S.ownerSelectedPortal && ROW_ID===tr.scope?'selected':''}>[Trial] ${esc(tr.orgName)} (${esc(tr.email)})</option>`;
     }).join('')}
    </select>
-   <button type="button" class="b sm" data-a="openPortalPicker">All Portals (${clients.length+1})</button>
+   ${S.ownerSelectedPortal?`<button type="button" class="b sm" data-a="goOwnerMaster">← Owner Master</button>`:''}
+   <button type="button" class="b sm" data-a="openPortalPicker">Select Portal (${clients.length + trials.length + 1})</button>
   </div>
  </div>`;
 }
 
 function Dash(){
+ if(!isOwnerViewingCoachingData()){
+  return `${OwnerPortalSwitchStrip()}<div class="ph"><h1>Owner Master — Portal Selection Required</h1></div>${OwnerWorkspaceGate()}`;
+ }
  const ids=mine().map(b=>b.id),t=dayC(TODAY,ids),rk=risk();
  const m=curMonth();
  const dueCount=myStu().filter(s=>getFee(s.id,m).status!=='Paid').length;
@@ -1648,15 +1785,32 @@ function bindLogoFileInput(){
 }
 
 function render(animateTab=true){
- if(animateTab)S.tabTick++;
- document.title=`${orgName()} — Attendance`;
- const bgHtml=S.u?'<div class="grid-bg"></div><div class="orb o1"></div><div class="orb o2"></div><div class="shape-3d-ring"></div>':'<div class="grid-bg"></div><div class="orb o1"></div><div class="orb o2"></div>';
- if($('#bg-fx').dataset.mode!==(S.u?'app':'login')){$('#bg-fx').innerHTML=bgHtml;$('#bg-fx').dataset.mode=S.u?'app':'login'}
- syncCursorFx();
- $('#app').innerHTML=S.u?Shell():Login();
- if(!S.u)syncLoginUsernameVisibility();
- if(S.u&&S.v==='settings')bindLogoFileInput();
- if(S.u&&S.drawerId&&sOf(S.drawerId)){$('#dr').innerHTML=`<aside class="dr" role="dialog" aria-label="Student profile">${profile(S.drawerId)}</aside>`}else{$('#dr').innerHTML=''}
+ try{
+  if(animateTab)S.tabTick++;
+  document.title=`${orgName()} — Attendance`;
+  const bgEl=$('#bg-fx');
+  if(bgEl){
+   const bgHtml=S.u?'<div class="grid-bg"></div><div class="orb o1"></div><div class="orb o2"></div><div class="shape-3d-ring"></div>':'<div class="grid-bg"></div><div class="orb o1"></div><div class="orb o2"></div>';
+   const mode=S.u?'app':'login';
+   if(bgEl.dataset.mode!==mode){bgEl.innerHTML=bgHtml;bgEl.dataset.mode=mode}
+  }
+  syncCursorFx();
+  const appEl=$('#app');
+  if(appEl){
+   appEl.innerHTML=S.u?Shell():Login();
+  }
+  if(!S.u)syncLoginUsernameVisibility();
+  if(S.u&&S.v==='settings')bindLogoFileInput();
+  const drEl=$('#dr');
+  if(drEl){
+   if(S.u&&S.drawerId&&sOf(S.drawerId)){drEl.innerHTML=`<aside class="dr" role="dialog" aria-label="Student profile">${profile(S.drawerId)}</aside>`}else{drEl.innerHTML=''}
+  }
+ }catch(err){
+  const appEl=$('#app');
+  if(appEl && !appEl.innerHTML.trim()){
+   appEl.innerHTML=`<div class="lg"><div class="card"><h2>${esc(DEFAULT_ORG)}</h2><p class="mut sm">Initializing view...</p><button type="button" class="b pri" onclick="location.reload()">Reload</button></div></div>`;
+  }
+ }
 }
 
 async function checkExpiryOnLoad(){
@@ -1690,6 +1844,7 @@ document.addEventListener('click',async e=>{
  else if(a==='mok'){if(modal.cb&&await modal.cb()===false)return;closeM()}
  else if(a==='myProfile'){openMyProfileModal()}
  else if(a==='openPortalPicker'){openOwnerPortalPicker(false)}
+ else if(a==='goOwnerMaster'){closeM();await returnToOwnerMasterGate()}
  else if(a==='pickScope'){
   const sc=el.dataset.scope;
   const lbl=el.dataset.label||'';
@@ -1829,14 +1984,15 @@ document.addEventListener('click',async e=>{
    const validOwnerPw = pw===(ownerMaster.ownerPw||DEFAULT_OWNER_PW) || pw===DEFAULT_OWNER_PW;
    if(!validOwnerPw){toast('Invalid owner password');return}
    const ownName=(ownerMaster.ownerProfile&&ownerMaster.ownerProfile.name)||DEFAULT_OWNER_NAME;
-   S.u={e:getOwnerEmail(),role:'owner',name:ownName,scope:targetScope};
+   S.ownerSelectedPortal=false;
+   S.u={e:getOwnerEmail(),role:'owner',name:ownName,scope:targetScope,ownerSelectedPortal:false};
    saveSession(S.u);
    S.v='dash';S.dr=null;S.drawerId=null;
    subscribeRealtime();
    render(true);
-   toast('Signed in: '+ownName);
+   toast('Signed in: '+ownName+'. Select a client coaching or trial to view coaching data.');
    persist();
-   if(getClientEntries().length>0){
+   if(getClientEntries().length>0 || getTrialPortalCandidates().length>0){
     openOwnerPortalPicker(true);
    }
    return;
@@ -2221,7 +2377,7 @@ document.addEventListener('input',e=>{
 document.addEventListener('change',async e=>{
  const el=e.target,f=el.dataset.f;if(!f)return;
  if(f==='lang'){if(LANGS[el.value]){currentLang=el.value;applyLanguage();render(false);toast(LANGS[currentLang].label)}}
- else if(f==='ownerPortalSel'){if(el.value)await switchOwnerToScope(el.value)}
+ else if(f==='ownerPortalSel'){if(el.value==='__OWNER_MASTER__')await returnToOwnerMasterGate();else if(el.value)await switchOwnerToScope(el.value)}
  else if(f==='b'){guard(()=>{S.b=el.value;openDraft();render(false)})}
  else if(f==='sub'&&S.dr){S.dr.subject=el.value;render(false)}
  else if(f==='d'){guard(()=>{S.d=el.value||TODAY;openDraft();render(false)})}
@@ -2261,26 +2417,34 @@ try{
  const savedOm=JSON.parse(localStorage.getItem(OWNER_STORE_KEY));
  if(savedOm)ownerMaster=savedOm;
 }catch(e){}
-normalizeOwnerMaster();
+try{normalizeOwnerMaster()}catch(e){ownerMaster=emptyOwnerMaster()}
 
 S.u = (()=>{try{return JSON.parse(localStorage.getItem(SESSION_KEY))}catch(e){return null}})();
+S.ownerSelectedPortal = !!(S.u && S.u.role==='owner' && S.u.ownerSelectedPortal);
 const bootEmail = (S.u && S.u.e) || '';
 const initialScope = bootEmail ? emailToScopeRow(bootEmail) : ((()=>{try{return localStorage.getItem(ACTIVE_SCOPE_KEY)}catch(e){return ''}})() || BASE_TRIAL_ROW);
-loadLocalScopeDb(initialScope, bootEmail);
+try{
+ loadLocalScopeDb(initialScope, bootEmail);
+}catch(e){
+ db=emptyDb();
+}
 applyAccent();
 S.tempAccent = db.accent;
 S.tempLogo = db.orgLogo || '';
 
 render(true);
 
-const startBackgroundSync = ()=>{
- subscribeRealtime();
- loadCloud(true).then(()=>checkExpiryOnLoad());
+const startBackgroundSync = async ()=>{
+ try{
+  subscribeRealtime();
+  await loadCloud(true);
+  await checkExpiryOnLoad();
+ }catch(e){}
 };
-if(typeof requestIdleCallback === 'function'){
- requestIdleCallback(startBackgroundSync,{timeout:1200});
+if(document.readyState === 'loading'){
+ document.addEventListener('DOMContentLoaded',()=>setTimeout(startBackgroundSync,30));
 }else{
- setTimeout(startBackgroundSync,50);
+ setTimeout(startBackgroundSync,30);
 }
 </script>
 </body>
