@@ -213,7 +213,7 @@ tr.cl{cursor:pointer;transition:background .12s}tr.cl:hover{background:var(--pbg
 <body>
 <div id="bg-fx" aria-hidden="true"></div><div id="cursor-fx" aria-hidden="true"></div><div id="app"></div><div id="m"></div><div id="dr"></div><div id="toast" style="opacity:0"></div>
 <script>
-const APP_VERSION = '2.3';
+const APP_VERSION = '2.4';
 const VERSION_KEY = 'our_coaching_app_ver';
 const LANG_KEY = 'our_coaching_lang';
 const OWNER_CONTACT_PHONE = '03213091550';
@@ -364,13 +364,13 @@ const SUPABASE_ANON_KEY = 'sb_publishable_hfUzvb1uykYMoRVKPY4laQ_1xqGnv-4';
 const OWNER_ACCOUNT = {
   email: 'abdullah.owner@ourcoaching.pk',
   pw: 'abdullah',
-  name: 'Abdullah (Platform Owner)',
+  name: 'Abdullah (Owner)',
   role: 'owner'
 };
 
 const TRIAL_ADMIN_EMAIL = 'admin@ourcoaching.pk';
 const OWNER_GLOBAL_ROW = 'owner_global_master';
-const ACTIVE_SCOPE_KEY = 'our_coaching_active_scope_v23';
+const ACTIVE_SCOPE_KEY = 'our_coaching_active_scope_v24';
 
 const DEFAULT_ORG = 'OUR COACHING';
 const DEFAULT_TAGLINE = 'Smart Attendance, Fees & Batch Operations';
@@ -454,15 +454,15 @@ const BASE_TRIAL_ROW = 'trial_' + DEFAULT_COACHING_ID.trim().toLowerCase().repla
 
 function emailToScopeRow(email){
  const em=String(email||'').trim().toLowerCase();
- if(!em || em===TRIAL_ADMIN_EMAIL)return BASE_TRIAL_ROW;
- if(em===OWNER_ACCOUNT.email.toLowerCase())return OWNER_GLOBAL_ROW;
- return 'client_' + em.replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
+ if(!em)return BASE_TRIAL_ROW;
+ if(em===OWNER_ACCOUNT.email.toLowerCase())return 'email_owner_' + em.replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
+ return 'email_' + em.replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
 }
 
 let ROW_ID = BASE_TRIAL_ROW;
 let STORE_KEY = 'att_db_' + ROW_ID;
-let SESSION_KEY = 'att_sess_global_v23';
-let OWNER_STORE_KEY = 'att_owner_master_v23';
+let SESSION_KEY = 'att_sess_global_v24';
+let OWNER_STORE_KEY = 'att_owner_master_v24';
 
 let ownerMaster = emptyOwnerMaster();
 let db = emptyDb();
@@ -474,12 +474,56 @@ function setActiveScope(scopeRow){
  try{localStorage.setItem(ACTIVE_SCOPE_KEY, ROW_ID)}catch(e){}
 }
 
-function loadLocalScopeDb(scopeRow){
+function findBestLegacyDb(targetEmail=''){
+ const em=String(targetEmail||'').trim().toLowerCase();
+ const candidateKeys=[];
+ if(em){
+  candidateKeys.push('att_db_' + emailToScopeRow(em));
+  candidateKeys.push('att_db_client_' + em.replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,''));
+ }
+ candidateKeys.push(
+  'att_db_' + BASE_TRIAL_ROW,
+  'att_db_trial_1_coaching',
+  'att_db_1_coaching',
+  'att_db_owner_global_master',
+  'att_db_v23',
+  'att_db_v22',
+  'att_db'
+ );
+ try{
+  for(let i=0;i<localStorage.length;i++){
+   const k=localStorage.key(i);
+   if(k && k.startsWith('att_db_') && !candidateKeys.includes(k)){
+    candidateKeys.push(k);
+   }
+  }
+ }catch(e){}
+
+ let fallback=null;
+ for(const k of candidateKeys){
+  try{
+   const raw=localStorage.getItem(k);
+   if(!raw)continue;
+   const parsed=JSON.parse(raw);
+   if(!parsed || typeof parsed!=='object')continue;
+   const hasRichData=(Array.isArray(parsed.bat)&&parsed.bat.length) || (Array.isArray(parsed.stu)&&parsed.stu.length) || (parsed.orgName && parsed.orgName!==DEFAULT_ORG) || parsed.orgLogo;
+   if(hasRichData)return parsed;
+   if(!fallback)fallback=parsed;
+  }catch(e){}
+ }
+ return fallback;
+}
+
+function loadLocalScopeDb(scopeRow, targetEmail=''){
  setActiveScope(scopeRow);
  let parsed=null;
  try{parsed=JSON.parse(localStorage.getItem(STORE_KEY))}catch(e){}
- if(!parsed && scopeRow===BASE_TRIAL_ROW){
-  try{parsed=JSON.parse(localStorage.getItem('att_db_' + DEFAULT_COACHING_ID.trim().toLowerCase().replace(/\s+/g,'_')))}catch(e){}
+ const hasMeaningful=p=>p && ((Array.isArray(p.bat)&&p.bat.length)||(Array.isArray(p.stu)&&p.stu.length)||(p.orgName && p.orgName!==DEFAULT_ORG)||p.orgLogo||(p.admin&&p.admin.photo));
+ if(!hasMeaningful(parsed)){
+  const legacy=findBestLegacyDb(targetEmail);
+  if(legacy){
+   parsed={...emptyDb(),...legacy};
+  }
  }
  db = parsed || emptyDb();
  normalizeDb();
@@ -510,10 +554,10 @@ function syncOwnerMasterToDb(){
  db.revokedTrials = ownerMaster.revokedTrials||{};
  db.loginLogs = ownerMaster.loginLogs||[];
  if(S.u && S.u.role==='owner'){
-  db.orgName = ownerMaster.ownerOrgName || db.orgName || DEFAULT_ORG;
-  db.orgTagline = ownerMaster.ownerTagline != null ? ownerMaster.ownerTagline : db.orgTagline;
-  db.orgLogo = ownerMaster.ownerLogo || '';
-  db.accent = ownerMaster.ownerAccent || db.accent || 'indigo';
+  if(ownerMaster.ownerOrgName && ownerMaster.ownerOrgName!==DEFAULT_ORG)db.orgName=ownerMaster.ownerOrgName;
+  if(ownerMaster.ownerTagline && ownerMaster.ownerTagline!==DEFAULT_TAGLINE)db.orgTagline=ownerMaster.ownerTagline;
+  if(ownerMaster.ownerLogo)db.orgLogo=ownerMaster.ownerLogo;
+  if(ownerMaster.ownerAccent)db.accent=ownerMaster.ownerAccent;
  }
 }
 
@@ -586,18 +630,6 @@ function addAudit(action,detail=''){
  db.auditLogs=(db.auditLogs||[]).concat([{action,detail,by,at:new Date().toISOString()}]).slice(-80);
 }
 
-function wipeTrialRecords(){
- db.bat=[];
- db.tch=[];
- db.stu=[];
- db.att={};
- db.fees={};
- db.flags={};
- S.dr=null;
- S.selectedFeeIds=[];
- closeDr();
-}
-
 function trialDaysElapsed(claimedAt){
  if(!claimedAt)return 0;
  const start=new Date(claimedAt).getTime();
@@ -633,13 +665,6 @@ function showTrialExpiredPopup(reasonText='Aapka trial khatam ho gaya hai.'){
 function waOwnerBuy(note=''){
  const msg=encodeURIComponent(`Assalam-o-Alaikum, ${orgName()} (${ROW_ID}) ke liye subscription buy / renew karni hai. ${note}`);
  return `https://wa.me/92${OWNER_CONTACT_PHONE.replace(/^0/,'')}?text=${msg}`;
-}
-
-function waClientRenewal(){
- const digits=String(db.clientPhone||'').replace(/\D/g,'');
- const intl=digits.startsWith('03')?'92'+digits.slice(1):digits;
- const msg=encodeURIComponent(`Assalam-o-Alaikum ${db.admin.name||'Client'}, aapki ${orgName()} (${ROW_ID}) subscription ka renewal/payment time aa gaya hai. Kindly fee clear kar dein taake service smoothly chalti rahe. Contact: ${OWNER_CONTACT_PHONE}`);
- return {intl,url:`https://wa.me/${intl}?text=${msg}`,text:decodeURIComponent(msg)};
 }
 
 const orgName=()=>db.orgName||DEFAULT_ORG;
@@ -750,7 +775,7 @@ function openMyProfileModal(){
   saveSession(S.u);
   await persist();
   render(false);
-  toast('Profile synced across devices');
+  toast('Profile synced across all devices & IPs');
  });
  const fin=$('#profPhotoInput');
  if(fin){
@@ -872,9 +897,9 @@ async function loadOwnerMaster(silent=true){
  const sb=getSb();
  if(!sb)return ownerMaster;
  try{
-  const {data,error}=await sb.from('app_state').select('data').eq('id',OWNER_GLOBAL_ROW).single();
+  const {data,error}=await sb.from('app_state').select('data').eq('id',OWNER_GLOBAL_ROW).maybeSingle();
   if(!error && data && data.data){
-   ownerMaster=data.data;
+   ownerMaster={...emptyOwnerMaster(),...data.data};
    normalizeOwnerMaster();
    try{localStorage.setItem(OWNER_STORE_KEY,JSON.stringify(ownerMaster))}catch(e){}
   }
@@ -888,7 +913,8 @@ async function persistOwnerMaster(){
  const sb=getSb();
  if(!sb)return;
  try{
-  await sb.from('app_state').upsert({id:OWNER_GLOBAL_ROW,data:ownerMaster,updated_at:new Date().toISOString()});
+  const {error}=await sb.from('app_state').upsert({id:OWNER_GLOBAL_ROW,data:ownerMaster,updated_at:new Date().toISOString()},{onConflict:'id'});
+  if(error)throw error;
  }catch(e){}
 }
 
@@ -897,25 +923,25 @@ async function loadCloud(silent=false){
  if(!sb)return;
  try{
   await loadOwnerMaster(true);
-  const targetRow = (S.u && S.u.role==='owner') ? OWNER_GLOBAL_ROW : ROW_ID;
-  const {data,error}=await sb.from('app_state').select('data').eq('id',targetRow).single();
-  if(error && error.code!=='PGRST116')throw error;
-  if(data&&data.data){
-   if(targetRow===OWNER_GLOBAL_ROW){
-    ownerMaster=data.data;
-    normalizeOwnerMaster();
-    syncOwnerMasterToDb();
-    if(S.u && S.u.role==='owner'){
-     S.u={...S.u,name:(ownerMaster.ownerProfile&&ownerMaster.ownerProfile.name)||OWNER_ACCOUNT.name};
-     saveSession(S.u);
-    }
-   }else{
-    db=data.data;
+  const targetRow = ROW_ID;
+  const {data,error}=await sb.from('app_state').select('data').eq('id',targetRow).maybeSingle();
+  if(error)throw error;
+  if(data && data.data){
+   const cloudDb={...emptyDb(),...data.data};
+   const hasCloudRich=((Array.isArray(cloudDb.bat)&&cloudDb.bat.length)||(Array.isArray(cloudDb.stu)&&cloudDb.stu.length)||(cloudDb.orgName&&cloudDb.orgName!==DEFAULT_ORG)||cloudDb.orgLogo);
+   const hasLocalRich=((Array.isArray(db.bat)&&db.bat.length)||(Array.isArray(db.stu)&&db.stu.length)||(db.orgName&&db.orgName!==DEFAULT_ORG)||db.orgLogo);
+   if(hasCloudRich || !hasLocalRich){
+    db=cloudDb;
     normalizeDb();
-    if(S.u && (S.u.role==='client'||S.u.role==='admin') && db.admin && db.admin.name){
-     S.u={...S.u,name:db.admin.name};
-     saveSession(S.u);
-    }
+   }else{
+    normalizeDb();
+   }
+   if(S.u && S.u.role==='owner' && ownerMaster.ownerProfile && ownerMaster.ownerProfile.name){
+    S.u={...S.u,name:ownerMaster.ownerProfile.name};
+    saveSession(S.u);
+   }else if(S.u && (S.u.role==='client'||S.u.role==='admin') && db.admin && db.admin.name){
+    S.u={...S.u,name:db.admin.name};
+    saveSession(S.u);
    }
    applyAccent();
    enforceRemoteLock();
@@ -932,7 +958,7 @@ async function loadCloud(silent=false){
   }
  }catch(err){
   syncStatus='Sync error';
-  if(!silent)toast('Cloud sync error: check Supabase table/key');
+  if(!silent)toast('Cloud sync error');
   else updateSyncBadges();
  }
 }
@@ -956,10 +982,8 @@ async function persist(){
  updateSyncBadges();
  try{
   await persistOwnerMaster();
-  if(!S.u || S.u.role!=='owner'){
-   const {error}=await sb.from('app_state').upsert({id:ROW_ID,data:db,updated_at:new Date().toISOString()});
-   if(error)throw error;
-  }
+  const {error}=await sb.from('app_state').upsert({id:ROW_ID,data:db,updated_at:new Date().toISOString()},{onConflict:'id'});
+  if(error)throw error;
   syncStatus='Live synced';
   updateSyncBadges();
  }catch(err){
@@ -973,25 +997,18 @@ function subscribeRealtime(){
  const sb=getSb();
  if(!sb)return;
  if(rtChannel){try{sb.removeChannel(rtChannel)}catch(e){}}
- const watchId = (S.u && S.u.role==='owner') ? OWNER_GLOBAL_ROW : ROW_ID;
+ const watchId = ROW_ID;
  rtChannel = sb.channel('live_'+watchId+'_'+Date.now())
   .on('postgres_changes',{event:'*',schema:'public',table:'app_state',filter:`id=eq.${watchId}`},payload=>{
    if(payload.new&&payload.new.data){
-    if(watchId===OWNER_GLOBAL_ROW){
-     ownerMaster=payload.new.data;
-     normalizeOwnerMaster();
-     syncOwnerMasterToDb();
-     if(S.u && S.u.role==='owner' && ownerMaster.ownerProfile && ownerMaster.ownerProfile.name){
-      S.u={...S.u,name:ownerMaster.ownerProfile.name};
-      saveSession(S.u);
-     }
-    }else{
-     db=payload.new.data;
-     normalizeDb();
-     if(S.u && (S.u.role==='client'||S.u.role==='admin') && db.admin && db.admin.name){
-      S.u={...S.u,name:db.admin.name};
-      saveSession(S.u);
-     }
+    db={...emptyDb(),...payload.new.data};
+    normalizeDb();
+    if(S.u && S.u.role==='owner' && ownerMaster.ownerProfile && ownerMaster.ownerProfile.name){
+     S.u={...S.u,name:ownerMaster.ownerProfile.name};
+     saveSession(S.u);
+    }else if(S.u && (S.u.role==='client'||S.u.role==='admin') && db.admin && db.admin.name){
+     S.u={...S.u,name:db.admin.name};
+     saveSession(S.u);
     }
     applyAccent();
     enforceRemoteLock();
@@ -1007,8 +1024,8 @@ function subscribeRealtime(){
 
 function getUsers(){
  const list=[
-  {e:OWNER_ACCOUNT.email.toLowerCase(),pw:ownerMaster.ownerPw||OWNER_ACCOUNT.pw,role:'owner',name:(ownerMaster.ownerProfile&&ownerMaster.ownerProfile.name)||OWNER_ACCOUNT.name,scope:OWNER_GLOBAL_ROW},
-  {e:TRIAL_ADMIN_EMAIL,pw:(db.admin&&db.admin.email===TRIAL_ADMIN_EMAIL?db.admin.pw:'admin123')||'admin123',role:'admin',name:(db.admin&&db.admin.email===TRIAL_ADMIN_EMAIL?db.admin.name:'Trial Admin')||'Trial Admin',scope:BASE_TRIAL_ROW}
+  {e:OWNER_ACCOUNT.email.toLowerCase(),pw:ownerMaster.ownerPw||OWNER_ACCOUNT.pw,role:'owner',name:(ownerMaster.ownerProfile&&ownerMaster.ownerProfile.name)||OWNER_ACCOUNT.name,scope:emailToScopeRow(OWNER_ACCOUNT.email)},
+  {e:TRIAL_ADMIN_EMAIL,pw:(db.admin&&db.admin.pw)||'admin123',role:'admin',name:(db.admin&&db.admin.name)||'Principal (Admin)',scope:emailToScopeRow(TRIAL_ADMIN_EMAIL)}
  ];
  Object.entries(ownerMaster.clients||{}).forEach(([em,cfg])=>{
   if(cfg && em && em!==OWNER_ACCOUNT.email.toLowerCase() && em!==TRIAL_ADMIN_EMAIL){
@@ -1017,14 +1034,14 @@ function getUsers(){
     pw:cfg.pw||'client123',
     role:'client',
     name:cfg.name||cfg.orgName||em,
-    scope:cfg.scope||emailToScopeRow(em)
+    scope:emailToScopeRow(em)
    });
   }
  });
  if(db.admin && db.admin.email && db.admin.email.toLowerCase()!==TRIAL_ADMIN_EMAIL){
   const aem=db.admin.email.toLowerCase();
   if(!list.some(x=>x.e===aem)){
-   list.push({e:aem,pw:db.admin.pw||'admin123',role:'client',name:db.admin.name,scope:ROW_ID});
+   list.push({e:aem,pw:db.admin.pw||'admin123',role:'client',name:db.admin.name,scope:emailToScopeRow(aem)});
   }
  }
  db.tch.forEach(t=>list.push({e:t.email.toLowerCase(),pw:t.pw||'teach123',role:'teacher',ref:t.id,name:t.name,scope:ROW_ID}));
@@ -1113,13 +1130,12 @@ function Login(){
   <label>${esc(T('password'))}<input id="lp" type="password" autocomplete="current-password" placeholder="••••••••"></label>
  </div>
  <button class="b pri" data-a="login">${esc(T('signIn'))}</button>
- <div class="mut sm"><b>Cross-Device Cloud Sync:</b> Owner &amp; Paid Client emails sync automatically across Mobile &amp; PC.</div>
- <div class="mut sm">Free Trial login: <b>${esc(TRIAL_ADMIN_EMAIL)}</b> / <b>admin123</b></div>
+ <div class="mut sm">Same email across any mobile, browser or IP keeps your data &amp; settings synced.</div>
  <button class="b sm" data-a="restoreJson">Restore backup (JSON)</button></div></div>`
 }
 
 const NAV={
- owner:[['dash','dash'],['settings','settings']],
+ owner:[['dash','dash'],['mark','mark'],['students','students'],['fees','fees'],['reports','reports'],['batches','batches'],['settings','settings']],
  client:[['dash','dash'],['mark','mark'],['students','students'],['fees','fees'],['reports','reports'],['batches','batches'],['settings','settings']],
  admin:[['dash','dash'],['mark','mark'],['students','students'],['fees','fees'],['reports','reports'],['batches','batches'],['settings','settings']],
  teacher:[['dash','dash'],['mark','mark'],['students','students'],['reports','reports']],
@@ -1132,37 +1148,14 @@ function Shell(){
  return`<div class="shell"><aside class="side">${brandHtml()}${db.orgTagline?`<div class="tagline">${esc(db.orgTagline)}</div>`:''}${n}<div style="flex:1"></div><button class="nv" data-a="myProfile">${esc(T('editProf'))}</button><button class="nv" data-a="syncNow">${esc(T('syncNow'))}</button><button class="nv" data-a="theme">${esc(T('themeBtn'))}</button><button class="nv" data-a="backupJson">${esc(T('exportBak'))}</button><button class="nv" data-a="logout">${esc(T('logout'))}</button><div class="mut sm" style="padding:6px 12px 0">Version ${esc(APP_VERSION)}</div></aside>
  <div><div class="top"><b class="mut sm rl">${esc(ctx)}</b><span class="sync ${syncStatus==='Sync error'?'err':''}"><i></i>${esc(syncStatus)}</span><div class="sp"></div>
  ${langSelectHtml()}
- ${isStaff(u.role)&&u.role!=='owner'?`<button class="b sm" data-a="bell" aria-label="${esc(T('alerts'))}">${esc(T('alerts'))} ${nr?`<b class="bad">${nr}</b>`:''}</button>`:''}
+ ${isStaff(u.role)?`<button class="b sm" data-a="bell" aria-label="${esc(T('alerts'))}">${esc(T('alerts'))} ${nr?`<b class="bad">${nr}</b>`:''}</button>`:''}
  <button type="button" class="chip" data-a="myProfile" title="${esc(T('editProf'))}">${avOf(curProf.name,curProf.photo)}<span class="role">${esc(u.role)}</span></button><button class="b sm" data-a="logout">${esc(T('logout'))}</button>
  <div class="mob-dots-wrap"><button type="button" class="b sm mob-dots-btn" data-a="mobDots" aria-label="Menu" aria-expanded="${S.mobMenuOpen?'true':'false'}">⋮</button>${S.mobMenuOpen?`<div class="mob-dots-backdrop" data-a="mobDotsClose"></div><div class="mob-dots-menu" role="menu">${mobNav}<hr><button type="button" data-a="myProfile">${esc(T('editProf'))}</button><button type="button" data-a="syncNow">${esc(T('syncNow'))}</button><button type="button" data-a="theme">${esc(T('themeBtn'))}</button><button type="button" data-a="backupJson">${esc(T('exportBak'))}</button></div>`:''}</div>
- ${isStaff(u.role)&&u.role!=='owner'?`<input id="gq" placeholder="${esc(T('searchStu'))}" aria-label="${esc(T('searchStu'))}" value="${esc(S.q)}">`:''}</div>
+ ${isStaff(u.role)?`<input id="gq" placeholder="${esc(T('searchStu'))}" aria-label="${esc(T('searchStu'))}" value="${esc(S.q)}">`:''}</div>
  <main id="mn"><div class="tab-anim" data-tab-key="${esc(S.v)}-${S.tabTick}">${View()}</div></main></div></div>`
 }
 function View(){
- if(S.u.role==='owner')return S.v==='settings'?Settings():OwnerDash();
  return({dash:S.u.role==='student'?Portal:Dash,mark:Mark,students:Studs,fees:Fees,reports:Reports,batches:Batches,settings:Settings})[S.v]();
-}
-
-function OwnerDash(){
- const clients=Object.entries(ownerMaster.clients||{});
- const activeClients=clients.filter(([,c])=>!c.paused).length;
- const trialCount=Object.keys(ownerMaster.trialAccounts||{}).length;
- const ipCount=Object.keys(ownerMaster.trialClaimedIps||{}).length;
- return`<div class="ph"><h1>Owner Control Center</h1><div class="bar" style="margin:0"><button class="b sm pri" data-a="nav" data-v="settings">Manage Clients &amp; Trials</button></div></div>
- <div class="kp">
-  <div class="card tilt-3d"><span class="mut">Paid Clients</span><b class="ok">${activeClients} / ${clients.length}</b></div>
-  <div class="card tilt-3d"><span class="mut">Trial Logins</span><b>${trialCount}</b></div>
-  <div class="card tilt-3d"><span class="mut">Claimed Trial IPs</span><b>${ipCount}</b></div>
-  <div class="card tilt-3d"><span class="mut">Account Sync</span><b class="ok">Global Cloud</b></div>
- </div>
- <div class="card" style="margin-bottom:14px">
-  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-   <h2>Paid Client Accounts (Cross-Device Synced)</h2>
-   <button type="button" class="b sm pri" data-a="addClientModal">+ Add Paid Client</button>
-  </div>
-  <p class="mut sm" style="margin-bottom:10px">Har paid client ki apni dedicated email aur isolated cloud database hoti hai. Client chahe mobile par login kare ya PC par, uska saara data, logo, profile picture aur settings same rehte hain — aur trial users ke saath mix nahi hote.</p>
-  ${clients.length?`<div class="tw"><table><tr><th>Client / Coaching</th><th>Login Email</th><th>Password</th><th>WhatsApp</th><th>Status</th><th>Actions</th></tr>${clients.map(([em,c])=>`<tr><td><b>${esc(c.orgName||c.name||em)}</b><div class="mut sm">${esc(c.name||'')}</div></td><td><b>${esc(em)}</b></td><td>${esc(c.pw||'')}</td><td>${esc(c.phone||'–')}</td><td>${c.paused?'<span class="bd sA">Paused</span>':'<span class="bd sP">Active</span>'}</td><td><div style="display:flex;gap:6px"><button type="button" class="b sm" data-a="toggleClientPause" data-em="${esc(em)}">${c.paused?'Activate':'Pause'}</button><button type="button" class="b sm del" data-a="delClient" data-em="${esc(em)}">Remove</button></div></td></tr>`).join('')}</table></div>`:'<div class="emp">Abhi koi paid client account add nahi hai. "+ Add Paid Client" par click karke naya client banayein (e.g. client.1@ourcoaching.pk).</div>'}
- </div>`;
 }
 
 function Dash(){
@@ -1336,25 +1329,24 @@ function Settings(){
  const selAcc=S.tempAccent||db.accent||'indigo';
  const logoCur=S.tempLogo!==undefined?S.tempLogo:(db.orgLogo||'');
  const isOwner=S.u.role==='owner';
- const isClient=S.u.role==='client';
  const clients=Object.entries(ownerMaster.clients||{});
  const trialAccList=Object.values(ownerMaster.trialAccounts||{}).sort((a,b)=>new Date(b.firstLoginAt||0)-new Date(a.firstLoginAt||0));
  const claimedList=Object.entries(ownerMaster.trialClaimedIps||{});
  const limitDays=Number(ownerMaster.trialDays)||7;
  const revokedEntries=Object.entries(ownerMaster.revokedTrials||{});
  const recentLogs=(ownerMaster.loginLogs||[]).slice(-15).reverse();
- return`<div class="ph"><h1>${esc(T('settings'))}</h1><span class="mut sm">Scope: <b>${esc(isOwner?'OWNER GLOBAL':ROW_ID)}</b> · App <b>v${esc(APP_VERSION)}</b></span></div>
+ return`<div class="ph"><h1>${esc(T('settings'))}</h1><span class="mut sm">Account: <b>${esc((S.u&&S.u.e)||'')}</b> · App <b>v${esc(APP_VERSION)}</b></span></div>
  ${isOwner?`
   <div class="card own-box" style="margin-bottom:14px">
    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
-    <h2>Paid Client Accounts (Owner se neeche, Trial Admin se upar)</h2>
-    <button type="button" class="b sm pri" data-a="addClientModal">+ Add Paid Client</button>
+    <h2>Clients Add</h2>
+    <button type="button" class="b sm pri" data-a="addClientModal">+ Add Client</button>
    </div>
-   <div class="mut sm">Jab aap kisi client ko software sell karein (e.g. <b>client.1@ourcoaching.pk</b>), yahan se uski email aur password banayein. Client apni email se Mobile par login kare ya PC par — uska saara data, profile picture, logo aur settings har device par 100% same rahenge.</div>
-   ${clients.length?`<div class="tw" style="margin-top:6px"><table><tr><th>Client Email</th><th>Institute / Name</th><th>Password</th><th>WhatsApp</th><th>Cloud Scope</th><th>Status</th><th>Manage</th></tr>${clients.map(([em,c])=>`<tr><td><b>${esc(em)}</b></td><td><b>${esc(c.orgName||c.name||em)}</b><div class="mut sm">${esc(c.name||'')}</div></td><td>${esc(c.pw||'')}</td><td>${esc(c.phone||'–')}</td><td class="sm mut">${esc(c.scope||emailToScopeRow(em))}</td><td>${c.paused?'<span class="bd sA">Paused</span>':'<span class="bd sP">Active</span>'}</td><td><div style="display:flex;gap:6px"><button type="button" class="b sm" data-a="toggleClientPause" data-em="${esc(em)}">${c.paused?'Activate':'Pause'}</button><button type="button" class="b sm del" data-a="delClient" data-em="${esc(em)}">Remove</button></div></td></tr>`).join('')}</table></div>`:'<div class="emp">No paid clients added yet.</div>'}
+   <div class="mut sm">Only Owner can add or manage client accounts. Each email keeps its own data, profile picture, logo, and settings across all mobiles and IPs.</div>
+   ${clients.length?`<div class="tw" style="margin-top:6px"><table><tr><th>Client Email</th><th>Institute / Name</th><th>Password</th><th>WhatsApp</th><th>Status</th><th>Manage</th></tr>${clients.map(([em,c])=>`<tr><td><b>${esc(em)}</b></td><td><b>${esc(c.orgName||c.name||em)}</b><div class="mut sm">${esc(c.name||'')}</div></td><td>${esc(c.pw||'')}</td><td>${esc(c.phone||'–')}</td><td>${c.paused?'<span class="bd sA">Paused</span>':'<span class="bd sP">Active</span>'}</td><td><div style="display:flex;gap:6px"><button type="button" class="b sm" data-a="toggleClientPause" data-em="${esc(em)}">${c.paused?'Activate':'Pause'}</button><button type="button" class="b sm del" data-a="delClient" data-em="${esc(em)}">Remove</button></div></td></tr>`).join('')}</table></div>`:'<div class="emp">No clients added yet. Click "+ Add Client" to add a client email.</div>'}
    <hr style="border:0;border-top:1px solid var(--line);margin:4px 0">
    <div style="min-width:0;max-width:100%">
-    <b class="sm">Trial Logins (${trialAccList.length}) — Isolated from Owner &amp; Paid Clients:</b>
+    <b class="sm">Trial Logins (${trialAccList.length}):</b>
     ${trialAccList.length?`<div class="tw" style="margin-top:6px"><table><tr><th>Username</th><th>Account Email</th><th>Role</th><th>IP</th><th>Logged In Since</th><th>First Login</th><th>Status</th><th>Manage</th></tr>${trialAccList.map(acc=>{
      const em=(acc&&acc.email)||'';
      const usr=(acc&&acc.username)||'–';
@@ -1405,28 +1397,27 @@ function Settings(){
    </div>
    <div class="bar" style="margin-top:4px"><button class="b sm" data-a="theme">${esc(T('themeBtn'))}</button></div>
    <hr style="border:0;border-top:1px solid var(--line);margin:4px 0">
-   <h2>${isOwner?'Owner Login Credentials':isClient?'Client Account Credentials':'Trial Admin Credentials'}</h2>
+   <h2>Account Credentials</h2>
    <label>Display name<input id="setAName" value="${esc(isOwner?((ownerMaster.ownerProfile&&ownerMaster.ownerProfile.name)||OWNER_ACCOUNT.name):db.admin.name)}"></label>
-   <label>Login email<input id="setAEmail" type="email" value="${esc(isOwner?OWNER_ACCOUNT.email:(isClient?S.u.e:db.admin.email))}" ${(isOwner||isClient)?'readonly':''}></label>
+   <label>Login email<input id="setAEmail" type="email" value="${esc(isOwner?OWNER_ACCOUNT.email:db.admin.email)}" ${isOwner?'readonly':''}></label>
    <label>Password<input id="setAPw" type="text" value="${esc(isOwner?(ownerMaster.ownerPw||OWNER_ACCOUNT.pw):db.admin.pw)}"></label>
   </div>
   <div class="card fl">
    ${isOwner?`
-    <h2>Trial Anti-Abuse &amp; Duration</h2>
-    <p class="mut sm">1 week (7 days) trial applies to <b>${esc(TRIAL_ADMIN_EMAIL)}</b>. Paid Client accounts are unaffected by trial expiry.</p>
+    <h2>Trial Duration &amp; IP Timer</h2>
+    <p class="mut sm">Trial duration applies from first IP login.</p>
     <label>Trial duration (days)<input id="setTrialDays" type="number" min="1" max="365" value="${esc(limitDays)}"></label>
     <label class="chk"><input type="checkbox" id="setTrialIpLock" ${ownerMaster.trialIpLock?'checked':''}> Enforce trial timer per IP &amp; expiry lock</label>
     ${claimedList.length?`<div class="bar"><button type="button" class="b sm" data-a="resetTrialIps">Clear all claimed IPs</button></div>`:''}
-   `:`
-    <h2>Campus Wi-Fi / IP Access Lock</h2>
-    <p class="mut sm">When enabled, <b>Students</b> can only sign in when connected to your coaching center’s Wi-Fi/internet IP.</p>
-    <label class="chk"><input type="checkbox" id="setIpLock" ${db.ipLock?'checked':''}> Enable campus-only IP access for students</label>
-    <label>Allowed coaching public IP(s) (comma separated)<input id="setIps" value="${esc(db.allowedIps||'')}" placeholder="e.g. 103.255.4.12"></label>
-    <div class="bar"><button type="button" class="b sm" data-a="grabIp">Use my current IP</button><span class="mut sm" id="curIpTxt" style="word-break:break-all">${clientIp?'Detected IP: '+esc(clientIp):''}</span></div>
-   `}
+   `:''}
+   <h2>Campus Wi-Fi / IP Access Lock</h2>
+   <p class="mut sm">When enabled, <b>Students</b> can only sign in when connected to your coaching center’s Wi-Fi/internet IP.</p>
+   <label class="chk"><input type="checkbox" id="setIpLock" ${db.ipLock?'checked':''}> Enable campus-only IP access for students</label>
+   <label>Allowed coaching public IP(s) (comma separated)<input id="setIps" value="${esc(db.allowedIps||'')}" placeholder="e.g. 103.255.4.12"></label>
+   <div class="bar"><button type="button" class="b sm" data-a="grabIp">Use my current IP</button><span class="mut sm" id="curIpTxt" style="word-break:break-all">${clientIp?'Detected IP: '+esc(clientIp):''}</span></div>
   </div>
  </div>
- <div class="bar"><button class="b pri" data-a="saveSettings">${esc(T('saveSettings'))}</button>${!isOwner?`<button class="b" data-a="loadDemo">Load sample demo data</button><button class="b del" data-a="clearAllData">Clear all records</button>`:''}</div>`
+ <div class="bar"><button class="b pri" data-a="saveSettings">${esc(T('saveSettings'))}</button><button class="b" data-a="loadDemo">Load sample demo data</button><button class="b del" data-a="clearAllData">Clear all records</button></div>`
 }
 
 function Portal(){
@@ -1554,24 +1545,24 @@ document.addEventListener('click',async e=>{
   if(box)box.innerHTML=`${avOf(nm,'','lg-av')}<div style="display:grid;gap:6px"><div><b>${esc(nm)}</b> <span class="role">${esc(S.u.role)}</span></div><label class="b sm" style="cursor:pointer;margin:0">Upload Photo<input type="file" id="profPhotoInput" accept="image/*" style="display:none"></label></div>`;
  }
  else if(a==='addClientModal'){
-  if(S.u.role!=='owner'){toast('Owner access only');return}
+  if(!S.u || S.u.role!=='owner'){toast('Only Owner can add clients');return}
   const nextNum=Object.keys(ownerMaster.clients||{}).length+1;
-  modal('Add Paid Client Account',`
+  modal('Clients Add',`
    <div class="fl">
-    <label>Client Login Email<input id="ncEmail" type="email" value="client.${nextNum}@ourcoaching.pk" placeholder="client.1@ourcoaching.pk"></label>
+    <label>Client Email<input id="ncEmail" type="email" value="client.${nextNum}@ourcoaching.pk" placeholder="client.1@ourcoaching.pk"></label>
     <label>Client Password<input id="ncPw" type="text" value="client123"></label>
-    <label>Client / Principal Name<input id="ncName" placeholder="e.g. Sir Ahmed"></label>
-    <label>Coaching Institute Name<input id="ncOrg" placeholder="e.g. Apex Science Academy"></label>
+    <label>Client Name<input id="ncName" placeholder="e.g. Sir Ahmed"></label>
+    <label>Coaching Name<input id="ncOrg" placeholder="e.g. Apex Science Academy"></label>
     <label>Client WhatsApp Number<input id="ncPhone" placeholder="e.g. 03001234567"></label>
    </div>
-  `,'Create Client',async()=>{
+  `,'Add Client',async()=>{
    const em=val('ncEmail').trim().toLowerCase();
    const pw=val('ncPw').trim();
    const cname=val('ncName').trim()||'Client Admin';
-   const corg=val('ncOrg').trim()||'Coaching Institute';
+   const corg=val('ncOrg').trim()||orgName();
    const cphone=val('ncPhone').trim();
    if(!em||!em.includes('@')||!pw){toast('Valid email and password required');return false}
-   if(em===OWNER_ACCOUNT.email.toLowerCase()||em===TRIAL_ADMIN_EMAIL){toast('Use a separate email for paid client');return false}
+   if(em===OWNER_ACCOUNT.email.toLowerCase()||em===TRIAL_ADMIN_EMAIL){toast('Use a separate email for client');return false}
    const scope=emailToScopeRow(em);
    ownerMaster.clients=ownerMaster.clients||{};
    ownerMaster.clients[em]={email:em,pw,name:cname,orgName:corg,phone:cphone,scope,paused:false,createdAt:new Date().toISOString()};
@@ -1579,14 +1570,14 @@ document.addEventListener('click',async e=>{
    const sb=getSb();
    if(sb){
     const initClientDb={...emptyDb(),orgName:corg,clientPhone:cphone,admin:{name:cname,email:em,pw,photo:''}};
-    await sb.from('app_state').upsert({id:scope,data:initClientDb,updated_at:new Date().toISOString()});
+    await sb.from('app_state').upsert({id:scope,data:initClientDb,updated_at:new Date().toISOString()},{onConflict:'id'});
    }
    render(false);
-   toast('Paid client created: '+em);
+   toast('Client added: '+em);
   });
  }
  else if(a==='toggleClientPause'){
-  if(S.u.role!=='owner')return;
+  if(!S.u || S.u.role!=='owner')return;
   const em=(el.dataset.em||'').toLowerCase();
   const c=ownerMaster.clients&&ownerMaster.clients[em];
   if(!c)return;
@@ -1594,21 +1585,21 @@ document.addEventListener('click',async e=>{
   await persistOwnerMaster();
   const sb=getSb();
   if(sb){
-   const sc=c.scope||emailToScopeRow(em);
-   const {data}=await sb.from('app_state').select('data').eq('id',sc).single();
+   const sc=emailToScopeRow(em);
+   const {data}=await sb.from('app_state').select('data').eq('id',sc).maybeSingle();
    if(data&&data.data){
     data.data.appLocked=!!c.paused;
-    await sb.from('app_state').upsert({id:sc,data:data.data,updated_at:new Date().toISOString()});
+    await sb.from('app_state').upsert({id:sc,data:data.data,updated_at:new Date().toISOString()},{onConflict:'id'});
    }
   }
   render(false);
   toast(c.paused?'Client paused':'Client activated');
  }
  else if(a==='delClient'){
-  if(S.u.role!=='owner')return;
+  if(!S.u || S.u.role!=='owner')return;
   const em=(el.dataset.em||'').toLowerCase();
   if(!ownerMaster.clients||!ownerMaster.clients[em])return;
-  modal('Remove Paid Client?',`<p class="mut">Remove <b>${esc(em)}</b> from paid client accounts?</p>`,'Remove',async()=>{
+  modal('Remove Client?',`<p class="mut">Remove <b>${esc(em)}</b> from client list?</p>`,'Remove',async()=>{
    delete ownerMaster.clients[em];
    await persistOwnerMaster();
    render(false);
@@ -1620,20 +1611,21 @@ document.addEventListener('click',async e=>{
   const enteredUser=val('luser').trim();
   await loadOwnerMaster(true);
 
+  const targetScope = emailToScopeRow(em);
+  loadLocalScopeDb(targetScope, em);
+  await loadCloud(true);
+
   if(em===OWNER_ACCOUNT.email.toLowerCase()){
    const validOwnerPw = pw===(ownerMaster.ownerPw||OWNER_ACCOUNT.pw) || pw===OWNER_ACCOUNT.pw;
    if(!validOwnerPw){toast('Invalid owner password');return}
-   setActiveScope(OWNER_GLOBAL_ROW);
-   db=emptyDb();
-   normalizeDb();
-   await loadCloud(true);
    const ownName=(ownerMaster.ownerProfile&&ownerMaster.ownerProfile.name)||OWNER_ACCOUNT.name;
-   S.u={e:OWNER_ACCOUNT.email.toLowerCase(),role:'owner',name:ownName,scope:OWNER_GLOBAL_ROW};
+   S.u={e:OWNER_ACCOUNT.email.toLowerCase(),role:'owner',name:ownName,scope:targetScope};
    saveSession(S.u);
    S.v='dash';S.dr=null;S.drawerId=null;
    subscribeRealtime();
    render(true);
-   toast('Owner synced across devices: '+ownName);
+   toast('Signed in: '+ownName);
+   persist();
    return;
   }
 
@@ -1644,17 +1636,11 @@ document.addEventListener('click',async e=>{
     showTrialExpiredPopup('Aapka account temporarily paused hai. Renewal ke liye contact karein.');
     return;
    }
-   const clientScope = paidClient.scope || emailToScopeRow(em);
-   loadLocalScopeDb(clientScope);
    db.orgName = db.orgName===DEFAULT_ORG && paidClient.orgName ? paidClient.orgName : db.orgName;
-   db.admin = {...db.admin, email:em, pw:paidClient.pw, name:db.admin.name||'Principal (Admin)'};
-   await loadCloud(true);
-   if(db.appLocked){
-    toast(db.lockMsg||'Access is paused');
-    return;
-   }
+   db.admin = {...db.admin, email:em, pw:paidClient.pw, name:db.admin.name||paidClient.name||'Principal (Admin)'};
+   if(db.appLocked){toast(db.lockMsg||'Access is paused');return}
    const activeClientName=(db.admin&&db.admin.name)||paidClient.name||paidClient.orgName||em;
-   S.u={e:em,role:'client',name:activeClientName,scope:clientScope};
+   S.u={e:em,role:'client',name:activeClientName,scope:targetScope};
    saveSession(S.u);
    S.v='dash';S.dr=null;S.drawerId=null;
    subscribeRealtime();
@@ -1664,21 +1650,10 @@ document.addEventListener('click',async e=>{
    return;
   }
 
-  let targetScope = BASE_TRIAL_ROW;
-  if(em!==TRIAL_ADMIN_EMAIL && em.includes('@')){
-   const domainPart = em.split('@')[1];
-   const matchingClient = Object.values(ownerMaster.clients||{}).find(c=>c.email&&c.email.endsWith('@'+domainPart));
-   if(matchingClient)targetScope = matchingClient.scope || emailToScopeRow(matchingClient.email);
-  }
-  loadLocalScopeDb(targetScope);
-  await loadCloud(true);
-
   const u=getUsers().find(x=>x.e===em&&x.pw===pw);
   if(!u){toast('Invalid email or password');return}
-  if(db.appLocked){
-   toast(db.lockMsg||'Access is paused');
-   return;
-  }
+  if(db.appLocked){toast(db.lockMsg||'Access is paused');return}
+
   const activeUsername=(enteredUser||u.name||u.e);
   let detectedIp='';
   if(u.role==='admin'){
@@ -1716,7 +1691,7 @@ document.addEventListener('click',async e=>{
    recordTrialAccount(u.e,u.role,detectedIp||'',nowIso,activeUsername);
    ownerMaster.loginLogs=(ownerMaster.loginLogs||[]).concat([{email:u.e,username:activeUsername,role:u.role,ip:detectedIp||'',at:nowIso}]).slice(-60);
   }
-  S.u={...u,name:activeUsername,scope:ROW_ID};saveSession(S.u);S.v='dash';S.dr=null;S.drawerId=null;
+  S.u={...u,name:activeUsername,scope:targetScope};saveSession(S.u);S.v='dash';S.dr=null;S.drawerId=null;
   subscribeRealtime();
   render(true);toast('Welcome, '+activeUsername);
   persist();
@@ -1738,7 +1713,7 @@ document.addEventListener('click',async e=>{
   toast('IP added: '+ip);
  }
  else if(a==='removeTrialUser'){
-  if(S.u.role!=='owner'){toast('Owner access only');return}
+  if(!S.u || S.u.role!=='owner'){toast('Only Owner can manage trials');return}
   const targetIp=(el.dataset.ip||'').trim();
   const targetEm=(el.dataset.em||'').trim().toLowerCase();
   ownerMaster.revokedTrials=ownerMaster.revokedTrials||{};
@@ -1748,15 +1723,11 @@ document.addEventListener('click',async e=>{
    if(ownerMaster.trialClaimedIps&&ownerMaster.trialClaimedIps[targetIp])delete ownerMaster.trialClaimedIps[targetIp];
   }
   await persistOwnerMaster();
-  const sb=getSb();
-  if(sb){
-   await sb.from('app_state').upsert({id:BASE_TRIAL_ROW,data:emptyDb(),updated_at:new Date().toISOString()});
-  }
   render(false);
-  toast('Trial removed & demo data wiped for '+(targetEm||targetIp));
+  toast('Trial removed for '+(targetEm||targetIp));
  }
  else if(a==='extendTrial'){
-  if(S.u.role!=='owner'){toast('Owner access only');return}
+  if(!S.u || S.u.role!=='owner'){toast('Only Owner can manage trials');return}
   const targetIp=(el.dataset.ip||'').trim();
   const targetEm=(el.dataset.em||'').trim().toLowerCase();
   if(ownerMaster.revokedTrials){
@@ -1780,14 +1751,14 @@ document.addEventListener('click',async e=>{
   toast('Extended trial by +7 days');
  }
  else if(a==='restoreAllTrials'){
-  if(S.u.role!=='owner'){toast('Owner access only');return}
+  if(!S.u || S.u.role!=='owner')return;
   ownerMaster.revokedTrials={};
   await persistOwnerMaster();
   render(false);
   toast('All trial blocks cleared');
  }
  else if(a==='resetTrialIps'){
-  if(S.u.role!=='owner'){toast('Owner access only');return}
+  if(!S.u || S.u.role!=='owner')return;
   ownerMaster.trialClaimedIps={};
   await persistOwnerMaster();
   render(false);
@@ -1796,42 +1767,41 @@ document.addEventListener('click',async e=>{
  else if(a==='saveSettings'){
   const nm=val('setOrg').trim(),tag=val('setTag').trim(),anm=val('setAName').trim()||'Principal (Admin)',aem=val('setAEmail').trim().toLowerCase(),apw=val('setAPw').trim();
   if(!nm||!aem||!apw){toast('Name, email and password are required');return}
+  const lock=!!($('#setIpLock')&&$('#setIpLock').checked);
+  const ips=val('setIps').trim();
+  if(lock&&!ips){toast('Please add at least one allowed IP or disable IP lock');return}
+
   db.orgName=nm;
   db.orgTagline=tag;
   if(S.tempLogo!==undefined)db.orgLogo=S.tempLogo;
   db.accent=S.tempAccent||db.accent||'indigo';
+  db.ipLock=lock;
+  db.allowedIps=ips;
 
   if(S.u.role==='owner'){
    ownerMaster.ownerOrgName=nm;
    ownerMaster.ownerTagline=tag;
    if(S.tempLogo!==undefined)ownerMaster.ownerLogo=S.tempLogo;
    ownerMaster.ownerAccent=db.accent;
-   ownerMaster.ownerProfile={...(ownerMaster.ownerProfile||{}),name:anm};
+   ownerMaster.ownerProfile={...(ownerMaster.ownerProfile||{}),name:anm,photo:(ownerMaster.ownerProfile&&ownerMaster.ownerProfile.photo)||''};
    ownerMaster.ownerPw=apw;
    const tDays=Math.max(1,Math.min(365,Number(val('setTrialDays'))||7));
    ownerMaster.trialDays=tDays;
    ownerMaster.trialIpLock=!!($('#setTrialIpLock')&&$('#setTrialIpLock').checked);
-   S.u={...S.u,name:anm};
-   saveSession(S.u);
   }else{
-   const lock=!!($('#setIpLock')&&$('#setIpLock').checked);
-   const ips=val('setIps').trim();
-   if(lock&&!ips){toast('Please add at least one allowed IP or disable IP lock');return}
    db.admin={...db.admin,name:anm,email:S.u.role==='client'?S.u.e:aem,pw:apw};
-   db.ipLock=lock;
-   db.allowedIps=ips;
    if(S.u.role==='client' && ownerMaster.clients && ownerMaster.clients[S.u.e]){
     ownerMaster.clients[S.u.e].pw=apw;
     ownerMaster.clients[S.u.e].name=anm;
     ownerMaster.clients[S.u.e].orgName=nm;
    }
-   S.u={...S.u,name:anm};
-   saveSession(S.u);
   }
+  S.u={...S.u,name:anm};
+  saveSession(S.u);
   addAudit('Settings Saved',nm);
   await persist();
   render(false);
-  toast('Settings saved & synced across devices');
+  toast('Settings saved & synced');
  }
  else if(a==='loadDemo'){
   modal('Load sample demo data','<p class="mut">This will add sample teachers, batches, students, attendance history, and fee entries for testing/demo.</p>','Load Demo',seedDemoData);
@@ -2027,7 +1997,7 @@ document.addEventListener('change',async e=>{
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeM();closeDr();if(S.mobMenuOpen){S.mobMenuOpen=false;render(false)}}});
 
 /* =========================================================
-   INITIAL BOOTSTRAP: Owner, Paid Clients & Trial Scopes
+   INITIAL BOOTSTRAP: Email-Synced Scope + Legacy Recovery
 ========================================================= */
 try{
  const savedOm=JSON.parse(localStorage.getItem(OWNER_STORE_KEY));
@@ -2036,8 +2006,9 @@ try{
 normalizeOwnerMaster();
 
 S.u = (()=>{try{return JSON.parse(localStorage.getItem(SESSION_KEY))}catch(e){return null}})();
-const initialScope = (S.u && S.u.scope) || (()=>{try{return localStorage.getItem(ACTIVE_SCOPE_KEY)}catch(e){return ''}})() || BASE_TRIAL_ROW;
-loadLocalScopeDb(initialScope);
+const bootEmail = (S.u && S.u.e) || '';
+const initialScope = bootEmail ? emailToScopeRow(bootEmail) : ((()=>{try{return localStorage.getItem(ACTIVE_SCOPE_KEY)}catch(e){return ''}})() || BASE_TRIAL_ROW);
+loadLocalScopeDb(initialScope, bootEmail);
 applyAccent();
 S.tempAccent = db.accent;
 S.tempLogo = db.orgLogo || '';
