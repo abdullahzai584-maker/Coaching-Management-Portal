@@ -146,7 +146,7 @@ tr.cl{cursor:pointer;transition:background .14s}tr.cl:hover{background:var(--pbg
 .sw:hover{transform:scale(1.1)}.sw.on{border-color:var(--ink);transform:scale(1.12)}
 .chk{display:flex;align-items:flex-start;gap:8px;cursor:pointer;font-weight:600;color:var(--ink);min-width:0;max-width:100%;word-break:break-word;line-height:1.4}
 .chk input{width:17px;height:17px;accent-color:var(--pri);flex-shrink:0;margin-top:2px}
-.own-box{border:1px solid color-mix(in srgb,var(--pri) 35%,var(--line));background:color-mix(in srgb,var(--pbg) 55%,var(--card2));border-radius:14px;padding:12px;display:grid;gap:8px;min-width:0;max-width:100%}
+.own-box{border:1px solid color-mix(in srgb,var(--pri) 35%,var(--line));background:color-mix(in srgb,var(--pbg) 55%,var(--card2));border-radius:14px;padding:12px;display:grid;gap:10px;min-width:0;max-width:100%}
 .id-card{border:1px solid var(--line);border-radius:16px;padding:16px;background:linear-gradient(135deg,color-mix(in srgb,var(--pbg) 70%,var(--card)),var(--card2));display:grid;gap:10px}
 .exp-box{border:1px solid rgba(225,29,72,.35);background:var(--Ab);color:var(--ink);border-radius:14px;padding:14px;display:grid;gap:8px}
 
@@ -191,7 +191,7 @@ tr.cl{cursor:pointer;transition:background .14s}tr.cl:hover{background:var(--pbg
 <body>
 <div id="bg-fx" aria-hidden="true"></div><div id="cursor-fx" aria-hidden="true"></div><div id="app"></div><div id="m"></div><div id="dr"></div><div id="toast" style="opacity:0"></div>
 <script>
-const APP_VERSION = '1.7';
+const APP_VERSION = '1.8';
 const VERSION_KEY = 'our_coaching_app_ver';
 const OWNER_CONTACT_PHONE = '03213091550';
 
@@ -269,6 +269,7 @@ function emptyDb(){
   trialIpLock: true,
   trialDays: 7,
   trialClaimedIps: {},
+  trialAccounts: {},
   revokedTrials: {},
   loginLogs: [],
   auditLogs: [],
@@ -282,6 +283,31 @@ let ROW_ID = '';
 let STORE_KEY = '';
 let SESSION_KEY = '';
 let db = emptyDb();
+
+function recordTrialAccount(email, role, ip, atIso){
+ if(!email || role==='owner')return;
+ const em=String(email).trim().toLowerCase();
+ if(!em)return;
+ db.trialAccounts=db.trialAccounts||{};
+ const key=em+'|'+(ip||'unknown');
+ const existing=db.trialAccounts[key];
+ const stamp=atIso||new Date().toISOString();
+ if(!existing){
+  db.trialAccounts[key]={
+   email:em,
+   role:role||'admin',
+   ip:ip||'',
+   firstLoginAt:stamp,
+   lastLoginAt:stamp,
+   loginCount:1
+  };
+ }else{
+  if(!existing.firstLoginAt || new Date(stamp)<new Date(existing.firstLoginAt))existing.firstLoginAt=stamp;
+  if(!existing.lastLoginAt || new Date(stamp)>new Date(existing.lastLoginAt))existing.lastLoginAt=stamp;
+  existing.loginCount=(Number(existing.loginCount)||1)+1;
+  if(ip && !existing.ip)existing.ip=ip;
+ }
+}
 
 function normalizeDb(){
  db={...emptyDb(),...db};
@@ -299,13 +325,41 @@ function normalizeDb(){
  if(!Number(db.trialDays)||Number(db.trialDays)<1)db.trialDays=7;
  if(typeof db.trialIpLock!=='boolean')db.trialIpLock=true;
  if(!db.trialClaimedIps||typeof db.trialClaimedIps!=='object')db.trialClaimedIps={};
+ if(!db.trialAccounts||typeof db.trialAccounts!=='object')db.trialAccounts={};
  if(!db.revokedTrials||typeof db.revokedTrials!=='object')db.revokedTrials={};
  if(!db.lockMsg)db.lockMsg='This coaching portal is currently paused. Please contact the service provider.';
+
+ // Preserve & backfill trial accounts from claimed IPs, login logs, and current admin
+ Object.entries(db.trialClaimedIps).forEach(([ip,info])=>{
+  if(info&&info.email)recordTrialAccount(info.email,'admin',ip,info.claimedAt||new Date().toISOString());
+ });
+ db.loginLogs.forEach(lg=>{
+  if(lg&&lg.role&&lg.role!=='owner'&&lg.email)recordTrialAccount(lg.email,lg.role,lg.ip||'',lg.at||new Date().toISOString());
+ });
+ if(db.admin&&db.admin.email){
+  const hasAdm=Object.values(db.trialAccounts).some(x=>x.email===String(db.admin.email).toLowerCase());
+  if(!hasAdm && (db.stu.length||db.bat.length||db.tch.length||Object.keys(db.trialClaimedIps).length)){
+   recordTrialAccount(db.admin.email,'admin','',new Date().toISOString());
+  }
+ }
+}
+
+function formatElapsed(sinceIso){
+ if(!sinceIso)return '–';
+ const ms=Date.now()-new Date(sinceIso).getTime();
+ if(!Number.isFinite(ms)||ms<0)return 'Just now';
+ const mins=Math.floor(ms/60000);
+ if(mins<1)return 'Just now';
+ if(mins<60)return mins+'m ago';
+ const hrs=Math.floor(mins/60);
+ if(hrs<24)return hrs+'h '+(mins%60)+'m ago';
+ const days=Math.floor(hrs/24);
+ return days+'d '+(hrs%24)+'h ago';
 }
 
 function addAudit(action,detail=''){
  const by=(S.u&&(S.u.name||S.u.e))||'System';
- db.auditLogs=(db.auditLogs||[]).concat([{action,detail,by,at:new Date().toISOString()}]).slice(-60);
+ db.auditLogs=(db.auditLogs||[]).concat([{action,detail,by,at:new Date().toISOString()}]).slice(-80);
 }
 
 function wipeTrialRecords(){
@@ -581,6 +635,7 @@ async function loadCloud(silent=false){
 }
 
 async function persist(){
+ normalizeDb();
  applyAccent();
  document.title=`${orgName()} — Attendance`;
  try{localStorage.setItem(STORE_KEY,JSON.stringify(db))}catch(e){}
@@ -885,23 +940,36 @@ function Settings(){
  const selAcc=S.tempAccent||db.accent||'indigo';
  const logoCur=S.tempLogo!==undefined?S.tempLogo:(db.orgLogo||'');
  const isOwner=S.u.role==='owner';
+ const trialAccList=Object.values(db.trialAccounts||{}).sort((a,b)=>new Date(b.firstLoginAt||0)-new Date(a.firstLoginAt||0));
  const claimedList=Object.entries(db.trialClaimedIps||{});
  const limitDays=Number(db.trialDays)||7;
  const revokedEntries=Object.entries(db.revokedTrials||{});
- const recentLogs=(db.loginLogs||[]).slice(-12).reverse();
+ const recentLogs=(db.loginLogs||[]).slice(-15).reverse();
  const ren=waClientRenewal();
  return`<div class="ph"><h1>Coaching settings</h1><span class="mut sm">Instance: <b>${esc(ROW_ID)}</b> · App <b>v${esc(APP_VERSION)}</b></span></div>
  ${isOwner?`
   <div class="card own-box" style="margin-bottom:14px">
    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
-    <h2>Owner Trial, Client WhatsApp &amp; Access Control</h2>
+    <h2>Owner Trial, All Admin Accounts &amp; Client WhatsApp</h2>
     <span class="role">Owner Only</span>
    </div>
    <div class="sm" style="word-break:break-word">
-    <b>Current Trial / Client Admin Account:</b>
+    <b>Current Configured Admin Account:</b>
     Name: <b>${esc(db.admin.name||'–')}</b> ·
     Email: <b>${esc(db.admin.email||'–')}</b> ·
     Password: <b>${esc(db.admin.pw||'–')}</b>
+   </div>
+   <div style="min-width:0;max-width:100%">
+    <b class="sm">All Admin / Trial Accounts Logged In (${trialAccList.length}) — Preserved Across Updates:</b>
+    ${trialAccList.length?`<div class="tw" style="margin-top:6px"><table><tr><th>Account Email</th><th>Role</th><th>IP</th><th>Logged In Since</th><th>First Login</th><th>Status</th><th>Manage</th></tr>${trialAccList.map(acc=>{
+     const em=(acc&&acc.email)||'';
+     const ip=(acc&&acc.ip)||'';
+     const sinceStr=formatElapsed(acc&&acc.firstLoginAt);
+     const firstStr=acc&&acc.firstLoginAt?acc.firstLoginAt.slice(0,16).replace('T',' '):'–';
+     const st=isTrialExpiredOrRemoved(em,ip);
+     const badge=st==='removed'?'<span class="bd sA">Removed</span>':st==='expired'?'<span class="bd sL">Expired</span>':'<span class="bd sP">Active</span>';
+     return`<tr><td><b>${esc(em||'–')}</b></td><td><span class="role">${esc(acc.role||'admin')}</span></td><td>${esc(ip||'–')}</td><td><b>${esc(sinceStr)}</b></td><td class="sm mut">${esc(firstStr)}</td><td>${badge}</td><td><div style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="b sm" data-a="extendTrial" data-ip="${esc(ip)}" data-em="${esc(em)}">+7d</button><button type="button" class="b sm del" data-a="removeTrialUser" data-ip="${esc(ip)}" data-em="${esc(em)}">Remove Trial</button></div></td></tr>`;
+    }).join('')}</table></div>`:'<div class="mut sm" style="margin-top:4px">No admin/trial logins recorded yet.</div>'}
    </div>
    <div class="fl" style="max-width:480px">
     <label>Client WhatsApp Number (for subscription / renewal reminders)<input id="setClientPhone" value="${esc(db.clientPhone||'')}" placeholder="e.g. 03001234567"></label>
@@ -910,14 +978,14 @@ function Settings(){
    </div>
    <div class="mut sm"><b>Remove Trial</b> dabane par user ka trial block hoga aur uska demo/coaching data (batches, students, attendance, fees) bhi saath hi remove ho jayega.</div>
    <div style="min-width:0;max-width:100%">
-    <b class="sm">Trial Accounts &amp; Claimed IPs (${claimedList.length}) — Same IP multi-device allowed, 1 week from first IP login:</b>
+    <b class="sm">Claimed Trial IPs (${claimedList.length}) — Same IP multi-device allowed, ${limitDays} days from first IP login:</b>
     ${claimedList.length?`<div class="tw" style="margin-top:6px"><table><tr><th>User Email</th><th>IP Address</th><th>First Login / Days</th><th>Status</th><th>Manage</th></tr>${claimedList.map(([ip,info])=>{
      const em=(info&&info.email)||'';
      const used=trialDaysElapsed(info&&info.claimedAt);
      const st=isTrialExpiredOrRemoved(em,ip);
      const badge=st==='removed'?'<span class="bd sA">Removed</span>':st==='expired'?'<span class="bd sL">Expired</span>':'<span class="bd sP">Active</span>';
      return`<tr><td><b>${esc(em||'–')}</b></td><td>${esc(ip)}</td><td class="sm"><b>${used}</b> / ${limitDays} days</td><td>${badge}</td><td><div style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="b sm" data-a="extendTrial" data-ip="${esc(ip)}" data-em="${esc(em)}">+7d</button><button type="button" class="b sm del" data-a="removeTrialUser" data-ip="${esc(ip)}" data-em="${esc(em)}">Remove Trial</button></div></td></tr>`;
-    }).join('')}</table></div>`:'<div class="mut sm" style="margin-top:4px">No trial accounts claimed yet.</div>'}
+    }).join('')}</table></div>`:'<div class="mut sm" style="margin-top:4px">No trial IPs claimed yet.</div>'}
    </div>
    ${revokedEntries.length?`<div style="word-break:break-word"><b class="sm">Removed / Blocked Trial Keys (${revokedEntries.length}):</b> <span class="mut sm">${revokedEntries.map(([k])=>esc(k)).join(', ')}</span> <button type="button" class="b sm" data-a="restoreAllTrials">Allow / Restore All</button></div>`:''}
    <div style="min-width:0;max-width:100%">
@@ -1151,7 +1219,11 @@ document.addEventListener('click',async e=>{
    }
   }
   if(!detectedIp){try{detectedIp=await fetchPublicIp()}catch(err){}}
-  db.loginLogs=(db.loginLogs||[]).concat([{email:u.e,role:u.role,ip:detectedIp||'',at:new Date().toISOString()}]).slice(-40);
+  const nowIso=new Date().toISOString();
+  if(u.role!=='owner'){
+   recordTrialAccount(u.e,u.role,detectedIp||'',nowIso);
+  }
+  db.loginLogs=(db.loginLogs||[]).concat([{email:u.e,role:u.role,ip:detectedIp||'',at:nowIso}]).slice(-60);
   await persist();
   S.u=u;saveSession(u);S.v='dash';S.dr=null;S.drawerId=null;render(true);toast('Welcome, '+u.name);
  }
@@ -1198,6 +1270,14 @@ document.addEventListener('click',async e=>{
   if(targetIp&&db.trialClaimedIps&&db.trialClaimedIps[targetIp]){
    const curStart=new Date(db.trialClaimedIps[targetIp].claimedAt||Date.now()).getTime();
    db.trialClaimedIps[targetIp].claimedAt=new Date(curStart+7*86400000).toISOString();
+  }
+  if(db.trialAccounts){
+   Object.values(db.trialAccounts).forEach(acc=>{
+    if((targetEm&&acc.email===targetEm)||(targetIp&&acc.ip===targetIp)){
+     const curFirst=new Date(acc.firstLoginAt||Date.now()).getTime();
+     acc.firstLoginAt=new Date(curFirst+7*86400000).toISOString();
+    }
+   });
   }
   addAudit('Trial Extended','+7 days for '+(targetEm||targetIp));
   await persist();
@@ -1253,8 +1333,8 @@ document.addEventListener('click',async e=>{
  }
  else if(a==='clearAllData'){
   modal('Clear all coaching records?','<p class="mut">Batches, teachers, students, attendance, and fees will be cleared. Admin login stays intact.</p>','Clear Records',async()=>{
-   const keepOrg=orgName(),keepTag=db.orgTagline,keepLogo=db.orgLogo,keepPhone=db.clientPhone,keepAuto=db.autoSubMsg,keepAcc=db.accent,keepAdm={...db.admin},keepOwn={...db.ownerProfile},keepLock=db.appLocked,keepMsg=db.lockMsg,keepIpLock=db.ipLock,keepIps=db.allowedIps,keepTLock=db.trialIpLock,keepTDays=db.trialDays,keepTIps={...db.trialClaimedIps},keepRev={...db.revokedTrials},keepLogs=[...(db.loginLogs||[])];
-   db={...emptyDb(),orgName:keepOrg,orgTagline:keepTag,orgLogo:keepLogo,clientPhone:keepPhone,autoSubMsg:keepAuto,accent:keepAcc,admin:keepAdm,ownerProfile:keepOwn,appLocked:keepLock,lockMsg:keepMsg,ipLock:keepIpLock,allowedIps:keepIps,trialIpLock:keepTLock,trialDays:keepTDays,trialClaimedIps:keepTIps,revokedTrials:keepRev,loginLogs:keepLogs};
+   const keepOrg=orgName(),keepTag=db.orgTagline,keepLogo=db.orgLogo,keepPhone=db.clientPhone,keepAuto=db.autoSubMsg,keepAcc=db.accent,keepAdm={...db.admin},keepOwn={...db.ownerProfile},keepLock=db.appLocked,keepMsg=db.lockMsg,keepIpLock=db.ipLock,keepIps=db.allowedIps,keepTLock=db.trialIpLock,keepTDays=db.trialDays,keepTIps={...db.trialClaimedIps},keepTAcc={...(db.trialAccounts||{})},keepRev={...db.revokedTrials},keepLogs=[...(db.loginLogs||[])];
+   db={...emptyDb(),orgName:keepOrg,orgTagline:keepTag,orgLogo:keepLogo,clientPhone:keepPhone,autoSubMsg:keepAuto,accent:keepAcc,admin:keepAdm,ownerProfile:keepOwn,appLocked:keepLock,lockMsg:keepMsg,ipLock:keepIpLock,allowedIps:keepIps,trialIpLock:keepTLock,trialDays:keepTDays,trialClaimedIps:keepTIps,trialAccounts:keepTAcc,revokedTrials:keepRev,loginLogs:keepLogs};
    addAudit('Records Cleared','Wiped batches, students, attendance & fees');
    S.dr=null;closeDr();await persist();render(false);toast('All records cleared');
   });
