@@ -163,6 +163,7 @@ tr.cl{cursor:pointer;transition:background .12s}tr.cl:hover{background:var(--pbg
 .chk{display:flex;align-items:flex-start;gap:8px;cursor:pointer;font-weight:600;color:var(--ink);min-width:0;max-width:100%;word-break:break-word;line-height:1.4}
 .chk input{width:17px;height:17px;accent-color:var(--pri);flex-shrink:0;margin-top:2px}
 .own-box{border:1px solid color-mix(in srgb,var(--pri) 38%,var(--glass-b));background:color-mix(in srgb,var(--pbg) 52%,var(--card2));border-radius:16px;padding:14px;display:grid;gap:10px;box-shadow:var(--glass-in);min-width:0;max-width:100%}
+.kill-box{border:1px solid rgba(225,29,72,.38);background:color-mix(in srgb,var(--Ab) 65%,var(--card2));border-radius:16px;padding:14px;display:grid;gap:10px;min-width:0;max-width:100%}
 .id-card{border:1px solid var(--glass-b);border-radius:18px;padding:18px;background:linear-gradient(135deg,color-mix(in srgb,var(--pbg) 72%,var(--card)),var(--card2));box-shadow:var(--sh-lg);display:grid;gap:10px}
 .exp-box{border:1px solid rgba(225,29,72,.38);background:var(--Ab);color:var(--ink);border-radius:14px;padding:14px;display:grid;gap:8px}
 
@@ -193,7 +194,7 @@ tr.cl{cursor:pointer;transition:background .12s}tr.cl:hover{background:var(--pbg
   .mob-dots-wrap{display:inline-flex;align-items:center}
   main{padding:12px;padding-bottom:32px;max-width:100%;overflow-x:clip}
   .card{padding:12px;border-radius:16px;max-width:100%}
-  .own-box{padding:10px}
+  .own-box,.kill-box{padding:10px}
   .kp{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
   .kp .card{padding:12px}
   .kp .card b{font-size:20px}
@@ -213,7 +214,7 @@ tr.cl{cursor:pointer;transition:background .12s}tr.cl:hover{background:var(--pbg
 <body>
 <div id="bg-fx" aria-hidden="true"></div><div id="cursor-fx" aria-hidden="true"></div><div id="app"></div><div id="m"></div><div id="dr"></div><div id="toast" style="opacity:0"></div>
 <script>
-const APP_VERSION = '2.4';
+const APP_VERSION = '2.5';
 const VERSION_KEY = 'our_coaching_app_ver';
 const LANG_KEY = 'our_coaching_lang';
 const OWNER_CONTACT_PHONE = '03213091550';
@@ -361,16 +362,13 @@ applyLanguage();
 const SUPABASE_URL = 'https://cukxgzrnbiinkzmolipj.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_hfUzvb1uykYMoRVKPY4laQ_1xqGnv-4';
 
-const OWNER_ACCOUNT = {
-  email: 'abdullah.owner@ourcoaching.pk',
-  pw: 'abdullah',
-  name: 'Abdullah (Owner)',
-  role: 'owner'
-};
+const DEFAULT_OWNER_EMAIL = 'abdullah.owner@ourcoaching.pk';
+const DEFAULT_OWNER_PW = 'abdullah';
+const DEFAULT_OWNER_NAME = 'Abdullah (Owner)';
 
 const TRIAL_ADMIN_EMAIL = 'admin@ourcoaching.pk';
 const OWNER_GLOBAL_ROW = 'owner_global_master';
-const ACTIVE_SCOPE_KEY = 'our_coaching_active_scope_v24';
+const ACTIVE_SCOPE_KEY = 'our_coaching_active_scope_v25';
 
 const DEFAULT_ORG = 'OUR COACHING';
 const DEFAULT_TAGLINE = 'Smart Attendance, Fees & Batch Operations';
@@ -408,12 +406,18 @@ function getSb(){
 
 function emptyOwnerMaster(){
  return{
-  ownerProfile:{name:OWNER_ACCOUNT.name,photo:''},
-  ownerPw:OWNER_ACCOUNT.pw,
+  ownerEmail:DEFAULT_OWNER_EMAIL,
+  ownerProfile:{name:DEFAULT_OWNER_NAME,photo:''},
+  ownerPw:DEFAULT_OWNER_PW,
   ownerOrgName:DEFAULT_ORG,
   ownerTagline:DEFAULT_TAGLINE,
   ownerLogo:'',
   ownerAccent:'indigo',
+  globalAppLocked:false,
+  globalLockMsg:'This coaching portal is currently paused by the owner. Please contact the service provider.',
+  trialAdminEmail:TRIAL_ADMIN_EMAIL,
+  trialAdminPw:'admin123',
+  trialAdminName:'Principal (Admin)',
   clients:{},
   trialDays:7,
   trialIpLock:true,
@@ -443,11 +447,14 @@ function emptyDb(){
   revokedTrials: {},
   loginLogs: [],
   auditLogs: [],
-  ownerProfile:{name:OWNER_ACCOUNT.name,photo:''},
+  ownerProfile:{name:DEFAULT_OWNER_NAME,photo:''},
   admin:{name:'Principal (Admin)',email:TRIAL_ADMIN_EMAIL,pw:'admin123',photo:''},
   bat:[],tch:[],stu:[],att:{},fees:{},flags:{}
  }
 }
+
+const getOwnerEmail=()=>String((ownerMaster&&ownerMaster.ownerEmail)||DEFAULT_OWNER_EMAIL).trim().toLowerCase();
+const getTrialAdminEmail=()=>String((ownerMaster&&ownerMaster.trialAdminEmail)||TRIAL_ADMIN_EMAIL).trim().toLowerCase();
 
 const DEFAULT_COACHING_ID = '1 coaching';
 const BASE_TRIAL_ROW = 'trial_' + DEFAULT_COACHING_ID.trim().toLowerCase().replace(/\s+/g, '_');
@@ -455,14 +462,14 @@ const BASE_TRIAL_ROW = 'trial_' + DEFAULT_COACHING_ID.trim().toLowerCase().repla
 function emailToScopeRow(email){
  const em=String(email||'').trim().toLowerCase();
  if(!em)return BASE_TRIAL_ROW;
- if(em===OWNER_ACCOUNT.email.toLowerCase())return 'email_owner_' + em.replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
+ if(em===getOwnerEmail() || em===DEFAULT_OWNER_EMAIL.toLowerCase())return 'email_owner_' + em.replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
  return 'email_' + em.replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
 }
 
 let ROW_ID = BASE_TRIAL_ROW;
 let STORE_KEY = 'att_db_' + ROW_ID;
-let SESSION_KEY = 'att_sess_global_v24';
-let OWNER_STORE_KEY = 'att_owner_master_v24';
+let SESSION_KEY = 'att_sess_global_v25';
+let OWNER_STORE_KEY = 'att_owner_master_v25';
 
 let ownerMaster = emptyOwnerMaster();
 let db = emptyDb();
@@ -476,6 +483,8 @@ function setActiveScope(scopeRow){
 
 function findBestLegacyDb(targetEmail=''){
  const em=String(targetEmail||'').trim().toLowerCase();
+ const isPaidClient = !!(em && ownerMaster.clients && ownerMaster.clients[em]);
+ if(isPaidClient)return null;
  const candidateKeys=[];
  if(em){
   candidateKeys.push('att_db_' + emailToScopeRow(em));
@@ -486,6 +495,7 @@ function findBestLegacyDb(targetEmail=''){
   'att_db_trial_1_coaching',
   'att_db_1_coaching',
   'att_db_owner_global_master',
+  'att_db_v24',
   'att_db_v23',
   'att_db_v22',
   'att_db'
@@ -531,11 +541,19 @@ function loadLocalScopeDb(scopeRow, targetEmail=''){
 
 function normalizeOwnerMaster(){
  ownerMaster = {...emptyOwnerMaster(), ...(ownerMaster||{})};
- if(!ownerMaster.ownerProfile)ownerMaster.ownerProfile={name:OWNER_ACCOUNT.name,photo:''};
- if(!ownerMaster.ownerPw)ownerMaster.ownerPw=OWNER_ACCOUNT.pw;
+ if(!ownerMaster.ownerEmail)ownerMaster.ownerEmail=DEFAULT_OWNER_EMAIL;
+ ownerMaster.ownerEmail=String(ownerMaster.ownerEmail).trim().toLowerCase();
+ if(!ownerMaster.ownerProfile)ownerMaster.ownerProfile={name:DEFAULT_OWNER_NAME,photo:''};
+ if(!ownerMaster.ownerPw)ownerMaster.ownerPw=DEFAULT_OWNER_PW;
  if(!ownerMaster.ownerOrgName)ownerMaster.ownerOrgName=DEFAULT_ORG;
  if(ownerMaster.ownerTagline==null)ownerMaster.ownerTagline=DEFAULT_TAGLINE;
  if(!ownerMaster.ownerAccent||!ACCENTS[ownerMaster.ownerAccent])ownerMaster.ownerAccent='indigo';
+ if(typeof ownerMaster.globalAppLocked!=='boolean')ownerMaster.globalAppLocked=false;
+ if(!ownerMaster.globalLockMsg)ownerMaster.globalLockMsg='This coaching portal is currently paused by the owner. Please contact the service provider.';
+ if(!ownerMaster.trialAdminEmail)ownerMaster.trialAdminEmail=TRIAL_ADMIN_EMAIL;
+ ownerMaster.trialAdminEmail=String(ownerMaster.trialAdminEmail).trim().toLowerCase();
+ if(!ownerMaster.trialAdminPw)ownerMaster.trialAdminPw='admin123';
+ if(!ownerMaster.trialAdminName)ownerMaster.trialAdminName='Principal (Admin)';
  if(!ownerMaster.clients||typeof ownerMaster.clients!=='object')ownerMaster.clients={};
  if(!Number(ownerMaster.trialDays)||Number(ownerMaster.trialDays)<1)ownerMaster.trialDays=7;
  if(typeof ownerMaster.trialIpLock!=='boolean')ownerMaster.trialIpLock=true;
@@ -546,7 +564,7 @@ function normalizeOwnerMaster(){
 }
 
 function syncOwnerMasterToDb(){
- db.ownerProfile = {...(ownerMaster.ownerProfile||{name:OWNER_ACCOUNT.name,photo:''})};
+ db.ownerProfile = {...(ownerMaster.ownerProfile||{name:DEFAULT_OWNER_NAME,photo:''})};
  db.trialDays = Number(ownerMaster.trialDays)||7;
  db.trialIpLock = !!ownerMaster.trialIpLock;
  db.trialClaimedIps = ownerMaster.trialClaimedIps||{};
@@ -558,6 +576,9 @@ function syncOwnerMasterToDb(){
   if(ownerMaster.ownerTagline && ownerMaster.ownerTagline!==DEFAULT_TAGLINE)db.orgTagline=ownerMaster.ownerTagline;
   if(ownerMaster.ownerLogo)db.orgLogo=ownerMaster.ownerLogo;
   if(ownerMaster.ownerAccent)db.accent=ownerMaster.ownerAccent;
+ }
+ if(S.u && S.u.role==='admin'){
+  db.admin={...db.admin,email:getTrialAdminEmail(),pw:ownerMaster.trialAdminPw||'admin123',name:ownerMaster.trialAdminName||db.admin.name};
  }
 }
 
@@ -598,8 +619,8 @@ function normalizeDb(){
  if(db.clientPhone==null)db.clientPhone='';
  if(typeof db.autoSubMsg!=='boolean')db.autoSubMsg=true;
  if(!db.accent||!ACCENTS[db.accent])db.accent='indigo';
- if(!db.ownerProfile)db.ownerProfile={name:OWNER_ACCOUNT.name,photo:''};
- if(!db.admin)db.admin={name:'Principal (Admin)',email:TRIAL_ADMIN_EMAIL,pw:'admin123',photo:''};
+ if(!db.ownerProfile)db.ownerProfile={name:DEFAULT_OWNER_NAME,photo:''};
+ if(!db.admin)db.admin={name:'Principal (Admin)',email:getTrialAdminEmail(),pw:'admin123',photo:''};
  if(!db.fees)db.fees={};
  if(!Array.isArray(db.loginLogs))db.loginLogs=[];
  if(!Array.isArray(db.auditLogs))db.auditLogs=[];
@@ -706,7 +727,7 @@ try{const t=localStorage.getItem(THEME_KEY);if(t)document.documentElement.datase
 
 function getCurrentUserProfile(){
  if(!S.u)return{name:'',photo:''};
- if(S.u.role==='owner')return{name:(ownerMaster.ownerProfile&&ownerMaster.ownerProfile.name)||S.u.name||OWNER_ACCOUNT.name,photo:(ownerMaster.ownerProfile&&ownerMaster.ownerProfile.photo)||''};
+ if(S.u.role==='owner')return{name:(ownerMaster.ownerProfile&&ownerMaster.ownerProfile.name)||S.u.name||DEFAULT_OWNER_NAME,photo:(ownerMaster.ownerProfile&&ownerMaster.ownerProfile.photo)||''};
  if(S.u.role==='client'||S.u.role==='admin')return{name:(db.admin&&db.admin.name)||S.u.name||'Principal (Admin)',photo:(db.admin&&db.admin.photo)||''};
  if(S.u.role==='teacher'){const t=db.tch.find(x=>x.id===S.u.ref);return{name:S.u.name||(t&&t.name)||'',photo:(t&&t.photo)||''}}
  if(S.u.role==='student'){const st=db.stu.find(x=>x.id===S.u.ref);return{name:S.u.name||(st&&st.name)||'',photo:(st&&st.photo)||''}}
@@ -764,6 +785,7 @@ function openMyProfileModal(){
    db.ownerProfile={...ownerMaster.ownerProfile};
   }else if(S.u.role==='client'||S.u.role==='admin'){
    db.admin={...db.admin,name:newName,photo:newPhoto};
+   if(S.u.role==='admin')ownerMaster.trialAdminName=newName;
   }else if(S.u.role==='teacher'){
    const t=db.tch.find(x=>x.id===S.u.ref);
    if(t){t.name=newName;t.photo=newPhoto}
@@ -884,7 +906,8 @@ function tickCursor(){
 }
 
 function enforceRemoteLock(){
- if(db.appLocked && S.u && S.u.role !== 'owner'){
+ const locked = !!(ownerMaster.globalAppLocked || db.appLocked);
+ if(locked && S.u && S.u.role !== 'owner'){
   S.u=null;
   saveSession(null);
   S.dr=null;
@@ -937,7 +960,7 @@ async function loadCloud(silent=false){
     normalizeDb();
    }
    if(S.u && S.u.role==='owner' && ownerMaster.ownerProfile && ownerMaster.ownerProfile.name){
-    S.u={...S.u,name:ownerMaster.ownerProfile.name};
+    S.u={...S.u,e:getOwnerEmail(),name:ownerMaster.ownerProfile.name};
     saveSession(S.u);
    }else if(S.u && (S.u.role==='client'||S.u.role==='admin') && db.admin && db.admin.name){
     S.u={...S.u,name:db.admin.name};
@@ -1004,7 +1027,7 @@ function subscribeRealtime(){
     db={...emptyDb(),...payload.new.data};
     normalizeDb();
     if(S.u && S.u.role==='owner' && ownerMaster.ownerProfile && ownerMaster.ownerProfile.name){
-     S.u={...S.u,name:ownerMaster.ownerProfile.name};
+     S.u={...S.u,e:getOwnerEmail(),name:ownerMaster.ownerProfile.name};
      saveSession(S.u);
     }else if(S.u && (S.u.role==='client'||S.u.role==='admin') && db.admin && db.admin.name){
      S.u={...S.u,name:db.admin.name};
@@ -1019,28 +1042,40 @@ function subscribeRealtime(){
     else updateSyncBadges();
    }
   })
+  .on('postgres_changes',{event:'*',schema:'public',table:'app_state',filter:`id=eq.${OWNER_GLOBAL_ROW}`},payload=>{
+   if(payload.new&&payload.new.data){
+    ownerMaster={...emptyOwnerMaster(),...payload.new.data};
+    normalizeOwnerMaster();
+    try{localStorage.setItem(OWNER_STORE_KEY,JSON.stringify(ownerMaster))}catch(e){}
+    enforceRemoteLock();
+    if(!dirty())render(false);
+   }
+  })
   .subscribe();
 }
 
 function getUsers(){
+ const ownEm=getOwnerEmail();
+ const admEm=getTrialAdminEmail();
  const list=[
-  {e:OWNER_ACCOUNT.email.toLowerCase(),pw:ownerMaster.ownerPw||OWNER_ACCOUNT.pw,role:'owner',name:(ownerMaster.ownerProfile&&ownerMaster.ownerProfile.name)||OWNER_ACCOUNT.name,scope:emailToScopeRow(OWNER_ACCOUNT.email)},
-  {e:TRIAL_ADMIN_EMAIL,pw:(db.admin&&db.admin.pw)||'admin123',role:'admin',name:(db.admin&&db.admin.name)||'Principal (Admin)',scope:emailToScopeRow(TRIAL_ADMIN_EMAIL)}
+  {e:ownEm,pw:ownerMaster.ownerPw||DEFAULT_OWNER_PW,role:'owner',name:(ownerMaster.ownerProfile&&ownerMaster.ownerProfile.name)||DEFAULT_OWNER_NAME,scope:emailToScopeRow(ownEm)},
+  {e:admEm,pw:ownerMaster.trialAdminPw||(db.admin&&db.admin.pw)||'admin123',role:'admin',name:ownerMaster.trialAdminName||(db.admin&&db.admin.name)||'Principal (Admin)',scope:emailToScopeRow(admEm)}
  ];
  Object.entries(ownerMaster.clients||{}).forEach(([em,cfg])=>{
-  if(cfg && em && em!==OWNER_ACCOUNT.email.toLowerCase() && em!==TRIAL_ADMIN_EMAIL){
+  const low=em.toLowerCase();
+  if(cfg && low && low!==ownEm && low!==admEm){
    list.push({
-    e:em.toLowerCase(),
+    e:low,
     pw:cfg.pw||'client123',
     role:'client',
-    name:cfg.name||cfg.orgName||em,
-    scope:emailToScopeRow(em)
+    name:cfg.name||cfg.orgName||low,
+    scope:emailToScopeRow(low)
    });
   }
  });
- if(db.admin && db.admin.email && db.admin.email.toLowerCase()!==TRIAL_ADMIN_EMAIL){
+ if(db.admin && db.admin.email){
   const aem=db.admin.email.toLowerCase();
-  if(!list.some(x=>x.e===aem)){
+  if(aem!==ownEm && !list.some(x=>x.e===aem)){
    list.push({e:aem,pw:db.admin.pw||'admin123',role:'client',name:db.admin.name,scope:emailToScopeRow(aem)});
   }
  }
@@ -1103,7 +1138,7 @@ function openDr(id){if(!S.u||!sOf(id))return;S.drawerId=id;$('#dr').innerHTML=`<
 
 function shouldHideLoginUsername(){
  const em=(val('le')||'').trim().toLowerCase();
- return em===OWNER_ACCOUNT.email.toLowerCase() || !!(ownerMaster.clients && ownerMaster.clients[em]);
+ return em===getOwnerEmail() || em===DEFAULT_OWNER_EMAIL.toLowerCase() || !!(ownerMaster.clients && ownerMaster.clients[em]);
 }
 function syncLoginUsernameVisibility(){
  const box=$('#loginUserWrap');
@@ -1112,20 +1147,21 @@ function syncLoginUsernameVisibility(){
 }
 
 function LockedScreen(){
+ const msg = ownerMaster.globalAppLocked ? (ownerMaster.globalLockMsg||'This coaching portal is currently paused by the owner.') : (db.lockMsg||'This coaching portal is currently paused.');
  return`<div class="lg"><div class="card" style="text-align:center">
   <div style="display:flex;justify-content:center">${brandHtml()}</div>
-  <h2>Access Paused</h2>
-  <div class="al">${esc(db.lockMsg||'This coaching portal is currently paused.')}</div>
-  <div class="fl"><label>${esc(T('email'))}<input id="le" type="email" autocomplete="username" placeholder="abdullah.owner@ourcoaching.pk"></label><label>${esc(T('password'))}<input id="lp" type="password" autocomplete="current-password" placeholder="••••••••"></label></div>
+  <h2>Portal Paused (Owner Kill Switch)</h2>
+  <div class="al">${esc(msg)}</div>
+  <div class="fl"><label>${esc(T('email'))}<input id="le" type="email" autocomplete="username" placeholder="${esc(getOwnerEmail())}"></label><label>${esc(T('password'))}<input id="lp" type="password" autocomplete="current-password" placeholder="••••••••"></label></div>
   <button class="b pri" data-a="login">${esc(T('signIn'))}</button>
  </div></div>`
 }
 
 function Login(){
- if(db.appLocked)return LockedScreen();
+ if(ownerMaster.globalAppLocked || db.appLocked)return LockedScreen();
  return`<div class="lg"><div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">${brandHtml()}<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">${langSelectHtml()}<span class="ver-pill">v${esc(APP_VERSION)}</span><span class="sync ${syncStatus==='Sync error'?'err':''}"><i></i>${esc(syncStatus)}</span></div></div>${db.orgTagline?`<div class="mut sm">${esc(db.orgTagline)}</div>`:''}<h2>${esc(T('signIn'))}</h2>
  <div class="fl">
-  <label>${esc(T('email'))}<input id="le" type="email" autocomplete="username" placeholder="admin@ourcoaching.pk"></label>
+  <label>${esc(T('email'))}<input id="le" type="email" autocomplete="username" placeholder="${esc(getTrialAdminEmail())}"></label>
   <label id="loginUserWrap">${esc(T('usernameLabel'))}<input id="luser" type="text" autocomplete="name" placeholder="${esc(T('usernamePh'))}"></label>
   <label>${esc(T('password'))}<input id="lp" type="password" autocomplete="current-password" placeholder="••••••••"></label>
  </div>
@@ -1343,7 +1379,7 @@ function Settings(){
     <button type="button" class="b sm pri" data-a="addClientModal">+ Add Client</button>
    </div>
    <div class="mut sm">Only Owner can add or manage client accounts. Each email keeps its own data, profile picture, logo, and settings across all mobiles and IPs.</div>
-   ${clients.length?`<div class="tw" style="margin-top:6px"><table><tr><th>Client Email</th><th>Institute / Name</th><th>Password</th><th>WhatsApp</th><th>Status</th><th>Manage</th></tr>${clients.map(([em,c])=>`<tr><td><b>${esc(em)}</b></td><td><b>${esc(c.orgName||c.name||em)}</b><div class="mut sm">${esc(c.name||'')}</div></td><td>${esc(c.pw||'')}</td><td>${esc(c.phone||'–')}</td><td>${c.paused?'<span class="bd sA">Paused</span>':'<span class="bd sP">Active</span>'}</td><td><div style="display:flex;gap:6px"><button type="button" class="b sm" data-a="toggleClientPause" data-em="${esc(em)}">${c.paused?'Activate':'Pause'}</button><button type="button" class="b sm del" data-a="delClient" data-em="${esc(em)}">Remove</button></div></td></tr>`).join('')}</table></div>`:'<div class="emp">No clients added yet. Click "+ Add Client" to add a client email.</div>'}
+   ${clients.length?`<div class="tw" style="margin-top:6px"><table><tr><th>Client Email</th><th>Institute / Name</th><th>Password</th><th>WhatsApp</th><th>Status</th><th>Manage</th></tr>${clients.map(([em,c])=>`<tr><td><b>${esc(em)}</b></td><td><b>${esc(c.orgName||c.name||em)}</b><div class="mut sm">${esc(c.name||'')}</div></td><td>${esc(c.pw||'')}</td><td>${esc(c.phone||'–')}</td><td>${c.paused?'<span class="bd sA">Paused</span>':'<span class="bd sP">Active</span>'}</td><td><div style="display:flex;gap:6px"><button type="button" class="b sm" data-a="editClientModal" data-em="${esc(em)}">Edit</button><button type="button" class="b sm" data-a="toggleClientPause" data-em="${esc(em)}">${c.paused?'Activate':'Pause'}</button><button type="button" class="b sm del" data-a="delClient" data-em="${esc(em)}">Remove</button></div></td></tr>`).join('')}</table></div>`:'<div class="emp">No clients added yet. Click "+ Add Client" to add a client email.</div>'}
    <hr style="border:0;border-top:1px solid var(--line);margin:4px 0">
    <div style="min-width:0;max-width:100%">
     <b class="sm">Trial Logins (${trialAccList.length}):</b>
@@ -1398,12 +1434,25 @@ function Settings(){
    <div class="bar" style="margin-top:4px"><button class="b sm" data-a="theme">${esc(T('themeBtn'))}</button></div>
    <hr style="border:0;border-top:1px solid var(--line);margin:4px 0">
    <h2>Account Credentials</h2>
-   <label>Display name<input id="setAName" value="${esc(isOwner?((ownerMaster.ownerProfile&&ownerMaster.ownerProfile.name)||OWNER_ACCOUNT.name):db.admin.name)}"></label>
-   <label>Login email<input id="setAEmail" type="email" value="${esc(isOwner?OWNER_ACCOUNT.email:db.admin.email)}" ${isOwner?'readonly':''}></label>
-   <label>Password<input id="setAPw" type="text" value="${esc(isOwner?(ownerMaster.ownerPw||OWNER_ACCOUNT.pw):db.admin.pw)}"></label>
+   <label>Display name<input id="setAName" value="${esc(isOwner?((ownerMaster.ownerProfile&&ownerMaster.ownerProfile.name)||DEFAULT_OWNER_NAME):db.admin.name)}"></label>
+   <label>Login email<input id="setAEmail" type="email" value="${esc(isOwner?getOwnerEmail():db.admin.email)}"></label>
+   <label>Password<input id="setAPw" type="text" value="${esc(isOwner?(ownerMaster.ownerPw||DEFAULT_OWNER_PW):db.admin.pw)}"></label>
+   ${isOwner?`
+    <hr style="border:0;border-top:1px solid var(--line);margin:4px 0">
+    <h2>Trial Admin Credentials</h2>
+    <label>Trial Admin Name<input id="setTAdminName" value="${esc(ownerMaster.trialAdminName||'Principal (Admin)')}"></label>
+    <label>Trial Admin Email<input id="setTAdminEmail" type="email" value="${esc(getTrialAdminEmail())}"></label>
+    <label>Trial Admin Password<input id="setTAdminPw" type="text" value="${esc(ownerMaster.trialAdminPw||'admin123')}"></label>
+   `:''}
   </div>
   <div class="card fl">
    ${isOwner?`
+    <div class="kill-box">
+     <h2 style="color:var(--A)">Owner Kill Switch (Global Portal Lock)</h2>
+     <p class="mut sm">Turn ON to immediately pause the entire coaching portal for all Admins, Clients, Teachers, and Students across every device.</p>
+     <label class="chk"><input type="checkbox" id="setGlobalLock" ${ownerMaster.globalAppLocked?'checked':''}> Pause entire portal (Kill Switch)</label>
+     <label>Pause screen message<input id="setGlobalLockMsg" value="${esc(ownerMaster.globalLockMsg||'')}" placeholder="Portal is temporarily paused..."></label>
+    </div>
     <h2>Trial Duration &amp; IP Timer</h2>
     <p class="mut sm">Trial duration applies from first IP login.</p>
     <label>Trial duration (days)<input id="setTrialDays" type="number" min="1" max="365" value="${esc(limitDays)}"></label>
@@ -1505,7 +1554,7 @@ async function checkExpiryOnLoad(){
  if(S.u && isPaidTier(S.u.role))return;
  let ip='';
  try{ip=await fetchPublicIp()}catch(e){}
- const reason=isTrialExpiredOrRemoved(TRIAL_ADMIN_EMAIL,ip);
+ const reason=isTrialExpiredOrRemoved(getTrialAdminEmail(),ip);
  if(reason){
   if(S.u && S.u.role==='admin'){
    S.u=null;
@@ -1562,7 +1611,7 @@ document.addEventListener('click',async e=>{
    const corg=val('ncOrg').trim()||orgName();
    const cphone=val('ncPhone').trim();
    if(!em||!em.includes('@')||!pw){toast('Valid email and password required');return false}
-   if(em===OWNER_ACCOUNT.email.toLowerCase()||em===TRIAL_ADMIN_EMAIL){toast('Use a separate email for client');return false}
+   if(em===getOwnerEmail()||em===getTrialAdminEmail()){toast('Use a separate email for client');return false}
    const scope=emailToScopeRow(em);
    ownerMaster.clients=ownerMaster.clients||{};
    ownerMaster.clients[em]={email:em,pw,name:cname,orgName:corg,phone:cphone,scope,paused:false,createdAt:new Date().toISOString()};
@@ -1574,6 +1623,47 @@ document.addEventListener('click',async e=>{
    }
    render(false);
    toast('Client added: '+em);
+  });
+ }
+ else if(a==='editClientModal'){
+  if(!S.u || S.u.role!=='owner'){toast('Only Owner can edit clients');return}
+  const oldEm=(el.dataset.em||'').toLowerCase();
+  const c=ownerMaster.clients&&ownerMaster.clients[oldEm];
+  if(!c)return;
+  modal('Edit Client Credentials',`
+   <div class="fl">
+    <label>Client Email<input id="ecEmail" type="email" value="${esc(oldEm)}"></label>
+    <label>Client Password<input id="ecPw" type="text" value="${esc(c.pw||'')}"></label>
+    <label>Client Name<input id="ecName" value="${esc(c.name||'')}"></label>
+    <label>Coaching Name<input id="ecOrg" value="${esc(c.orgName||'')}"></label>
+    <label>Client WhatsApp Number<input id="ecPhone" value="${esc(c.phone||'')}"></label>
+   </div>
+  `,'Save Client',async()=>{
+   const newEm=val('ecEmail').trim().toLowerCase();
+   const newPw=val('ecPw').trim();
+   const newName=val('ecName').trim()||'Client Admin';
+   const newOrg=val('ecOrg').trim()||orgName();
+   const newPhone=val('ecPhone').trim();
+   if(!newEm||!newEm.includes('@')||!newPw){toast('Valid email and password required');return false}
+   if(newEm===getOwnerEmail()||newEm===getTrialAdminEmail()){toast('Cannot conflict with Owner or Trial Admin email');return false}
+   if(newEm!==oldEm && ownerMaster.clients[newEm]){toast('Another client already uses this email');return false}
+   const oldScope=emailToScopeRow(oldEm);
+   const newScope=emailToScopeRow(newEm);
+   const updatedCfg={...c,email:newEm,pw:newPw,name:newName,orgName:newOrg,phone:newPhone,scope:newScope};
+   if(newEm!==oldEm)delete ownerMaster.clients[oldEm];
+   ownerMaster.clients[newEm]=updatedCfg;
+   await persistOwnerMaster();
+   const sb=getSb();
+   if(sb){
+    const {data}=await sb.from('app_state').select('data').eq('id',oldScope).maybeSingle();
+    const clientData={...emptyDb(),...((data&&data.data)||{})};
+    clientData.orgName=newOrg;
+    clientData.clientPhone=newPhone;
+    clientData.admin={...(clientData.admin||{}),name:newName,email:newEm,pw:newPw};
+    await sb.from('app_state').upsert({id:newScope,data:clientData,updated_at:new Date().toISOString()},{onConflict:'id'});
+   }
+   render(false);
+   toast('Client updated: '+newEm);
   });
  }
  else if(a==='toggleClientPause'){
@@ -1611,21 +1701,27 @@ document.addEventListener('click',async e=>{
   const enteredUser=val('luser').trim();
   await loadOwnerMaster(true);
 
-  const targetScope = emailToScopeRow(em);
+  const isOwnerEmail = em===getOwnerEmail() || em===DEFAULT_OWNER_EMAIL.toLowerCase();
+  const targetScope = isOwnerEmail ? emailToScopeRow(getOwnerEmail()) : emailToScopeRow(em);
   loadLocalScopeDb(targetScope, em);
   await loadCloud(true);
 
-  if(em===OWNER_ACCOUNT.email.toLowerCase()){
-   const validOwnerPw = pw===(ownerMaster.ownerPw||OWNER_ACCOUNT.pw) || pw===OWNER_ACCOUNT.pw;
+  if(isOwnerEmail){
+   const validOwnerPw = pw===(ownerMaster.ownerPw||DEFAULT_OWNER_PW) || pw===DEFAULT_OWNER_PW;
    if(!validOwnerPw){toast('Invalid owner password');return}
-   const ownName=(ownerMaster.ownerProfile&&ownerMaster.ownerProfile.name)||OWNER_ACCOUNT.name;
-   S.u={e:OWNER_ACCOUNT.email.toLowerCase(),role:'owner',name:ownName,scope:targetScope};
+   const ownName=(ownerMaster.ownerProfile&&ownerMaster.ownerProfile.name)||DEFAULT_OWNER_NAME;
+   S.u={e:getOwnerEmail(),role:'owner',name:ownName,scope:targetScope};
    saveSession(S.u);
    S.v='dash';S.dr=null;S.drawerId=null;
    subscribeRealtime();
    render(true);
    toast('Signed in: '+ownName);
    persist();
+   return;
+  }
+
+  if(ownerMaster.globalAppLocked){
+   toast(ownerMaster.globalLockMsg||'Portal paused by owner');
    return;
   }
 
@@ -1766,7 +1862,7 @@ document.addEventListener('click',async e=>{
  }
  else if(a==='saveSettings'){
   const nm=val('setOrg').trim(),tag=val('setTag').trim(),anm=val('setAName').trim()||'Principal (Admin)',aem=val('setAEmail').trim().toLowerCase(),apw=val('setAPw').trim();
-  if(!nm||!aem||!apw){toast('Name, email and password are required');return}
+  if(!nm||!aem||!aem.includes('@')||!apw){toast('Valid name, email and password are required');return}
   const lock=!!($('#setIpLock')&&$('#setIpLock').checked);
   const ips=val('setIps').trim();
   if(lock&&!ips){toast('Please add at least one allowed IP or disable IP lock');return}
@@ -1779,27 +1875,56 @@ document.addEventListener('click',async e=>{
   db.allowedIps=ips;
 
   if(S.u.role==='owner'){
+   const tAdmEm=val('setTAdminEmail').trim().toLowerCase();
+   const tAdmPw=val('setTAdminPw').trim();
+   const tAdmNm=val('setTAdminName').trim()||'Principal (Admin)';
+   if(!tAdmEm||!tAdmEm.includes('@')||!tAdmPw){toast('Valid Trial Admin email and password required');return}
+   if(tAdmEm===aem){toast('Owner and Trial Admin emails must be different');return}
+
+   ownerMaster.ownerEmail=aem;
    ownerMaster.ownerOrgName=nm;
    ownerMaster.ownerTagline=tag;
    if(S.tempLogo!==undefined)ownerMaster.ownerLogo=S.tempLogo;
    ownerMaster.ownerAccent=db.accent;
    ownerMaster.ownerProfile={...(ownerMaster.ownerProfile||{}),name:anm,photo:(ownerMaster.ownerProfile&&ownerMaster.ownerProfile.photo)||''};
    ownerMaster.ownerPw=apw;
+
+   ownerMaster.trialAdminEmail=tAdmEm;
+   ownerMaster.trialAdminPw=tAdmPw;
+   ownerMaster.trialAdminName=tAdmNm;
+
+   ownerMaster.globalAppLocked=!!($('#setGlobalLock')&&$('#setGlobalLock').checked);
+   ownerMaster.globalLockMsg=val('setGlobalLockMsg').trim()||'This coaching portal is currently paused by the owner. Please contact the service provider.';
+
    const tDays=Math.max(1,Math.min(365,Number(val('setTrialDays'))||7));
    ownerMaster.trialDays=tDays;
    ownerMaster.trialIpLock=!!($('#setTrialIpLock')&&$('#setTrialIpLock').checked);
+
+   const newOwnerScope=emailToScopeRow(aem);
+   if(newOwnerScope!==ROW_ID){
+    setActiveScope(newOwnerScope);
+   }
+   S.u={...S.u,e:aem,name:anm,scope:newOwnerScope};
   }else{
    db.admin={...db.admin,name:anm,email:S.u.role==='client'?S.u.e:aem,pw:apw};
-   if(S.u.role==='client' && ownerMaster.clients && ownerMaster.clients[S.u.e]){
+   if(S.u.role==='admin'){
+    ownerMaster.trialAdminEmail=aem;
+    ownerMaster.trialAdminPw=apw;
+    ownerMaster.trialAdminName=anm;
+    const newAdmScope=emailToScopeRow(aem);
+    if(newAdmScope!==ROW_ID)setActiveScope(newAdmScope);
+    S.u={...S.u,e:aem,name:anm,scope:newAdmScope};
+   }else if(S.u.role==='client' && ownerMaster.clients && ownerMaster.clients[S.u.e]){
     ownerMaster.clients[S.u.e].pw=apw;
     ownerMaster.clients[S.u.e].name=anm;
     ownerMaster.clients[S.u.e].orgName=nm;
+    S.u={...S.u,name:anm};
    }
   }
-  S.u={...S.u,name:anm};
   saveSession(S.u);
   addAudit('Settings Saved',nm);
   await persist();
+  subscribeRealtime();
   render(false);
   toast('Settings saved & synced');
  }
@@ -1991,7 +2116,7 @@ document.addEventListener('change',async e=>{
  }
  else if(f==='bt'){const b=bOf(el.dataset.id);if(b){b.time=el.value;await persist();toast('Timing updated')}}
  else if(f==='bte'){const b=bOf(el.dataset.id);if(b){b.teacher=el.value;await persist();render(false);toast('Teacher assigned')}}
- else if(f==='bth'){const b=bOf(el.dataset.id);if(b){b.th=Math.min(100,Math.max(50,Number(el.value)||75));await persist();render(false);toast('Threshold updated')}}
+ else if(f==='bth'){const b=bOf(el.dataset.id);if(b){b.th=Math.min(100,Math.max(50,Number(el.value)||75));await persist();toast('Threshold updated')}}
 });
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeM();closeDr();if(S.mobMenuOpen){S.mobMenuOpen=false;render(false)}}});
