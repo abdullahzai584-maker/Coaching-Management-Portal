@@ -40,8 +40,8 @@
 
 *,*::before,*::after{box-sizing:border-box}
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-html{scroll-padding-top:env(safe-area-inset-top,0px);width:100%;max-width:100%;overflow-x:hidden}
-body{margin:0;width:100%;max-width:100%;background:var(--bg);color:var(--ink);font:14px/1.55 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative}
+html{scroll-padding-top:env(safe-area-inset-top,0px);width:100%;max-width:100%;overflow-x:clip}
+body{margin:0;width:100%;max-width:100%;background:var(--bg);color:var(--ink);font:14px/1.55 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;overflow-x:clip;position:relative}
 
 #bg-fx{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 #bg-fx .grid-bg{position:absolute;inset:0;background-image:radial-gradient(color-mix(in srgb,var(--pri) 22%,transparent) 1px,transparent 1px);background-size:28px 28px;opacity:.45}
@@ -58,7 +58,7 @@ body{margin:0;width:100%;max-width:100%;background:var(--bg);color:var(--ink);fo
 }
 
 #app,#m,#dr,#toast{position:relative;z-index:1}
-#app{width:100%;max-width:100%;overflow-x:hidden}
+#app{width:100%;max-width:100%;overflow-x:clip}
 h1,h2,h3{margin:0;font-weight:700;letter-spacing:-.02em;word-break:break-word}h1{font-size:21px}h2{font-size:15px}
 button,input,select,textarea{font:inherit;color:inherit;max-width:100%}
 input,select,textarea{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:9px 12px;min-width:0;transition:border-color .18s,box-shadow .18s,background .18s}
@@ -101,10 +101,10 @@ textarea{width:100%;min-height:90px}
 .av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px;flex-shrink:0;overflow:hidden}
 .av img{width:100%;height:100%;object-fit:cover;display:block}
 .av.lg-av{width:68px;height:68px;font-size:24px;border:2px solid var(--line)}
-.prof-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:10px;border:1px solid var(--line);border-radius:14px;background:var(--card2)}
+.prof-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:10px;border:1px solid var(--line);border-radius:14px;background:var(--card2);min-width:0;max-width:100%}
 .role{font-size:11px;font-weight:700;background:var(--pbg);color:var(--pri);border-radius:6px;padding:2px 7px;text-transform:capitalize}
 main{padding:20px;max-width:1160px;width:100%;min-width:0;animation:fadeUp .24s ease}
-.tab-anim{animation:tabEnter .3s cubic-bezier(.22,1,.36,1)}
+.tab-anim{animation:tabEnter .3s cubic-bezier(.22,1,.36,1);min-width:0;max-width:100%}
 .ph{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;min-width:0}
 .bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center;width:100%;min-width:0}
 .kp{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin-bottom:16px;width:100%;min-width:0}
@@ -128,7 +128,7 @@ main{padding:20px;max-width:1160px;width:100%;min-width:0;animation:fadeUp .24s 
 .seg .oL{background:var(--L);color:#fff;border-color:var(--L);box-shadow:0 4px 12px -2px var(--L)}
 .seg .oV{background:var(--V);color:#fff;border-color:var(--V);box-shadow:0 4px 12px -2px var(--V)}
 .mins{width:72px;padding:6px}
-.tw{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}th{color:var(--mut);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.03em;background:var(--card2)}
+.tw{width:100%;max-width:100%;min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}th{color:var(--mut);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.03em;background:var(--card2)}
 tr.cl{cursor:pointer;transition:background .14s}tr.cl:hover{background:var(--pbg)}
 .mt{height:7px;background:var(--line);border-radius:999px;overflow:hidden;min-width:60px}.mt i{display:block;height:100%;background:linear-gradient(90deg,var(--pri),var(--P));border-radius:999px;transition:width .35s ease}.mt i.lo{background:var(--A)}
 .al{border-radius:12px;padding:11px 14px;margin-bottom:12px;background:var(--Ab);color:var(--A);font-weight:600;border:1px solid rgba(225,29,72,.2);word-break:break-word}.al.w{background:var(--Lb);color:var(--L);border-color:rgba(180,83,9,.2)}
@@ -140,13 +140,13 @@ tr.cl{cursor:pointer;transition:background .14s}tr.cl:hover{background:var(--pbg
 .dr{position:fixed;top:0;right:0;bottom:0;width:min(440px,100vw);background:var(--card);border-left:1px solid var(--line);z-index:15;padding:16px;overflow:auto;display:grid;gap:12px;align-content:start;box-shadow:var(--sh-lg);animation:slideLeft .22s ease}
 #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:600;z-index:35;transition:opacity .2s;pointer-events:none;box-shadow:var(--sh-lg);max-width:calc(100vw - 24px);text-align:center;font-size:13px}
 .cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;text-align:center}.cal div{padding:7px 0;border-radius:9px;font-size:12px;font-weight:600;background:var(--card2)}
-.fl{display:grid;gap:10px;min-width:0}.fl label{display:grid;gap:4px;font-size:13px;font-weight:500;color:var(--mut);min-width:0}
+.fl{display:grid;gap:10px;min-width:0;max-width:100%}.fl label{display:grid;gap:4px;font-size:13px;font-weight:500;color:var(--mut);min-width:0;max-width:100%;word-break:break-word}
 .swatches{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
 .sw{width:30px;height:30px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:transform .15s}
 .sw:hover{transform:scale(1.1)}.sw.on{border-color:var(--ink);transform:scale(1.12)}
-.chk{display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;color:var(--ink)}
-.chk input{width:17px;height:17px;accent-color:var(--pri);flex-shrink:0}
-.own-box{border:1px solid color-mix(in srgb,var(--pri) 35%,var(--line));background:color-mix(in srgb,var(--pbg) 55%,var(--card2));border-radius:14px;padding:12px;display:grid;gap:8px}
+.chk{display:flex;align-items:flex-start;gap:8px;cursor:pointer;font-weight:600;color:var(--ink);min-width:0;max-width:100%;word-break:break-word;line-height:1.4}
+.chk input{width:17px;height:17px;accent-color:var(--pri);flex-shrink:0;margin-top:2px}
+.own-box{border:1px solid color-mix(in srgb,var(--pri) 35%,var(--line));background:color-mix(in srgb,var(--pbg) 55%,var(--card2));border-radius:14px;padding:12px;display:grid;gap:8px;min-width:0;max-width:100%}
 .id-card{border:1px solid var(--line);border-radius:16px;padding:16px;background:linear-gradient(135deg,color-mix(in srgb,var(--pbg) 70%,var(--card)),var(--card2));display:grid;gap:10px}
 .exp-box{border:1px solid rgba(225,29,72,.35);background:var(--Ab);color:var(--ink);border-radius:14px;padding:14px;display:grid;gap:8px}
 
@@ -160,7 +160,7 @@ tr.cl{cursor:pointer;transition:background .14s}tr.cl:hover{background:var(--pbg
 
 @media (max-width:860px){
   h1{font-size:18px}
-  .shell{grid-template-columns:minmax(0,1fr)}
+  .shell{grid-template-columns:minmax(0,1fr);overflow-x:clip}
   .side{display:none}
   .top{padding:8px 12px;gap:6px;flex-wrap:wrap}
   .top .sync{font-size:10.5px;padding:3px 8px}
@@ -169,19 +169,21 @@ tr.cl{cursor:pointer;transition:background .14s}tr.cl:hover{background:var(--pbg
   .top .chip{padding:2px;border:0;background:none}
   .top .b.sm{padding:6px 9px;min-height:34px;font-size:12px}
   .mob-dots-wrap{display:inline-flex;align-items:center}
-  main{padding:12px;padding-bottom:28px}
-  .card{padding:14px;border-radius:14px}
+  main{padding:12px;padding-bottom:32px;max-width:100%;overflow-x:clip}
+  .card{padding:12px;border-radius:14px;max-width:100%}
+  .own-box{padding:10px}
   .kp{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
   .kp .card{padding:12px}
   .kp .card b{font-size:20px}
   .g2{grid-template-columns:minmax(0,1fr);gap:12px}
   .bar{gap:6px}
   .bar > input,.bar > select{flex:1 1 100%;width:100%}
-  .bar > button,.bar > a.b{flex:1 1 calc(50% - 6px);min-width:0;padding:8px 10px;font-size:12.5px}
+  .bar > button,.bar > a.b{flex:1 1 auto;min-width:0;padding:8px 10px;font-size:12px;white-space:normal}
   .row{padding:10px 12px;gap:8px}
   .row .nm{flex:1 1 100%;min-width:0}
   .seg{width:100%;justify-content:space-between}
   .seg button{flex:1;height:40px;width:auto}
+  th,td{padding:8px;font-size:12px}
 }
 @media print{#bg-fx,#cursor-fx{display:none!important}.side,.top,.bar,.mob-dots-wrap,.noprint{display:none!important}.shell{display:block}body{background:#fff}}
 </style>
@@ -189,7 +191,7 @@ tr.cl{cursor:pointer;transition:background .14s}tr.cl:hover{background:var(--pbg
 <body>
 <div id="bg-fx" aria-hidden="true"></div><div id="cursor-fx" aria-hidden="true"></div><div id="app"></div><div id="m"></div><div id="dr"></div><div id="toast" style="opacity:0"></div>
 <script>
-const APP_VERSION = '1.6';
+const APP_VERSION = '1.7';
 const VERSION_KEY = 'our_coaching_app_ver';
 const OWNER_CONTACT_PHONE = '03213091550';
 
@@ -895,7 +897,7 @@ function Settings(){
     <h2>Owner Trial, Client WhatsApp &amp; Access Control</h2>
     <span class="role">Owner Only</span>
    </div>
-   <div class="sm">
+   <div class="sm" style="word-break:break-word">
     <b>Current Trial / Client Admin Account:</b>
     Name: <b>${esc(db.admin.name||'–')}</b> ·
     Email: <b>${esc(db.admin.email||'–')}</b> ·
@@ -907,18 +909,18 @@ function Settings(){
     ${db.clientPhone?`<div class="bar" style="margin:0"><a class="b sm pri" target="_blank" rel="noopener" href="${esc(ren.url)}">Send Renewal Msg to ${esc(db.clientPhone)}</a></div>`:''}
    </div>
    <div class="mut sm"><b>Remove Trial</b> dabane par user ka trial block hoga aur uska demo/coaching data (batches, students, attendance, fees) bhi saath hi remove ho jayega.</div>
-   <div>
+   <div style="min-width:0;max-width:100%">
     <b class="sm">Trial Accounts &amp; Claimed IPs (${claimedList.length}) — Same IP multi-device allowed, 1 week from first IP login:</b>
     ${claimedList.length?`<div class="tw" style="margin-top:6px"><table><tr><th>User Email</th><th>IP Address</th><th>First Login / Days</th><th>Status</th><th>Manage</th></tr>${claimedList.map(([ip,info])=>{
      const em=(info&&info.email)||'';
      const used=trialDaysElapsed(info&&info.claimedAt);
      const st=isTrialExpiredOrRemoved(em,ip);
      const badge=st==='removed'?'<span class="bd sA">Removed</span>':st==='expired'?'<span class="bd sL">Expired</span>':'<span class="bd sP">Active</span>';
-     return`<tr><td><b>${esc(em||'–')}</b></td><td>${esc(ip)}</td><td class="sm"><b>${used}</b> / ${limitDays} days</td><td>${badge}</td><td><div style="display:flex;gap:6px"><button type="button" class="b sm" data-a="extendTrial" data-ip="${esc(ip)}" data-em="${esc(em)}">+7d</button><button type="button" class="b sm del" data-a="removeTrialUser" data-ip="${esc(ip)}" data-em="${esc(em)}">Remove Trial</button></div></td></tr>`;
+     return`<tr><td><b>${esc(em||'–')}</b></td><td>${esc(ip)}</td><td class="sm"><b>${used}</b> / ${limitDays} days</td><td>${badge}</td><td><div style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="b sm" data-a="extendTrial" data-ip="${esc(ip)}" data-em="${esc(em)}">+7d</button><button type="button" class="b sm del" data-a="removeTrialUser" data-ip="${esc(ip)}" data-em="${esc(em)}">Remove Trial</button></div></td></tr>`;
     }).join('')}</table></div>`:'<div class="mut sm" style="margin-top:4px">No trial accounts claimed yet.</div>'}
    </div>
-   ${revokedEntries.length?`<div><b class="sm">Removed / Blocked Trial Keys (${revokedEntries.length}):</b> <span class="mut sm">${revokedEntries.map(([k])=>esc(k)).join(', ')}</span> <button type="button" class="b sm" data-a="restoreAllTrials">Allow / Restore All</button></div>`:''}
-   <div>
+   ${revokedEntries.length?`<div style="word-break:break-word"><b class="sm">Removed / Blocked Trial Keys (${revokedEntries.length}):</b> <span class="mut sm">${revokedEntries.map(([k])=>esc(k)).join(', ')}</span> <button type="button" class="b sm" data-a="restoreAllTrials">Allow / Restore All</button></div>`:''}
+   <div style="min-width:0;max-width:100%">
     <b class="sm">Recent Sign-In Activity (${recentLogs.length}):</b>
     ${recentLogs.length?`<div class="tw" style="margin-top:6px"><table><tr><th>Time</th><th>User</th><th>Role</th><th>IP</th></tr>${recentLogs.map(lg=>`<tr class="sm"><td class="mut">${esc((lg.at||'').slice(0,16).replace('T',' '))}</td><td><b>${esc(lg.email||'')}</b></td><td><span class="role">${esc(lg.role||'')}</span></td><td>${esc(lg.ip||'–')}</td></tr>`).join('')}</table></div>`:'<div class="mut sm" style="margin-top:4px">No sign-in logs recorded yet.</div>'}
    </div>
@@ -929,7 +931,7 @@ function Settings(){
    <h2>Branding &amp; Theme</h2>
    <div class="prof-bar" id="orgLogoPreview">
     ${logoCur?`<img class="org-img" style="width:46px;height:46px" src="${logoCur}" alt="Logo">`:`<div class="av" style="width:46px;height:46px;font-size:16px">${esc((orgName()||'C')[0].toUpperCase())}</div>`}
-    <div style="display:grid;gap:6px">
+    <div style="display:grid;gap:6px;min-width:0">
      <b class="sm">Institute Logo</b>
      <div style="display:flex;gap:6px;flex-wrap:wrap">
       <label class="b sm" style="cursor:pointer;margin:0">Upload Logo<input type="file" id="orgLogoInput" accept="image/*" style="display:none"></label>
@@ -962,7 +964,7 @@ function Settings(){
    <p class="mut sm">When enabled, <b>Students</b> can only sign in when connected to your coaching center’s Wi-Fi/internet IP. Admin and Teachers can still log in from anywhere.</p>
    <label class="chk"><input type="checkbox" id="setIpLock" ${db.ipLock?'checked':''}> Enable campus-only IP access for students</label>
    <label>Allowed coaching public IP(s) (comma separated)<input id="setIps" value="${esc(db.allowedIps||'')}" placeholder="e.g. 103.255.4.12"></label>
-   <div class="bar"><button type="button" class="b sm" data-a="grabIp">Use my current IP</button><span class="mut sm" id="curIpTxt">${clientIp?'Detected IP: '+esc(clientIp):''}</span></div>
+   <div class="bar"><button type="button" class="b sm" data-a="grabIp">Use my current IP</button><span class="mut sm" id="curIpTxt" style="word-break:break-all">${clientIp?'Detected IP: '+esc(clientIp):''}</span></div>
    <hr style="border:0;border-top:1px solid var(--line);margin:4px 0">
    <h2>Owner Kill Switch</h2>
    ${isOwner?`
