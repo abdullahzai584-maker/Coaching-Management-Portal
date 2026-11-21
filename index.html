@@ -480,7 +480,7 @@ tr.cl{cursor:pointer;transition:background .12s}tr.cl:hover{background:var(--pbg
 
 <script>
 
-const APP_VERSION = '3.1';
+const APP_VERSION = '3.2';
 
 const VERSION_KEY = 'our_coaching_app_ver';
 
@@ -1406,6 +1406,8 @@ function applyAccent(){
 
 let syncStatus = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY) ? 'Syncing...' : 'Local mode';
 
+let cloudLoaded = false;
+
 let clientIp = '';
 
 async function fetchPublicIp(){
@@ -2050,21 +2052,11 @@ async function loadCloud(silent=false){
 
    try{localStorage.setItem(OWNER_STORE_KEY,JSON.stringify(ownerMaster))}catch(e){}
 
-   const hasCloudRich=((Array.isArray(cloudDb.bat)&&cloudDb.bat.length)||(Array.isArray(cloudDb.stu)&&cloudDb.stu.length)||(cloudDb.orgName&&cloudDb.orgName!==DEFAULT_ORG)||cloudDb.orgLogo);
+   // Cloud data wins across all devices — always use it when it exists
 
-   const hasLocalRich=((Array.isArray(db.bat)&&db.bat.length)||(Array.isArray(db.stu)&&db.stu.length)||(db.orgName&&db.orgName!==DEFAULT_ORG)||db.orgLogo);
+   db=cloudDb;
 
-   if(hasCloudRich || !hasLocalRich){
-
-    db=cloudDb;
-
-    normalizeDb();
-
-   }else{
-
-    normalizeDb();
-
-   }
+   normalizeDb();
 
    if(S.u && S.u.role==='owner' && ownerMaster.ownerProfile && ownerMaster.ownerProfile.name){
 
@@ -2090,7 +2082,9 @@ async function loadCloud(silent=false){
 
    syncStatus='Live synced';
 
-   if(!silent)render(false);
+   cloudLoaded=true;
+
+   if(!dirty())render(false);
 
    else updateSyncBadges();
 
@@ -2102,13 +2096,19 @@ async function loadCloud(silent=false){
 
    syncStatus='Live synced';
 
-   updateSyncBadges();
+   cloudLoaded=true;
+
+   if(!dirty())render(false);
+
+   else updateSyncBadges();
 
   }
 
  }catch(err){
 
   syncStatus='Sync error';
+
+  cloudLoaded=false;
 
   if(!silent)toast('Cloud sync error');
 
@@ -2146,6 +2146,22 @@ async function persist(){
 
  if(!sb)return;
 
+ // Never overwrite cloud data with stale/empty local state when the last
+
+ // cloud sync failed (e.g. freshly restored session on another device).
+
+ if(!cloudLoaded){
+
+  syncStatus='Sync error';
+
+  updateSyncBadges();
+
+  toast('Could not reach cloud — changes saved on this device only');
+
+  return;
+
+ }
+
  syncStatus='Saving...';
 
  updateSyncBadges();
@@ -2160,11 +2176,15 @@ async function persist(){
 
   syncStatus='Live synced';
 
+  cloudLoaded=true;
+
   updateSyncBadges();
 
  }catch(err){
 
   syncStatus='Sync error';
+
+  cloudLoaded=false;
 
   updateSyncBadges();
 
@@ -2217,6 +2237,8 @@ function subscribeRealtime(){
     try{localStorage.setItem(STORE_KEY,JSON.stringify(db))}catch(e){}
 
     syncStatus='Live synced';
+
+    cloudLoaded=true;
 
     if(!dirty())render(false);
 
@@ -2271,6 +2293,12 @@ function subscribeRealtime(){
     syncOwnerMasterToDb();
 
     enforceRemoteLock();
+
+    cloudLoaded=true;
+
+    syncStatus='Live synced';
+
+    updateSyncBadges();
 
     if(!dirty())render(false);
 
@@ -4437,6 +4465,6 @@ if(document.readyState === 'loading'){
 
 </script>
 
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5decf39db9c5d1e',t:'MTc5NTI1NDgyOQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5decf39db9c5d1e',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5dee17b1d73a813',t:'MTc5NTI1NTU3Ng=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5dee17b1d73a813',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 
 </html>
