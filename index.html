@@ -1,2586 +1,4442 @@
 <!DOCTYPE html>
+
 <html lang="en" dir="ltr">
+
 <head>
+
 <meta charset="utf-8">
+
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+
 <meta http-equiv="Pragma" content="no-cache">
+
 <meta http-equiv="Expires" content="0">
+
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+
 <title>OUR COACHING — Attendance &amp; Operations</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
+
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;600;700&display=swap">
+
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
+
 :root{
+
   --bg:#eef2ff;--card:rgba(255,255,255,.92);--card2:rgba(248,250,252,.94);--menu-bg:#ffffff;--glass-b:rgba(255,255,255,.78);--glass-in:inset 0 1px 0 rgba(255,255,255,.85);
+
   --ink:#0f172a;--mut:#64748b;--line:rgba(148,163,184,.28);
+
   --pri:#4f46e5;--pri2:#6366f1;--pbg:rgba(79,70,229,.12);--onpri:#ffffff;
+
   --P:#059669;--Pb:rgba(16,185,129,.15);--A:#e11d48;--Ab:rgba(244,63,94,.15);--L:#b45309;--Lb:rgba(245,158,11,.16);--V:#0369a1;--Vb:rgba(14,165,233,.16);
+
   --sh:0 8px 24px -6px rgba(15,23,42,.08),var(--glass-in);
+
   --sh-lg:0 18px 40px -12px rgba(15,23,42,.18),var(--glass-in)
+
 }
+
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+
   --bg:#060a13;--card:rgba(15,23,42,.9);--card2:rgba(30,41,59,.86);--menu-bg:#0f172a;--glass-b:rgba(255,255,255,.14);--glass-in:inset 0 1px 0 rgba(255,255,255,.14);
+
   --ink:#f1f5f9;--mut:#94a3b8;--line:rgba(148,163,184,.18);
+
   --pbg:rgba(99,102,241,.18);--onpri:#ffffff;
+
   --P:#34d399;--Pb:rgba(16,185,129,.18);--A:#fb7185;--Ab:rgba(244,63,94,.18);--L:#fbbf24;--Lb:rgba(245,158,11,.18);--V:#38bdf8;--Vb:rgba(14,165,233,.18);
+
   --sh:0 10px 26px rgba(0,0,0,.38),var(--glass-in);--sh-lg:0 22px 48px rgba(0,0,0,.62),var(--glass-in)
+
 }}
+
 :root[data-theme="dark"]{
+
   --bg:#060a13;--card:rgba(15,23,42,.9);--card2:rgba(30,41,59,.86);--menu-bg:#0f172a;--glass-b:rgba(255,255,255,.14);--glass-in:inset 0 1px 0 rgba(255,255,255,.14);
+
   --ink:#f1f5f9;--mut:#94a3b8;--line:rgba(148,163,184,.18);
+
   --pbg:rgba(99,102,241,.18);--onpri:#ffffff;
+
   --P:#34d399;--Pb:rgba(16,185,129,.18);--A:#fb7185;--Ab:rgba(244,63,94,.18);--L:#fbbf24;--Lb:rgba(245,158,11,.18);--V:#38bdf8;--Vb:rgba(14,165,233,.18);
+
   --sh:0 10px 26px rgba(0,0,0,.38),var(--glass-in);--sh-lg:0 22px 48px rgba(0,0,0,.62),var(--glass-in)
+
 }
+
 :root[lang="ur"] body{font-family:"Noto Nastaliq Urdu",Inter,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.95}
+
 :root[lang="ur"] h1,:root[lang="ur"] h2,:root[lang="ur"] h3{letter-spacing:0}
 
 @keyframes fadeUp{from{opacity:0;transform:translate3d(0,8px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+
 @keyframes waveGlideA{
+
   0%{transform:translate3d(-12%,6%,0) rotate(-3deg) scale(1)}
+
   50%{transform:translate3d(10%,-7%,0) rotate(2.5deg) scale(1.06)}
+
   100%{transform:translate3d(-12%,6%,0) rotate(-3deg) scale(1)}
+
 }
+
 @keyframes waveGlideB{
+
   0%{transform:translate3d(12%,-5%,0) rotate(3deg) scale(1.04)}
+
   50%{transform:translate3d(-11%,7%,0) rotate(-3deg) scale(.98)}
+
   100%{transform:translate3d(12%,-5%,0) rotate(3deg) scale(1.04)}
+
 }
+
 @keyframes orbitSweep{
+
   0%{transform:translate3d(0,0,0) rotate(0deg)}
+
   50%{transform:translate3d(-26px,22px,0) rotate(180deg)}
+
   100%{transform:translate3d(0,0,0) rotate(360deg)}
+
 }
+
 @keyframes nodeFloat1{
+
   0%,100%{transform:translate3d(0,0,0) scale(1)}
+
   50%{transform:translate3d(28px,-24px,0) scale(1.18)}
+
 }
+
 @keyframes nodeFloat2{
+
   0%,100%{transform:translate3d(0,0,0) scale(1)}
+
   50%{transform:translate3d(-32px,20px,0) scale(.88)}
+
 }
+
 @keyframes nodeFloat3{
+
   0%,100%{transform:translate3d(0,0,0) scale(.95)}
+
   50%{transform:translate3d(20px,28px,0) scale(1.15)}
+
 }
+
 @keyframes scanRibbon{
+
   0%{transform:translate3d(-45%,-20%,0) rotate(-18deg)}
+
   100%{transform:translate3d(145%,25%,0) rotate(-18deg)}
+
 }
 
 *,*::before,*::after{box-sizing:border-box}
+
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+
 html{scroll-padding-top:env(safe-area-inset-top,0px);width:100%;max-width:100%;overflow-x:clip}
+
 body{margin:0;width:100%;max-width:100%;background:var(--bg);color:var(--ink);font:14px/1.55 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;overflow-x:clip;position:relative}
 
 #bg-fx{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;contain:strict}
+
 #bg-fx .dot-field{position:absolute;inset:-24px;background-image:radial-gradient(circle,color-mix(in srgb,var(--pri) 26%,transparent) 1.35px,transparent 1.35px);background-size:28px 28px;opacity:.42;will-change:transform;animation:waveGlideA 14s ease-in-out infinite}
+
 #bg-fx .mesh-wave-1{position:absolute;width:135vw;height:44vh;top:8%;left:-18vw;border-radius:46% 54% 48% 52%/62% 38% 62% 38%;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--pri) 15%,transparent),color-mix(in srgb,var(--pri2) 17%,transparent),transparent);will-change:transform;animation:waveGlideA 11s ease-in-out infinite}
+
 #bg-fx .mesh-wave-2{position:absolute;width:135vw;height:42vh;bottom:6%;right:-18vw;border-radius:54% 46% 52% 48%/40% 60% 42% 58%;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--P) 14%,transparent),color-mix(in srgb,var(--pri) 14%,transparent),transparent);will-change:transform;animation:waveGlideB 13s ease-in-out infinite}
+
 #bg-fx .scan-ribbon{position:absolute;top:-20%;left:0;width:24%;height:150vh;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--pri2) 11%,transparent),transparent);will-change:transform;animation:scanRibbon 12s linear infinite}
+
 #bg-fx .geo-orbit{position:absolute;top:16%;right:10%;width:180px;height:180px;border-radius:44% 56% 62% 38%/48% 42% 58% 52%;border:1.5px dashed color-mix(in srgb,var(--pri) 36%,transparent);will-change:transform;animation:orbitSweep 16s linear infinite}
+
 #bg-fx .geo-orbit::after{content:"";position:absolute;inset:24px;border-radius:50%;border:1.5px solid color-mix(in srgb,var(--pri2) 26%,transparent)}
+
 #bg-fx .glow-node{position:absolute;border-radius:50%;will-change:transform}
+
 #bg-fx .gn1{width:14px;height:14px;top:22%;left:18%;background:var(--pri);box-shadow:0 0 18px var(--pri);opacity:.48;animation:nodeFloat1 6.5s ease-in-out infinite}
+
 #bg-fx .gn2{width:18px;height:18px;bottom:24%;right:22%;background:var(--pri2);box-shadow:0 0 22px var(--pri2);opacity:.42;animation:nodeFloat2 8s ease-in-out infinite}
+
 #bg-fx .gn3{width:11px;height:11px;top:62%;left:12%;background:var(--P);box-shadow:0 0 16px var(--P);opacity:.45;animation:nodeFloat3 7.2s ease-in-out infinite}
 
 #cursor-fx{display:none;position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;contain:strict}
+
 #cursor-fx .cur-aura{position:fixed;width:210px;height:210px;margin:-105px 0 0 -105px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--pri) 20%,transparent),transparent 70%);opacity:0;transition:opacity .2s ease;will-change:transform}
+
 #cursor-fx .cur-ring{position:fixed;width:32px;height:32px;margin:-16px 0 0 -16px;border-radius:50%;border:1.5px solid color-mix(in srgb,var(--pri) 48%,transparent);opacity:0;transition:opacity .2s ease;will-change:transform}
+
 @media (hover:hover) and (pointer:fine){
+
   #cursor-fx{display:block}
+
 }
 
 #app,#m,#dr,#toast{position:relative;z-index:1}
+
 #app{width:100%;max-width:100%;overflow-x:clip}
+
 h1,h2,h3{margin:0;font-weight:700;letter-spacing:-.02em;word-break:break-word}h1{font-size:21px}h2{font-size:15px}
+
 button,input,select,textarea{font:inherit;color:inherit;max-width:100%}
+
 input,select,textarea{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:9px 12px;min-width:0;transition:border-color .14s,box-shadow .14s,background .14s}
+
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--pri);box-shadow:0 0 0 3px var(--pbg);background:var(--menu-bg)}
-textarea{width:100%;min-height:90px}
+
+textarea{width:100%;min-height:90px;resize:vertical}
+
 .b{border:1px solid var(--glass-b);background:var(--card);box-shadow:var(--glass-in);border-radius:10px;padding:9px 14px;cursor:pointer;font-weight:600;min-height:40px;transition:transform .12s ease,background .14s,border-color .14s;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;white-space:nowrap;flex-shrink:0}
+
 .b:hover:not(:disabled){background:var(--pbg);border-color:var(--pri);transform:translate3d(0,-1px,0)}
+
 .b:active:not(:disabled){transform:scale(.98)}
+
 .b.pri{background:linear-gradient(135deg,var(--pri),var(--pri2));color:var(--onpri);border-color:rgba(255,255,255,.22);box-shadow:0 6px 16px -4px var(--pri),var(--glass-in)}
+
 .b.pri:hover:not(:disabled){opacity:.96;transform:translate3d(0,-1px,0)}
+
 .b.del{color:var(--A);border-color:rgba(225,29,72,.3)}.b.del:hover:not(:disabled){background:var(--Ab);border-color:var(--A)}
+
 .b.sm{padding:6px 11px;min-height:34px;font-size:12.5px;border-radius:8px}
+
 .b:disabled{opacity:.45;cursor:not-allowed}
+
 :focus-visible{outline:2px solid var(--pri);outline-offset:2px}
 
 .card{background:var(--card);border:1px solid var(--glass-b);border-radius:18px;padding:18px;box-shadow:var(--sh);transition:border-color .16s,box-shadow .16s;min-width:0;max-width:100%;overflow:hidden}
+
 .card:hover{border-color:color-mix(in srgb,var(--pri) 36%,var(--glass-b));box-shadow:var(--sh-lg)}
+
 .tilt-3d{will-change:transform;transition:transform .14s ease-out,border-color .16s,box-shadow .16s;transform:perspective(850px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translate3d(0,var(--tz,0px),0)}
+
 @media (hover:hover) and (pointer:fine){
+
   .tilt-3d:active{--tz:-1px}
+
 }
+
 @media not ((hover:hover) and (pointer:fine)){
+
   .tilt-3d{transform:none!important;will-change:auto}
+
 }
+
 .mut{color:var(--mut)}.sm{font-size:13px}
+
 .lg{min-height:100dvh;width:100%;display:grid;place-items:center;padding:14px;background:radial-gradient(circle at top right,var(--pbg),transparent 58%),var(--bg)}
+
 .lg .card{width:100%;max-width:440px;display:grid;gap:12px;padding:22px;animation:popIn3d .2s ease-out}
+
 .logo{font-weight:800;font-size:17px;letter-spacing:-.03em;color:var(--ink);display:inline-flex;align-items:center;gap:8px;min-width:0;overflow:hidden;text-overflow:ellipsis}
+
 .logo span.brand-txt{background:linear-gradient(135deg,var(--pri),var(--pri2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+
 .org-img{width:30px;height:30px;border-radius:9px;object-fit:cover;flex-shrink:0;border:1px solid var(--glass-b)}
+
 .sync{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--pbg);color:var(--pri);white-space:nowrap;flex-shrink:0;border:1px solid var(--glass-b)}
+
 .sync i{width:7px;height:7px;border-radius:50%;background:var(--P);display:inline-block;animation:pulseDot 2.4s ease-in-out infinite}
+
 .sync.err i{background:var(--A);animation:none}
+
 .ver-pill{font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:var(--card2);border:1px solid var(--glass-b);color:var(--mut)}
+
 .lang-sel{padding:5px 8px;min-height:32px;font-size:12px;font-weight:600;border-radius:9px;cursor:pointer;flex-shrink:0}
 
 .shell{display:grid;grid-template-columns:228px minmax(0,1fr);min-height:100dvh;width:100%;max-width:100%}
+
 .shell > div{min-width:0;width:100%;max-width:100%}
+
 .side{background:var(--card);border-right:1px solid var(--glass-b);padding:18px 12px;position:sticky;top:0;height:100dvh;display:flex;flex-direction:column;gap:4px;box-shadow:var(--glass-in)}
+
 :root[dir="rtl"] .side{border-right:0;border-left:1px solid var(--glass-b)}
+
 .side .logo{padding:4px 10px 6px}
+
 .side .tagline{padding:0 10px 12px;font-size:11.5px;color:var(--mut);line-height:1.35}
+
 .nv{display:flex;align-items:center;gap:8px;width:100%;text-align:start;border:0;background:none;padding:10px 12px;border-radius:11px;cursor:pointer;font-weight:600;color:var(--mut);transition:background .14s,color .14s;white-space:nowrap}
+
 .nv.on{background:var(--pbg);color:var(--pri);box-shadow:var(--glass-in)}.nv:hover{color:var(--ink);background:var(--card2)}
+
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:12;background:var(--menu-bg);border-bottom:1px solid var(--glass-b);display:flex;gap:8px;align-items:center;padding:10px 20px;width:100%;max-width:100%;min-width:0;box-shadow:var(--glass-in)}
+
 .top .sp{flex:1;min-width:0}.top input{width:190px}
+
 .chip{display:flex;align-items:center;gap:7px;border:1px solid var(--glass-b);background:var(--card2);border-radius:999px;padding:4px 10px 4px 4px;flex-shrink:0;cursor:pointer;transition:border-color .14s,background .14s}
+
 .chip:hover{border-color:var(--pri);background:var(--pbg)}
+
 .av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px;flex-shrink:0;overflow:hidden}
+
 .av img{width:100%;height:100%;object-fit:cover;display:block}
+
 .av.lg-av{width:68px;height:68px;font-size:24px;border:2px solid var(--glass-b)}
+
 .prof-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:10px;border:1px solid var(--glass-b);border-radius:14px;background:var(--card2);box-shadow:var(--glass-in);min-width:0;max-width:100%}
+
 .role{font-size:11px;font-weight:700;background:var(--pbg);color:var(--pri);border-radius:6px;padding:2px 7px;text-transform:capitalize}
+
 main{padding:20px;max-width:1160px;width:100%;min-width:0;animation:fadeUp .16s ease-out}
+
 .tab-anim{animation:tabEnter3d .2s ease-out;min-width:0;max-width:100%}
+
 .ph{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;min-width:0}
+
 .bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center;width:100%;min-width:0}
+
 .kp{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin-bottom:16px;width:100%;min-width:0}
+
 .kp .card{position:relative;overflow:hidden}
+
 .kp .card b{display:block;font-size:24px;font-weight:800;line-height:1.2;margin-top:4px;word-break:break-word}
+
 .g2{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:14px;margin-bottom:14px;width:100%;min-width:0}
+
 .bd{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
+
 .sP{background:var(--Pb);color:var(--P)}.sA{background:var(--Ab);color:var(--A)}.sL{background:var(--Lb);color:var(--L)}.sV{background:var(--Vb);color:var(--V)}.sN{background:var(--line);color:var(--mut)}
+
 .ok{color:var(--P)}.bad{color:var(--A)}
+
 .cnt{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;width:100%}.cnt span{padding:5px 10px;border-radius:10px;font-weight:700;font-size:12px}
+
 .row{display:flex;align-items:center;gap:10px;justify-content:space-between;background:var(--card);border:1px solid var(--glass-b);border-radius:14px;padding:10px 14px;margin-bottom:8px;flex-wrap:wrap;box-shadow:var(--sh);transition:border-color .14s;width:100%;min-width:0}
+
 .row:hover{border-color:var(--pri)}
+
 .row .nm{flex:1;min-width:140px;cursor:pointer;word-break:break-word}.row .nm b{display:block;font-weight:600}
+
 .seg{display:flex;gap:5px;flex-shrink:0}
+
 .seg button{width:42px;height:38px;border:1px solid var(--glass-b);background:var(--card2);border-radius:10px;cursor:pointer;font-weight:700;color:var(--mut);transition:background .12s,border-color .12s,color .12s}
+
 .seg button:hover:not(:disabled){border-color:var(--pri);color:var(--ink)}
+
 .seg .oP{background:var(--P);color:#fff;border-color:var(--P)}
+
 .seg .oA{background:var(--A);color:#fff;border-color:var(--A)}
+
 .seg .oL{background:var(--L);color:#fff;border-color:var(--L)}
+
 .seg .oV{background:var(--V);color:#fff;border-color:var(--V)}
+
 .mins{width:72px;padding:6px}
+
 .tw{width:100%;max-width:100%;min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch}table{width:100%;border-collapse:collapse}th,td{text-align:start;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}th{color:var(--mut);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.03em;background:var(--card2)}
+
 tr.cl{cursor:pointer;transition:background .12s}tr.cl:hover{background:var(--pbg)}
+
 .mt{height:7px;background:var(--line);border-radius:999px;overflow:hidden;min-width:60px}.mt i{display:block;height:100%;background:linear-gradient(90deg,var(--pri),var(--P));border-radius:999px;transition:width .25s ease}.mt i.lo{background:var(--A)}
+
 .al{border-radius:12px;padding:11px 14px;margin-bottom:12px;background:var(--Ab);color:var(--A);font-weight:600;border:1px solid rgba(225,29,72,.24);word-break:break-word}.al.w{background:var(--Lb);color:var(--L);border-color:rgba(180,83,9,.24)}
+
 .dirty{color:var(--L);font-weight:700}
+
 .emp{text-align:center;padding:24px 14px;color:var(--mut);border:1px dashed var(--line);border-radius:14px;background:var(--card2)}
+
 .ov{position:fixed;inset:0;background:rgba(7,11,20,.56);display:grid;place-items:center;padding:12px;z-index:25}
+
 .md{background:var(--menu-bg);border:1px solid var(--glass-b);border-radius:20px;padding:20px;width:100%;max-width:500px;max-height:88dvh;overflow:auto;display:grid;gap:12px;box-shadow:var(--sh-lg);animation:popIn3d .18s ease-out}
+
 .md.w{max-width:680px}.mf{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:4px}
+
 .dr{position:fixed;top:0;right:0;bottom:0;width:min(440px,100vw);background:var(--menu-bg);border-left:1px solid var(--glass-b);z-index:15;padding:16px;overflow:auto;display:grid;gap:12px;align-content:start;box-shadow:var(--sh-lg);animation:slideLeft .18s ease-out}
+
 :root[dir="rtl"] .dr{right:auto;left:0;border-left:0;border-right:1px solid var(--glass-b)}
+
 #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:600;z-index:35;transition:opacity .16s ease;pointer-events:none;box-shadow:var(--sh-lg);max-width:calc(100vw - 24px);text-align:center;font-size:13px}
+
 .cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;text-align:center}.cal div{padding:7px 0;border-radius:9px;font-size:12px;font-weight:600;background:var(--card2);border:1px solid var(--glass-b)}
+
 .fl{display:grid;gap:10px;min-width:0;max-width:100%}.fl label{display:grid;gap:4px;font-size:13px;font-weight:500;color:var(--mut);min-width:0;max-width:100%;word-break:break-word}
+
 .swatches{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+
 .sw{width:30px;height:30px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:transform .12s ease}
+
 .sw:hover{transform:scale(1.1)}.sw.on{border-color:var(--ink);transform:scale(1.12)}
+
 .chk{display:flex;align-items:flex-start;gap:8px;cursor:pointer;font-weight:600;color:var(--ink);min-width:0;max-width:100%;word-break:break-word;line-height:1.4}
+
 .chk input{width:17px;height:17px;accent-color:var(--pri);flex-shrink:0;margin-top:2px}
+
 .own-box{border:1px solid color-mix(in srgb,var(--pri) 38%,var(--glass-b));background:color-mix(in srgb,var(--pbg) 52%,var(--card2));border-radius:16px;padding:14px;display:grid;gap:10px;box-shadow:var(--glass-in);min-width:0;max-width:100%}
+
 .kill-box{border:1px solid rgba(225,29,72,.38);background:color-mix(in srgb,var(--Ab) 65%,var(--card2));border-radius:16px;padding:14px;display:grid;gap:10px;min-width:0;max-width:100%}
+
 .id-card{border:1px solid var(--glass-b);border-radius:18px;padding:18px;background:linear-gradient(135deg,color-mix(in srgb,var(--pbg) 72%,var(--card)),var(--card2));box-shadow:var(--sh-lg);display:grid;gap:10px}
+
 .exp-box{border:1px solid rgba(225,29,72,.38);background:var(--Ab);color:var(--ink);border-radius:14px;padding:14px;display:grid;gap:8px}
-.portal-pick-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:4px}
-.portal-pick-card{border:1px solid var(--glass-b);background:var(--card2);border-radius:14px;padding:12px;display:grid;gap:6px;text-align:start;cursor:pointer;transition:border-color .14s,background .14s,transform .12s}
-.portal-pick-card:hover{border-color:var(--pri);background:var(--pbg);transform:translate3d(0,-1px,0)}
-.portal-pick-card.active{border-color:var(--pri);background:var(--pbg);box-shadow:0 0 0 2px var(--pbg)}
+
+.wa-note{font-size:12px;color:var(--mut);line-height:1.4}
+
+.wa-item{display:flex;align-items:center;gap:10px;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
+
+.wa-item .nm{flex:1;min-width:0;word-break:break-word}
+
+.wa-item .nm b{display:block;font-weight:600}
+
+.wa-item .nm span{display:block;font-size:12px;color:var(--mut)}
 
 .mob-dots-wrap{display:inline-flex;align-items:center}
+
 .mob-dots-btn{width:36px;min-height:36px;padding:0;border-radius:10px;font-size:19px;line-height:1}
+
 .mob-dots-backdrop{position:fixed;inset:0;z-index:28;background:rgba(7,11,20,.28)}
+
 .mob-dots-menu{position:fixed;top:62px;right:12px;left:auto;width:min(235px,calc(100vw - 24px));max-height:calc(100dvh - 82px);overflow-y:auto;background:var(--menu-bg);border:1px solid var(--glass-b);border-radius:16px;box-shadow:var(--sh-lg);padding:8px;display:grid;gap:3px;z-index:30;animation:popIn3d .14s ease-out}
+
 :root[dir="rtl"] .mob-dots-menu{right:auto;left:12px}
+
 .mob-dots-menu button{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;text-align:start;border:0;background:none;padding:10px 12px;border-radius:10px;cursor:pointer;font-weight:600;font-size:13.5px;color:var(--ink)}
+
 .mob-dots-menu button:hover{background:var(--pbg);color:var(--pri)}
+
 .mob-dots-menu button.on{background:var(--pbg);color:var(--pri);font-weight:700}
+
 .mob-dots-menu hr{border:0;border-top:1px solid var(--line);margin:4px 6px}
 
 @media (prefers-reduced-motion:reduce){
+
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+
 }
+
 @media (max-width:860px){
+
   h1{font-size:18px}
+
   .shell{grid-template-columns:minmax(0,1fr);overflow-x:clip}
+
   .side{display:none}
+
   .top{padding:8px 10px;gap:6px;flex-wrap:wrap}
+
   .top .sync{font-size:10.5px;padding:3px 7px}
+
   .top .lang-sel{padding:4px 6px;min-height:30px;font-size:11.5px;max-width:104px}
+
   .top input{order:10;flex:1 1 100%;width:100%;padding:8px 10px;font-size:13.5px}
+
   .top .rl,.top .chip .role{display:none}
+
   .top .chip{padding:2px;border:0;background:none}
+
   .top .b.sm{padding:5px 8px;min-height:32px;font-size:11.5px}
+
   .mob-dots-wrap{display:inline-flex;align-items:center}
+
   main{padding:12px;padding-bottom:32px;max-width:100%;overflow-x:clip}
+
   .card{padding:12px;border-radius:16px;max-width:100%}
+
   .own-box,.kill-box{padding:10px}
+
   .kp{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+
   .kp .card{padding:12px}
+
   .kp .card b{font-size:20px}
+
   .g2{grid-template-columns:minmax(0,1fr);gap:12px}
+
   .bar{gap:6px}
+
   .bar > input,.bar > select{flex:1 1 100%;width:100%}
+
   .bar > button,.bar > a.b{flex:1 1 auto;min-width:0;padding:8px 10px;font-size:12px;white-space:normal}
+
   .row{padding:10px 12px;gap:8px}
+
   .row .nm{flex:1 1 100%;min-width:0}
+
   .seg{width:100%;justify-content:space-between}
+
   .seg button{flex:1;height:40px;width:auto}
+
   th,td{padding:8px;font-size:12px}
+
 }
+
 @media print{#bg-fx,#cursor-fx{display:none!important}.side,.top,.bar,.mob-dots-wrap,.noprint{display:none!important}.shell{display:block}body{background:#fff}}
+
 </style>
+
 </head>
+
 <body>
+
 <div id="bg-fx" aria-hidden="true"></div><div id="cursor-fx" aria-hidden="true"></div><div id="app"></div><div id="m"></div><div id="dr"></div><div id="toast" style="opacity:0"></div>
+
 <script>
-const APP_VERSION = '3.0';
+
+const APP_VERSION = '3.1';
+
 const VERSION_KEY = 'our_coaching_app_ver';
+
 const LANG_KEY = 'our_coaching_lang';
+
 const OWNER_CONTACT_PHONE = '03213091550';
 
 const LANGS = {
+
   en: {
+
     dir: 'ltr',
+
     label: 'English',
+
     signIn: 'Sign in',
+
     email: 'Email',
+
     usernameLabel: 'Your Username (who is logging in)',
+
     usernamePh: 'Enter your name / username',
+
     password: 'Password',
+
     language: 'Language',
+
     dash: 'Dashboard',
+
     mark: 'Attendance',
+
     students: 'Students',
+
     fees: 'Fees',
+
     reports: 'Reports',
+
     batches: 'Batches',
+
     settings: 'Settings',
+
     myAtt: 'My attendance',
+
     editProf: 'Edit profile',
+
     syncNow: 'Sync now',
+
     themeBtn: 'Dark / Light mode',
+
     exportBak: 'Export backup',
+
     logout: 'Log out',
+
     alerts: 'Alerts',
+
     searchStu: 'Search students',
+
     markToday: 'Mark today',
+
     feeDues: 'Fee dues',
+
     todayAtt: 'Today’s attendance',
+
     presentToday: 'Present today',
+
     absentToday: 'Absent today',
+
     lateArr: 'Late arrivals',
+
     atRisk: 'At-risk students',
+
     unpaidFees: 'Unpaid fees',
+
     attTrend: 'Attendance trend',
+
     batchComp: 'Batch comparison (14 days)',
+
     lowAtt: 'Low attendance',
+
     saveSettings: 'Save settings'
+
   },
+
   ur: {
+
     dir: 'rtl',
+
     label: 'اردو',
+
     signIn: 'لاگ ان کریں',
+
     email: 'ای میل',
+
     usernameLabel: 'آپ کا یوزر نیم (کون لاگ ان کر رہا ہے)',
+
     usernamePh: 'اپنا نام یا یوزر نیم لکھیں',
+
     password: 'پاس ورڈ',
+
     language: 'زبان',
+
     dash: 'ڈیش بورڈ',
+
     mark: 'حاضری',
+
     students: 'طلبہ',
+
     fees: 'فیس',
+
     reports: 'رپورٹس',
+
     batches: 'بیچز',
+
     settings: 'سیٹنگز',
+
     myAtt: 'میری حاضری',
+
     editProf: 'پروفائل تبدیل کریں',
+
     syncNow: 'ابھی سنک کریں',
+
     themeBtn: 'ڈارک / لائٹ موڈ',
+
     exportBak: 'بیک اپ ڈاؤن لوڈ',
+
     logout: 'لاگ آؤٹ',
+
     alerts: 'الرٹس',
+
     searchStu: 'طلبہ تلاش کریں',
+
     markToday: 'آج کی حاضری',
+
     feeDues: 'باقی فیس',
+
     todayAtt: 'آج کی حاضری',
+
     presentToday: 'آج حاضر',
+
     absentToday: 'آج غیر حاضر',
+
     lateArr: 'تاخیر سے آنے والے',
+
     atRisk: 'کم حاضری والے طلبہ',
+
     unpaidFees: 'غیر ادا شدہ فیس',
+
     attTrend: 'حاضری کا رجحان',
+
     batchComp: 'بیچ موازنہ (14 دن)',
+
     lowAtt: 'کم حاضری الرٹ',
+
     saveSettings: 'سیٹنگز محفوظ کریں'
+
   },
+
   ro: {
+
     dir: 'ltr',
+
     label: 'Roman Urdu',
+
     signIn: 'Sign in karein',
+
     email: 'Email',
+
     usernameLabel: 'Aap ka Username (kaun login kar raha hai)',
+
     usernamePh: 'Apna naam / username likhein',
+
     password: 'Password',
+
     language: 'Zaban / Language',
+
     dash: 'Dashboard',
+
     mark: 'Attendance',
+
     students: 'Students',
+
     fees: 'Fees',
+
     reports: 'Reports',
+
     batches: 'Batches',
+
     settings: 'Settings',
+
     myAtt: 'Meri attendance',
+
     editProf: 'Profile edit karein',
+
     syncNow: 'Sync karein',
+
     themeBtn: 'Dark / Light mode',
+
     exportBak: 'Backup export karein',
+
     logout: 'Log out',
+
     alerts: 'Alerts',
+
     searchStu: 'Student search karein',
+
     markToday: 'Aaj ki hazri',
+
     feeDues: 'Fee dues',
+
     todayAtt: 'Aaj ki attendance',
+
     presentToday: 'Aaj hazir',
+
     absentToday: 'Aaj ghair-hazir',
+
     lateArr: 'Late arrivals',
+
     atRisk: 'Kam attendance',
+
     unpaidFees: 'Unpaid fees',
+
     attTrend: 'Attendance trend',
+
     batchComp: 'Batch comparison (14 din)',
+
     lowAtt: 'Kam attendance alerts',
+
     saveSettings: 'Settings save karein'
+
   }
+
 };
 
 let currentLang = 'en';
+
 try{const sl=localStorage.getItem(LANG_KEY);if(sl&&LANGS[sl])currentLang=sl}catch(e){}
+
 const T=key=>(LANGS[currentLang]&&LANGS[currentLang][key])||LANGS.en[key]||key;
+
 function applyLanguage(){
+
  const cfg=LANGS[currentLang]||LANGS.en;
+
  document.documentElement.lang=currentLang;
+
  document.documentElement.dir=cfg.dir;
+
  try{localStorage.setItem(LANG_KEY,currentLang)}catch(e){}
+
 }
+
 applyLanguage();
 
 (function cleanupOldCache(){
+
  try{
+
   const prevVer = localStorage.getItem(VERSION_KEY);
+
   if(prevVer !== APP_VERSION){
+
    localStorage.setItem(VERSION_KEY, APP_VERSION);
+
    if('serviceWorker' in navigator){
+
     navigator.serviceWorker.getRegistrations().then(regs=>regs.forEach(r=>r.unregister())).catch(()=>{});
+
    }
+
    if('caches' in window){
+
     caches.keys().then(keys=>keys.forEach(k=>caches.delete(k))).catch(()=>{});
+
    }
+
   }
+
  }catch(e){}
+
 })();
 
 const SUPABASE_URL = 'https://cukxgzrnbiinkzmolipj.supabase.co';
+
 const SUPABASE_ANON_KEY = 'sb_publishable_hfUzvb1uykYMoRVKPY4laQ_1xqGnv-4';
 
 const DEFAULT_OWNER_EMAIL = 'abdullah.owner@ourcoaching.pk';
+
 const DEFAULT_OWNER_PW = 'abdullah';
+
 const DEFAULT_OWNER_NAME = 'Abdullah (Owner)';
 
 const TRIAL_ADMIN_EMAIL = 'admin@ourcoaching.pk';
+
 const OWNER_GLOBAL_ROW = 'owner_global_master';
+
 const ACTIVE_SCOPE_KEY = 'our_coaching_active_scope_v30';
 
 const DEFAULT_ORG = 'OUR COACHING';
+
 const DEFAULT_TAGLINE = 'Smart Attendance, Fees & Batch Operations';
+
+const DEFAULT_WA_TEMPLATE = 'Assalam-o-Alaikum from {org}, {student} ({roll}) was marked ABSENT today on {date} in {subject} (Batch: {batch}). Please contact {org} for more details.';
+
 const THEME_KEY = 'our_coaching_theme';
+
 const ACCENTS = {
+
   indigo:{label:'Indigo',pri:'#4f46e5',pri2:'#7c3aed',pbg:'rgba(79,70,229,.12)'},
+
   emerald:{label:'Emerald',pri:'#059669',pri2:'#0d9488',pbg:'rgba(5,150,105,.12)'},
+
   rose:{label:'Rose',pri:'#e11d48',pri2:'#db2777',pbg:'rgba(225,29,72,.12)'},
+
   amber:{label:'Amber',pri:'#d97706',pri2:'#ea580c',pbg:'rgba(217,119,6,.12)'},
+
   cyan:{label:'Cyan',pri:'#0284c7',pri2:'#2563eb',pbg:'rgba(2,132,199,.12)'},
+
   slate:{label:'Slate',pri:'#334155',pri2:'#0f172a',pbg:'rgba(51,65,85,.12)'}
+
 };
 
 const $= (s,r=document)=>r.querySelector(s);
+
 const $$= (s,r=document)=>Array.from(r.querySelectorAll(s));
+
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
 const iso=d=>d.toLocaleDateString('en-CA'),TODAY=iso(new Date());
+
 const addD=(s,n)=>{const d=new Date(s+'T00:00:00');d.setDate(d.getDate()+n);return iso(d)};
+
 const fd=s=>new Date(s+'T00:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+
 const curMonth=()=>TODAY.slice(0,7);
+
 const ST={P:'Present',A:'Absent',L:'Late',V:'Leave'};
+
 const bdg=s=>`<span class="bd s${s||'N'}">${ST[s]||'Not marked'}</span>`;
+
 const isStaff=r=>r==='owner'||r==='admin'||r==='client'||r==='teacher';
+
 const canManage=r=>r==='owner'||r==='admin'||r==='client';
+
 const isPaidTier=r=>r==='owner'||r==='client';
 
 let sbClient = null;
+
 function getSb(){
+
  if(sbClient)return sbClient;
+
  if(window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY){
+
   sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
  }
+
  return sbClient;
+
 }
 
 function emptyOwnerMaster(){
+
  return{
+
   ownerEmail:DEFAULT_OWNER_EMAIL,
+
   ownerProfile:{name:DEFAULT_OWNER_NAME,photo:''},
+
   ownerPw:DEFAULT_OWNER_PW,
+
   ownerOrgName:DEFAULT_ORG,
+
   ownerTagline:DEFAULT_TAGLINE,
+
   ownerLogo:'',
+
   ownerAccent:'indigo',
+
   globalAppLocked:false,
+
   globalLockMsg:'This coaching portal is currently paused by the owner. Please contact the service provider.',
+
   trialAdminEmail:TRIAL_ADMIN_EMAIL,
+
   trialAdminPw:'admin123',
+
   trialAdminName:'Principal (Admin)',
+
   clients:{},
+
   trialDays:7,
+
   trialIpLock:true,
+
   trialClaimedIps:{},
+
   trialAccounts:{},
+
   revokedTrials:{},
+
   loginLogs:[]
+
  };
+
 }
 
 function emptyDb(){
+
  return{
+
   orgName: DEFAULT_ORG,
+
   orgTagline: DEFAULT_TAGLINE,
+
   orgLogo: '',
+
   clientPhone: '',
+
   autoSubMsg: true,
+
+  waAuto: true,
+
+  waTemplate: DEFAULT_WA_TEMPLATE,
+
+  waNotified: {},
+
   accent: 'indigo',
+
   appLocked: false,
+
   lockMsg: 'This coaching portal is currently paused. Please contact the service provider.',
+
   ipLock: false,
+
   allowedIps: '',
+
   trialIpLock: true,
+
   trialDays: 7,
+
   trialClaimedIps: {},
+
   trialAccounts: {},
+
   revokedTrials: {},
+
   loginLogs: [],
+
   auditLogs: [],
+
   ownerProfile:{name:DEFAULT_OWNER_NAME,photo:''},
+
   admin:{name:'Principal (Admin)',email:TRIAL_ADMIN_EMAIL,pw:'admin123',photo:''},
+
   bat:[],tch:[],stu:[],att:{},fees:{},flags:{}
+
  }
+
 }
 
 const getOwnerEmail=()=>String((ownerMaster&&ownerMaster.ownerEmail)||DEFAULT_OWNER_EMAIL).trim().toLowerCase();
+
 const getTrialAdminEmail=()=>String((ownerMaster&&ownerMaster.trialAdminEmail)||TRIAL_ADMIN_EMAIL).trim().toLowerCase();
 
 const DEFAULT_COACHING_ID = '1 coaching';
+
 const BASE_TRIAL_ROW = 'trial_' + DEFAULT_COACHING_ID.trim().toLowerCase().replace(/\s+/g, '_');
 
 function emailToScopeRow(email){
+
  const em=String(email||'').trim().toLowerCase();
+
  if(!em)return BASE_TRIAL_ROW;
+
  if(em===getOwnerEmail() || em===DEFAULT_OWNER_EMAIL.toLowerCase())return 'email_owner_' + em.replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
+
  return 'email_' + em.replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
+
 }
 
 let ROW_ID = BASE_TRIAL_ROW;
+
 let STORE_KEY = 'att_db_' + ROW_ID;
+
 let SESSION_KEY = 'att_sess_global_v25';
+
 let OWNER_STORE_KEY = 'att_owner_master_v25';
 
 let ownerMaster = emptyOwnerMaster();
+
 let db = emptyDb();
+
 let rtChannel = null;
 
 function setActiveScope(scopeRow){
- ROW_ID = scopeRow || BASE_TRIAL_ROW;
- STORE_KEY = 'att_db_' + ROW_ID;
- try{localStorage.setItem(ACTIVE_SCOPE_KEY, ROW_ID)}catch(e){}
-}
 
-function getClientEntries(){
- return Object.entries(ownerMaster.clients||{}).filter(([em,cfg])=>{
-  const low=String(em||'').trim().toLowerCase();
-  return cfg && low && low!==getOwnerEmail() && low!==getTrialAdminEmail();
- });
+ ROW_ID = scopeRow || BASE_TRIAL_ROW;
+
+ STORE_KEY = 'att_db_' + ROW_ID;
+
+ try{localStorage.setItem(ACTIVE_SCOPE_KEY, ROW_ID)}catch(e){}
+
 }
 
 function findBestLegacyDb(targetEmail=''){
+
  const em=String(targetEmail||'').trim().toLowerCase();
+
  const isPaidClient = !!(em && ownerMaster.clients && ownerMaster.clients[em]);
+
  if(isPaidClient)return null;
+
  const candidateKeys=[];
+
  if(em){
+
   candidateKeys.push('att_db_' + emailToScopeRow(em));
+
   candidateKeys.push('att_db_client_' + em.replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,''));
+
  }
+
  candidateKeys.push(
+
   'att_db_' + BASE_TRIAL_ROW,
+
   'att_db_trial_1_coaching',
+
   'att_db_1_coaching',
+
   'att_db_owner_global_master',
+
   'att_db_v24',
+
   'att_db_v23',
+
   'att_db_v22',
+
   'att_db'
+
  );
+
  try{
+
   for(let i=0;i<localStorage.length;i++){
+
    const k=localStorage.key(i);
+
    if(k && k.startsWith('att_db_') && !candidateKeys.includes(k)){
+
     candidateKeys.push(k);
+
    }
+
   }
+
  }catch(e){}
 
  let fallback=null;
+
  for(const k of candidateKeys){
+
   try{
+
    const raw=localStorage.getItem(k);
+
    if(!raw)continue;
+
    const parsed=JSON.parse(raw);
+
    if(!parsed || typeof parsed!=='object')continue;
+
    const hasRichData=(Array.isArray(parsed.bat)&&parsed.bat.length) || (Array.isArray(parsed.stu)&&parsed.stu.length) || (parsed.orgName && parsed.orgName!==DEFAULT_ORG) || parsed.orgLogo;
+
    if(hasRichData)return parsed;
+
    if(!fallback)fallback=parsed;
+
   }catch(e){}
+
  }
+
  return fallback;
+
 }
 
 function loadLocalScopeDb(scopeRow, targetEmail=''){
+
  setActiveScope(scopeRow);
+
  let parsed=null;
+
  try{parsed=JSON.parse(localStorage.getItem(STORE_KEY))}catch(e){}
+
  const hasMeaningful=p=>p && ((Array.isArray(p.bat)&&p.bat.length)||(Array.isArray(p.stu)&&p.stu.length)||(p.orgName && p.orgName!==DEFAULT_ORG)||p.orgLogo||(p.admin&&p.admin.photo));
+
  if(!hasMeaningful(parsed)){
+
   const legacy=findBestLegacyDb(targetEmail);
+
   if(legacy){
+
    parsed={...emptyDb(),...legacy};
+
   }
+
  }
+
  db = parsed || emptyDb();
+
  normalizeDb();
+
 }
 
 function normalizeOwnerMaster(){
+
  ownerMaster = {...emptyOwnerMaster(), ...(ownerMaster||{})};
+
  if(!ownerMaster.ownerEmail)ownerMaster.ownerEmail=DEFAULT_OWNER_EMAIL;
+
  ownerMaster.ownerEmail=String(ownerMaster.ownerEmail).trim().toLowerCase();
+
  if(!ownerMaster.ownerProfile)ownerMaster.ownerProfile={name:DEFAULT_OWNER_NAME,photo:''};
+
  if(!ownerMaster.ownerPw)ownerMaster.ownerPw=DEFAULT_OWNER_PW;
+
  if(!ownerMaster.ownerOrgName)ownerMaster.ownerOrgName=DEFAULT_ORG;
+
  if(ownerMaster.ownerTagline==null)ownerMaster.ownerTagline=DEFAULT_TAGLINE;
+
  if(!ownerMaster.ownerAccent||!ACCENTS[ownerMaster.ownerAccent])ownerMaster.ownerAccent='indigo';
+
  if(typeof ownerMaster.globalAppLocked!=='boolean')ownerMaster.globalAppLocked=false;
+
  if(!ownerMaster.globalLockMsg)ownerMaster.globalLockMsg='This coaching portal is currently paused by the owner. Please contact the service provider.';
+
  if(!ownerMaster.trialAdminEmail)ownerMaster.trialAdminEmail=TRIAL_ADMIN_EMAIL;
+
  ownerMaster.trialAdminEmail=String(ownerMaster.trialAdminEmail).trim().toLowerCase();
+
  if(!ownerMaster.trialAdminPw)ownerMaster.trialAdminPw='admin123';
+
  if(!ownerMaster.trialAdminName)ownerMaster.trialAdminName='Principal (Admin)';
+
  if(!ownerMaster.clients||typeof ownerMaster.clients!=='object')ownerMaster.clients={};
+
  if(!Number(ownerMaster.trialDays)||Number(ownerMaster.trialDays)<1)ownerMaster.trialDays=7;
+
  if(typeof ownerMaster.trialIpLock!=='boolean')ownerMaster.trialIpLock=true;
+
  if(!ownerMaster.trialClaimedIps||typeof ownerMaster.trialClaimedIps!=='object')ownerMaster.trialClaimedIps={};
+
  if(!ownerMaster.trialAccounts||typeof ownerMaster.trialAccounts!=='object')ownerMaster.trialAccounts={};
+
  if(!ownerMaster.revokedTrials||typeof ownerMaster.revokedTrials!=='object')ownerMaster.revokedTrials={};
+
  if(!Array.isArray(ownerMaster.loginLogs))ownerMaster.loginLogs=[];
+
 }
 
 function syncOwnerMasterToDb(){
+
  db.ownerProfile = {...(ownerMaster.ownerProfile||{name:DEFAULT_OWNER_NAME,photo:''})};
+
  db.trialDays = Number(ownerMaster.trialDays)||7;
+
  db.trialIpLock = !!ownerMaster.trialIpLock;
+
  db.trialClaimedIps = ownerMaster.trialClaimedIps||{};
+
  db.trialAccounts = ownerMaster.trialAccounts||{};
+
  db.revokedTrials = ownerMaster.revokedTrials||{};
+
  db.loginLogs = ownerMaster.loginLogs||[];
+
  if(S.u && S.u.role==='owner' && ROW_ID===emailToScopeRow(getOwnerEmail())){
+
   if(ownerMaster.ownerOrgName && ownerMaster.ownerOrgName!==DEFAULT_ORG)db.orgName=ownerMaster.ownerOrgName;
+
   if(ownerMaster.ownerTagline && ownerMaster.ownerTagline!==DEFAULT_TAGLINE)db.orgTagline=ownerMaster.ownerTagline;
+
   if(ownerMaster.ownerLogo)db.orgLogo=ownerMaster.ownerLogo;
+
   if(ownerMaster.ownerAccent)db.accent=ownerMaster.ownerAccent;
+
  }
+
  if(S.u && S.u.role==='admin'){
+
   db.admin={...db.admin,email:getTrialAdminEmail(),pw:ownerMaster.trialAdminPw||'admin123',name:ownerMaster.trialAdminName||db.admin.name};
+
  }
+
 }
 
 function recordTrialAccount(email, role, ip, atIso, username=''){
+
  if(!email || role==='owner')return;
+
  const em=String(email).trim().toLowerCase();
+
  if(!em)return;
+
  ownerMaster.trialAccounts=ownerMaster.trialAccounts||{};
+
  const key=em+'|'+(ip||'unknown');
+
  const existing=ownerMaster.trialAccounts[key];
+
  const stamp=atIso||new Date().toISOString();
+
  const cleanUser=String(username||'').trim();
+
  if(!existing){
+
   ownerMaster.trialAccounts[key]={
+
    email:em,
+
    username:cleanUser,
+
    role:role||'admin',
+
    ip:ip||'',
+
    firstLoginAt:stamp,
+
    lastLoginAt:stamp,
+
    loginCount:1
+
   };
+
  }else{
+
   if(!existing.firstLoginAt || new Date(stamp)<new Date(existing.firstLoginAt))existing.firstLoginAt=stamp;
+
   if(!existing.lastLoginAt || new Date(stamp)>new Date(existing.lastLoginAt))existing.lastLoginAt=stamp;
+
   existing.loginCount=(Number(existing.loginCount)||1)+1;
+
   if(cleanUser)existing.username=cleanUser;
+
   if(ip && !existing.ip)existing.ip=ip;
+
  }
+
  db.trialAccounts=ownerMaster.trialAccounts;
+
 }
 
 function normalizeDb(){
+
  db={...emptyDb(),...db};
+
  if(!db.orgName)db.orgName=DEFAULT_ORG;
+
  if(db.orgTagline==null)db.orgTagline=DEFAULT_TAGLINE;
+
  if(!db.orgLogo)db.orgLogo='';
+
  if(db.clientPhone==null)db.clientPhone='';
+
  if(typeof db.autoSubMsg!=='boolean')db.autoSubMsg=true;
+
+ if(typeof db.waAuto!=='boolean')db.waAuto=true;
+
+ if(db.waTemplate==null)db.waTemplate=DEFAULT_WA_TEMPLATE;
+
+ if(!db.waNotified||typeof db.waNotified!=='object')db.waNotified={};
+
  if(!db.accent||!ACCENTS[db.accent])db.accent='indigo';
+
  if(!db.ownerProfile)db.ownerProfile={name:DEFAULT_OWNER_NAME,photo:''};
+
  if(!db.admin)db.admin={name:'Principal (Admin)',email:getTrialAdminEmail(),pw:'admin123',photo:''};
+
  if(!db.fees)db.fees={};
+
  if(!Array.isArray(db.loginLogs))db.loginLogs=[];
+
  if(!Array.isArray(db.auditLogs))db.auditLogs=[];
+
  if(!Number(db.trialDays)||Number(db.trialDays)<1)db.trialDays=7;
+
  if(typeof db.trialIpLock!=='boolean')db.trialIpLock=true;
+
  if(!db.trialClaimedIps||typeof db.trialClaimedIps!=='object')db.trialClaimedIps={};
+
  if(!db.trialAccounts||typeof db.trialAccounts!=='object')db.trialAccounts={};
+
  if(!db.revokedTrials||typeof db.revokedTrials!=='object')db.revokedTrials={};
+
  if(!db.lockMsg)db.lockMsg='This coaching portal is currently paused. Please contact the service provider.';
+
  syncOwnerMasterToDb();
+
 }
 
 function formatElapsed(sinceIso){
+
  if(!sinceIso)return '–';
+
  const ms=Date.now()-new Date(sinceIso).getTime();
+
  if(!Number.isFinite(ms)||ms<0)return 'Just now';
+
  const mins=Math.floor(ms/60000);
+
  if(mins<1)return 'Just now';
+
  if(mins<60)return mins+'m ago';
+
  const hrs=Math.floor(mins/60);
+
  if(hrs<24)return hrs+'h '+(mins%60)+'m ago';
+
  const days=Math.floor(hrs/24);
+
  return days+'d '+(hrs%24)+'h ago';
+
 }
 
 function addAudit(action,detail=''){
+
  const by=(S.u&&(S.u.name||S.u.e))||'System';
+
  db.auditLogs=(db.auditLogs||[]).concat([{action,detail,by,at:new Date().toISOString()}]).slice(-80);
+
 }
 
 function trialDaysElapsed(claimedAt){
+
  if(!claimedAt)return 0;
+
  const start=new Date(claimedAt).getTime();
+
  if(!start)return 0;
+
  return Math.max(0,Math.floor((Date.now()-start)/86400000));
+
 }
 
 function isTrialExpiredOrRemoved(email,ip){
+
  const em=(email||'').toLowerCase();
+
  if(em&&ownerMaster.revokedTrials&&ownerMaster.revokedTrials['email:'+em])return 'removed';
+
  if(ip&&ownerMaster.revokedTrials&&ownerMaster.revokedTrials['ip:'+ip])return 'removed';
+
  const limit=Number(ownerMaster.trialDays)||7;
+
  const info=(ip&&ownerMaster.trialClaimedIps&&ownerMaster.trialClaimedIps[ip])||null;
+
  if(info&&info.claimedAt&&trialDaysElapsed(info.claimedAt)>=limit)return 'expired';
+
  return '';
+
 }
 
 function showTrialExpiredPopup(reasonText='Aapka trial khatam ho gaya hai.'){
+
  const waUrl=waOwnerBuy(reasonText);
+
  modal('Trial / Subscription Alert',`
+
   <div class="exp-box">
+
    <b style="color:var(--A);font-size:15px">${esc(reasonText)}</b>
+
    <div class="sm">Aapka trial ya subscription period khatam/pause hai. Service buy ya renew karne ke liye contact karein:</div>
+
    <div style="font-size:16px;font-weight:800">Phone / WhatsApp: <a href="tel:${esc(OWNER_CONTACT_PHONE)}" style="color:var(--pri)">${esc(OWNER_CONTACT_PHONE)}</a></div>
+
   </div>
+
   <div class="bar" style="margin-bottom:0">
+
    <a class="b pri" target="_blank" rel="noopener" href="${esc(waUrl)}">WhatsApp ${esc(OWNER_CONTACT_PHONE)}</a>
+
    <button type="button" class="b sm" data-a="copyCred" data-txt="${esc(OWNER_CONTACT_PHONE)}">Copy Number</button>
+
   </div>
+
  `);
+
 }
 
 function waOwnerBuy(note=''){
+
  const msg=encodeURIComponent(`Assalam-o-Alaikum, ${orgName()} (${ROW_ID}) ke liye subscription buy / renew karni hai. ${note}`);
+
  return `https://wa.me/92${OWNER_CONTACT_PHONE.replace(/^0/,'')}?text=${msg}`;
+
 }
 
 const orgName=()=>db.orgName||DEFAULT_ORG;
+
 function brandHtml(small=false){
+
  const img=db.orgLogo?`<img class="org-img" src="${db.orgLogo}" alt="${esc(orgName())}" style="${small?'width:24px;height:24px':''}">`:'';
+
  return`<div class="logo">${img}<span class="brand-txt">${esc(orgName())}</span></div>`;
+
 }
+
 function applyAccent(){
+
  const a=ACCENTS[db.accent]||ACCENTS.indigo;
+
  const r=document.documentElement.style;
+
  r.setProperty('--pri',a.pri);
+
  r.setProperty('--pri2',a.pri2);
+
  r.setProperty('--pbg',a.pbg);
+
 }
 
 let syncStatus = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY) ? 'Syncing...' : 'Local mode';
+
 let clientIp = '';
 
 async function fetchPublicIp(){
+
  if(clientIp)return clientIp;
+
  const urls=['https://api.ipify.org?format=json','https://api64.ipify.org?format=json'];
+
  for(const u of urls){
+
   try{
+
    const ctrl=typeof AbortController!=='undefined'?new AbortController():null;
+
    const tid=ctrl?setTimeout(()=>ctrl.abort(),2500):null;
+
    const res=await fetch(u,{cache:'no-store',signal:ctrl?ctrl.signal:undefined});
+
    if(tid)clearTimeout(tid);
+
    const j=await res.json();
+
    const ip=(j.ip||'').trim();
+
    if(ip){clientIp=ip;return ip}
+
   }catch(e){}
+
  }
+
  return '';
+
 }
 
-let S={u:null,v:'dash',b:'',d:TODAY,q:'',f:'',dr:null,rp:'month',from:'',to:'',rb:'',rf:'',drawerId:null,tempAccent:db.accent,feeMonth:curMonth(),feeFilter:'',selectedFeeIds:[],mobMenuOpen:false,tabTick:0,tempPhoto:'',tempLogo:'',expiredShownOnce:false};
+let S={u:null,v:'dash',b:'',d:TODAY,q:'',f:'',dr:null,rp:'month',from:'',to:'',rb:'',rf:'',drawerId:null,tempAccent:db.accent,feeMonth:curMonth(),feeFilter:'',selectedFeeIds:[],mobMenuOpen:false,tabTick:0,tempPhoto:'',tempLogo:'',expiredShownOnce:false,waPending:null};
+
 function saveSession(u){try{if(u)localStorage.setItem(SESSION_KEY,JSON.stringify(u));else localStorage.removeItem(SESSION_KEY)}catch(e){}}
+
 try{const t=localStorage.getItem(THEME_KEY);if(t)document.documentElement.dataset.theme=t}catch(e){}
 
 function getCurrentUserProfile(){
+
  if(!S.u)return{name:'',photo:''};
+
  if(S.u.role==='owner')return{name:(ownerMaster.ownerProfile&&ownerMaster.ownerProfile.name)||S.u.name||DEFAULT_OWNER_NAME,photo:(ownerMaster.ownerProfile&&ownerMaster.ownerProfile.photo)||''};
+
  if(S.u.role==='client'||S.u.role==='admin')return{name:(db.admin&&db.admin.name)||S.u.name||'Principal (Admin)',photo:(db.admin&&db.admin.photo)||''};
+
  if(S.u.role==='teacher'){const t=db.tch.find(x=>x.id===S.u.ref);return{name:S.u.name||(t&&t.name)||'',photo:(t&&t.photo)||''}}
+
  if(S.u.role==='student'){const st=db.stu.find(x=>x.id===S.u.ref);return{name:S.u.name||(st&&st.name)||'',photo:(st&&st.photo)||''}}
+
  return{name:S.u.name||'',photo:''};
+
 }
 
 function avOf(name,photo,cls=''){
+
  const ch=esc((name||'?')[0].toUpperCase());
+
  if(photo)return`<span class="av ${cls}"><img src="${photo}" alt="${esc(name||'Avatar')}" loading="lazy" decoding="async"></span>`;
+
  return`<span class="av ${cls}">${ch}</span>`;
+
 }
 
 function readPhotoFile(file,cb,maxSide=240){
+
  if(!file||!file.type.startsWith('image/')){toast('Please select an image file');return}
+
  const reader=new FileReader();
+
  reader.onload=ev=>{
+
   const img=new Image();
+
   img.onload=()=>{
+
    let w=img.width,h=img.height;
+
    if(w>h&&w>maxSide){h=Math.round(h*maxSide/w);w=maxSide}
+
    else if(h>=w&&h>maxSide){w=Math.round(w*maxSide/h);h=maxSide}
+
    const cv=document.createElement('canvas');
+
    cv.width=w;cv.height=h;
+
    const ctx=cv.getContext('2d');
+
    ctx.drawImage(img,0,0,w,h);
+
    cb(cv.toDataURL('image/jpeg',0.82));
+
   };
+
   img.src=ev.target.result;
+
  };
+
  reader.readAsDataURL(file);
+
 }
 
 function openMyProfileModal(){
+
  if(!S.u)return;
+
  const cur=getCurrentUserProfile();
+
  S.tempPhoto=cur.photo||'';
+
  modal('Edit My Profile',`
+
   <div class="fl">
+
    <div class="prof-bar" id="myProfPreview">
+
     ${avOf(cur.name,S.tempPhoto,'lg-av')}
+
     <div style="display:grid;gap:6px">
+
      <div><b>${esc(cur.name)}</b> <span class="role">${esc(S.u.role)}</span></div>
+
      <label class="b sm" style="cursor:pointer;margin:0">Upload Photo<input type="file" id="profPhotoInput" accept="image/*" style="display:none"></label>
+
      ${S.tempPhoto?`<button type="button" class="b sm" data-a="clearMyPhoto">Remove photo</button>`:''}
+
     </div>
+
    </div>
+
    <label>Display name / Username<input id="profNameInput" value="${esc(cur.name)}" placeholder="Enter your name"></label>
+
   </div>
+
  `,'Save profile',async()=>{
+
   const newName=val('profNameInput').trim();
+
   if(!newName){toast('Name cannot be empty');return false}
+
   const newPhoto=S.tempPhoto||'';
+
   if(S.u.role==='owner'){
+
    ownerMaster.ownerProfile={...(ownerMaster.ownerProfile||{}),name:newName,photo:newPhoto};
+
    db.ownerProfile={...ownerMaster.ownerProfile};
+
    await persistOwnerMaster();
+
   }else if(S.u.role==='client'||S.u.role==='admin'){
+
    db.admin={...db.admin,name:newName,photo:newPhoto};
+
    if(S.u.role==='admin')ownerMaster.trialAdminName=newName;
+
   }else if(S.u.role==='teacher'){
+
    const t=db.tch.find(x=>x.id===S.u.ref);
+
    if(t){t.name=newName;t.photo=newPhoto}
+
   }else if(S.u.role==='student'){
+
    const st=db.stu.find(x=>x.id===S.u.ref);
+
    if(st){st.name=newName;st.photo=newPhoto}
+
   }
+
   S.u={...S.u,name:newName};
+
   saveSession(S.u);
+
   await persist();
+
   // Pull latest from cloud so other devices see it immediately on next open
+
   await loadOwnerMaster(true);
+
   render(false);
+
   toast('Profile synced across all devices & IPs');
+
  });
+
  const fin=$('#profPhotoInput');
+
  if(fin){
+
   fin.addEventListener('change',()=>{
+
    if(!fin.files||!fin.files[0])return;
+
    readPhotoFile(fin.files[0],dataUrl=>{
+
     S.tempPhoto=dataUrl;
+
     const nm=val('profNameInput').trim()||cur.name;
+
     const box=$('#myProfPreview');
+
     if(box)box.innerHTML=`${avOf(nm,S.tempPhoto,'lg-av')}<div style="display:grid;gap:6px"><div><b>${esc(nm)}</b> <span class="role">${esc(S.u.role)}</span></div><label class="b sm" style="cursor:pointer;margin:0">Change Photo<input type="file" id="profPhotoInput" accept="image/*" style="display:none"></label><button type="button" class="b sm" data-a="clearMyPhoto">Remove photo</button></div>`;
+
    });
+
   });
+
  }
-}
 
-
-function isOwnerViewingCoachingData(){
- return true;
-}
-
-function getTrialPortalCandidates(){
- const list = [];
- const tEm = getTrialAdminEmail();
- const tScope = emailToScopeRow(tEm);
- const tName = ownerMaster.trialAdminName || (db.admin && db.admin.name) || 'Principal (Admin)';
- if(tEm){
-  list.push({
-   kind: 'trial',
-   email: tEm,
-   name: tName,
-   orgName: 'Trial Coaching (' + tName + ')',
-   scope: tScope,
-   status: 'Trial Admin'
-  });
- }
- const accs = Object.values(ownerMaster.trialAccounts || {});
- accs.forEach(acc=>{
-  const em = String((acc && acc.email) || '').trim().toLowerCase();
-  if(!em || em === getOwnerEmail()) return;
-  const sc = emailToScopeRow(em);
-  if(!list.some(x=>x.scope === sc && x.email === em)){
-   list.push({
-    kind: 'trial',
-    email: em,
-    name: (acc && (acc.username || acc.role)) || em,
-    orgName: 'Trial Account (' + ((acc && acc.username) || em) + ')',
-    scope: sc,
-    status: 'Trial (' + ((acc && acc.ip) || 'IP') + ')'
-   });
-  }
- });
- return list;
-}
-
-function OwnerWorkspaceGate(){
- const clients = getClientEntries();
- const trials = getTrialPortalCandidates();
- return `<div class="card" style="display:grid;gap:14px">
-  <div>
-   <h2>Owner Workspace — Select a Client Coaching or Trial Admin</h2>
-   <p class="mut sm">Coaching data (students, batches, attendance, and fees) is hidden until you select a specific <b>Client Coaching</b> or a <b>Trial Admin</b> below.</p>
-  </div>
-  <div style="display:grid;gap:8px">
-   <b>Client Coachings (${clients.length})</b>
-   ${clients.length ? `<div class="portal-pick-grid">${clients.map(([em,cfg])=>{
-    const sc = cfg.scope || emailToScopeRow(em);
-    const title = cfg.orgName || cfg.name || em;
-    return `<button type="button" class="portal-pick-card" data-a="pickScope" data-scope="${esc(sc)}" data-label="${esc(title)}" data-portal-kind="client">
-     <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
-      <b>${esc(title)}</b>
-      <span class="bd ${cfg.paused?'sA':'sP'}">${cfg.paused?'Paused':'Client'}</span>
-     </div>
-     <div class="mut sm">${esc(cfg.name||'Client')} · ${esc(em)}</div>
-     <div class="sm" style="color:var(--pri);font-weight:600">Select Client Coaching →</div>
-    </button>`;
-   }).join('')}</div>` : '<div class="emp">No client coachings added yet. Add a client in Settings to select their coaching.</div>'}
-  </div>
-  <div style="display:grid;gap:8px">
-   <b>Trial Admins / Trial Accounts (${trials.length})</b>
-   ${trials.length ? `<div class="portal-pick-grid">${trials.map(tr=>{
-    return `<button type="button" class="portal-pick-card" data-a="pickScope" data-scope="${esc(tr.scope)}" data-label="${esc(tr.orgName)}" data-portal-kind="trial">
-     <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
-      <b>${esc(tr.orgName)}</b>
-      <span class="role">Trial</span>
-     </div>
-     <div class="mut sm">${esc(tr.email)}</div>
-     <div class="sm" style="color:var(--pri);font-weight:600">Select Trial Admin →</div>
-    </button>`;
-   }).join('')}</div>` : '<div class="emp">No trial admins found yet.</div>'}
-  </div>
- </div>`;
-}
-
-
-async function returnToOwnerMasterGate(){
- if(!S.u || S.u.role !== 'owner') return;
- if(dirty()){
-  const ok = confirm('Unsaved attendance changes will be discarded. Return to Owner Master?');
-  if(!ok) return;
- }
- closeDr();
- S.dr = null;
- S.b = '';
- S.rb = '';
- S.q = '';
- S.f = '';
- S.selectedFeeIds = [];
- S.ownerSelectedPortal = false;
- const ownScope = emailToScopeRow(getOwnerEmail());
- setActiveScope(ownScope);
- S.u = {...S.u, scope: ownScope, ownerSelectedPortal: false};
- saveSession(S.u);
- loadLocalScopeDb(ownScope, S.u.e);
- await loadCloud(false);
- S.tempAccent = db.accent;
- S.tempLogo = db.orgLogo || '';
- applyAccent();
- subscribeRealtime();
- render(true);
- toast('Returned to Owner Master (coaching data hidden)');
-}
-
-function getActivePortalLabel(){
- const ownScope=emailToScopeRow(getOwnerEmail());
- if(ROW_ID===ownScope)return 'Owner Master';
- const matched=getClientEntries().find(([em,cfg])=>(cfg.scope||emailToScopeRow(em))===ROW_ID);
- if(matched){
-  const [em,cfg]=matched;
-  return (db.orgName && db.orgName!==DEFAULT_ORG ? db.orgName : (cfg.orgName||cfg.name||em));
- }
- return db.orgName || ROW_ID;
-}
-
-async function switchOwnerToScope(targetScope, labelText=''){
- if(!S.u || S.u.role!=='owner')return;
- if(dirty()){
-  const ok=confirm('Unsaved attendance changes will be discarded. Switch portal?');
-  if(!ok)return;
- }
- closeDr();
- S.dr=null;
- S.b='';
- S.rb='';
- S.q='';
- S.f='';
- S.selectedFeeIds=[];
- S.ownerSelectedPortal=true;
- setActiveScope(targetScope);
- S.u={...S.u,scope:targetScope,ownerSelectedPortal:true};
- saveSession(S.u);
- loadLocalScopeDb(targetScope, S.u.e);
- await loadCloud(false);
- S.tempAccent=db.accent;
- S.tempLogo=db.orgLogo||'';
- applyAccent();
- subscribeRealtime();
- render(true);
- toast('Switched to: '+(labelText||getActivePortalLabel()));
-}
-
-function openOwnerPortalPicker(fromLogin=false){
- if(!S.u || S.u.role!=='owner')return;
- const clients=getClientEntries();
- const trials=getTrialPortalCandidates();
- const ownEm=getOwnerEmail();
- const isMasterView=!S.ownerSelectedPortal;
- modal(fromLogin?'Select Client Coaching or Trial':'Select Coaching / Trial Portal',`
-  <p class="mut sm">Coaching data is hidden until you select a specific <b>Client Coaching</b> or a <b>Trial Admin</b>.</p>
-  <b class="sm">Owner Master Workspace</b>
-  <div class="portal-pick-grid">
-   <button type="button" class="portal-pick-card ${isMasterView?'active':''}" data-a="goOwnerMaster">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
-     <b>Owner Master</b>
-     <span class="role">Master</span>
-    </div>
-    <div class="mut sm">${esc(ownEm)}</div>
-    <div class="sm">${isMasterView?'<span class="ok">● Active now (Data Hidden)</span>':'Back to Owner Master →'}</div>
-   </button>
-  </div>
-  <b class="sm" style="margin-top:6px">Client Coachings (${clients.length})</b>
-  <div class="portal-pick-grid">
-   ${clients.map(([em,cfg])=>{
-    const sc=cfg.scope||emailToScopeRow(em);
-    const active=S.ownerSelectedPortal && ROW_ID===sc;
-    const title=cfg.orgName||cfg.name||em;
-    return`<button type="button" class="portal-pick-card ${active?'active':''}" data-a="pickScope" data-scope="${esc(sc)}" data-label="${esc(title)}">
-     <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
-      <b>${esc(title)}</b>
-      <span class="bd ${cfg.paused?'sA':'sP'}">${cfg.paused?'Paused':'Client'}</span>
-     </div>
-     <div class="mut sm">${esc(cfg.name||'Client')} · ${esc(em)}</div>
-     <div class="sm">${active?'<span class="ok">● Selected</span>':'Select client →'}</div>
-    </button>`;
-   }).join('')}
-  </div>
-  ${!clients.length?'<div class="emp" style="margin-top:6px">No client coachings added yet.</div>':''}
-  <b class="sm" style="margin-top:6px">Trial Admins / Trial Accounts (${trials.length})</b>
-  <div class="portal-pick-grid">
-   ${trials.map(tr=>{
-    const active=S.ownerSelectedPortal && ROW_ID===tr.scope;
-    return`<button type="button" class="portal-pick-card ${active?'active':''}" data-a="pickScope" data-scope="${esc(tr.scope)}" data-label="${esc(tr.orgName)}">
-     <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
-      <b>${esc(tr.orgName)}</b>
-      <span class="role">Trial</span>
-     </div>
-     <div class="mut sm">${esc(tr.email)}</div>
-     <div class="sm">${active?'<span class="ok">● Selected</span>':'Select trial →'}</div>
-    </button>`;
-   }).join('')}
-  </div>
- `,null,null,true);
 }
 
 function openStudentIdCard(id){
+
  const s=sOf(id);if(!s)return;
+
  const b=bOf(s.b)||{name:'Batch',time:'',th:75};
+
  const f=getFee(s.id,curMonth());
+
  const p=pctOf(recs(s.id));
+
  modal('Student ID & Fee Card',`
+
   <div class="id-card tilt-3d" id="idCardPrintArea">
+
    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid var(--line);padding-bottom:8px">
+
     ${brandHtml(true)}
+
     <span class="role">Student Pass</span>
+
    </div>
+
    <div style="display:flex;align-items:center;gap:12px">
+
     ${avOf(s.name,s.photo,'lg-av')}
+
     <div style="display:grid;gap:2px">
+
      <b style="font-size:16px">${esc(s.name)}</b>
+
      <span class="mut sm">Roll No: <b>${esc(s.roll)}</b></span>
+
      <span class="mut sm">Batch: <b>${esc(b.name)}</b>${b.time?' ('+esc(b.time)+')':''}</span>
+
      <span class="mut sm">Parent: ${esc(s.par||'–')}</span>
+
     </div>
+
    </div>
+
    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding-top:8px;border-top:1px solid var(--line)" class="sm">
+
     <span>Attendance: <b>${p===null?'n/a':p+'%'}</b></span>
+
     <span>Fee (${curMonth()}): <b>${fmtRs(f.amt)}</b> <span class="bd ${f.status==='Paid'?'sP':'sA'}">${esc(f.status)}</span></span>
+
    </div>
+
   </div>
+
  `,'Print Card',()=>{window.print();return false});
+
 }
 
 const isDesktopPointer = window.matchMedia && window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+
 let curTarget={x:-400,y:-400,active:false},curPos={x:-400,y:-400},ringPos={x:-400,y:-400},rafId=0,activeTilt=null;
+
 function syncCursorFx(){
+
  const wrap=$('#cursor-fx');
+
  if(!wrap){return}
+
  if(!S.u || !isDesktopPointer){wrap.innerHTML='';return}
+
  if(!wrap.children.length){wrap.innerHTML='<div class="cur-aura"></div><div class="cur-ring"></div>'}
+
 }
+
 if(isDesktopPointer){
+
  document.addEventListener('pointermove',e=>{
+
   if(e.pointerType!=='mouse')return;
+
   const tiltCard=e.target.closest('.tilt-3d');
+
   if(activeTilt && activeTilt!==tiltCard){
+
    activeTilt.style.setProperty('--rx','0deg');
+
    activeTilt.style.setProperty('--ry','0deg');
+
    activeTilt.style.setProperty('--tz','0px');
+
    activeTilt=null;
+
   }
+
   if(tiltCard){
+
    activeTilt=tiltCard;
+
    const rect=tiltCard.getBoundingClientRect();
+
    const px=(e.clientX-rect.left)/Math.max(rect.width,1)-.5;
+
    const py=(e.clientY-rect.top)/Math.max(rect.height,1)-.5;
+
    tiltCard.style.setProperty('--rx',(-py*7).toFixed(2)+'deg');
+
    tiltCard.style.setProperty('--ry',(px*8).toFixed(2)+'deg');
+
    tiltCard.style.setProperty('--tz','3px');
+
   }
+
   if(!S.u)return;
+
   curTarget.x=e.clientX;
+
   curTarget.y=e.clientY;
+
   if(!curTarget.active){curPos.x=e.clientX;curPos.y=e.clientY;ringPos.x=e.clientX;ringPos.y=e.clientY;curTarget.active=true}
+
   const aura=$('#cursor-fx .cur-aura'),ring=$('#cursor-fx .cur-ring');
+
   if(aura)aura.style.opacity='1';
+
   if(ring)ring.style.opacity='1';
+
   if(!rafId)rafId=requestAnimationFrame(tickCursor);
+
  },{passive:true});
+
  document.addEventListener('pointerleave',e=>{
+
   if(activeTilt){
+
    activeTilt.style.setProperty('--rx','0deg');
+
    activeTilt.style.setProperty('--ry','0deg');
+
    activeTilt.style.setProperty('--tz','0px');
+
    activeTilt=null;
+
   }
+
   curTarget.active=false;
+
   const aura=$('#cursor-fx .cur-aura'),ring=$('#cursor-fx .cur-ring');
+
   if(aura)aura.style.opacity='0';
+
   if(ring)ring.style.opacity='0';
+
  },true);
+
 }
+
 function tickCursor(){
+
  rafId=0;
+
  if(!S.u || !curTarget.active)return;
+
  curPos.x+=(curTarget.x-curPos.x)*.2;
+
  curPos.y+=(curTarget.y-curPos.y)*.2;
+
  ringPos.x+=(curTarget.x-ringPos.x)*.12;
+
  ringPos.y+=(curTarget.y-ringPos.y)*.12;
+
  const aura=$('#cursor-fx .cur-aura'),ring=$('#cursor-fx .cur-ring');
+
  if(aura)aura.style.transform=`translate3d(${curPos.x.toFixed(1)}px,${curPos.y.toFixed(1)}px,0)`;
+
  if(ring)ring.style.transform=`translate3d(${ringPos.x.toFixed(1)}px,${ringPos.y.toFixed(1)}px,0)`;
+
  if(Math.abs(curTarget.x-ringPos.x)>.4 || Math.abs(curTarget.y-ringPos.y)>.4){
+
   rafId=requestAnimationFrame(tickCursor);
+
  }
+
 }
 
 function enforceRemoteLock(){
+
  const locked = !!(ownerMaster.globalAppLocked || db.appLocked);
+
  if(locked && S.u && S.u.role !== 'owner'){
+
   S.u=null;
+
   saveSession(null);
+
   S.dr=null;
+
   S.drawerId=null;
+
   toast('Portal locked by owner');
+
  }
+
 }
 
 function mergeOwnerMasterSnapshots(baseOm, incomingOm){
+
  const a = {...emptyOwnerMaster(), ...(baseOm||{})};
+
  const b = {...emptyOwnerMaster(), ...(incomingOm||{})};
+
  const merged = {...a, ...b};
+
  // Keep non-empty / customized owner identity & branding if one snapshot has defaults
+
  if((!b.ownerEmail || b.ownerEmail===DEFAULT_OWNER_EMAIL) && a.ownerEmail && a.ownerEmail!==DEFAULT_OWNER_EMAIL){
+
   merged.ownerEmail = a.ownerEmail;
+
  }
+
  if((!b.ownerPw || b.ownerPw===DEFAULT_OWNER_PW) && a.ownerPw && a.ownerPw!==DEFAULT_OWNER_PW){
+
   merged.ownerPw = a.ownerPw;
+
  }
+
  const aName = (a.ownerProfile && a.ownerProfile.name) || '';
+
  const bName = (b.ownerProfile && b.ownerProfile.name) || '';
+
  const aPhoto = (a.ownerProfile && a.ownerProfile.photo) || '';
+
  const bPhoto = (b.ownerProfile && b.ownerProfile.photo) || '';
+
  merged.ownerProfile = {
+
   name: (bName && bName!==DEFAULT_OWNER_NAME) ? bName : (aName || bName || DEFAULT_OWNER_NAME),
+
   photo: bPhoto || aPhoto || ''
+
  };
+
  if((!b.ownerOrgName || b.ownerOrgName===DEFAULT_ORG) && a.ownerOrgName && a.ownerOrgName!==DEFAULT_ORG){
+
   merged.ownerOrgName = a.ownerOrgName;
+
  }
+
  if((!b.ownerTagline || b.ownerTagline===DEFAULT_TAGLINE) && a.ownerTagline && a.ownerTagline!==DEFAULT_TAGLINE){
+
   merged.ownerTagline = a.ownerTagline;
+
  }
+
  merged.ownerLogo = b.ownerLogo || a.ownerLogo || '';
+
  if((!b.ownerAccent || b.ownerAccent==='indigo') && a.ownerAccent && a.ownerAccent!=='indigo'){
+
   merged.ownerAccent = a.ownerAccent;
+
  }
+
  // Merge maps & arrays so neither device wipes out clients, trial logins, or logs
+
  merged.clients = {...(a.clients||{}), ...(b.clients||{})};
+
  merged.trialClaimedIps = {...(a.trialClaimedIps||{}), ...(b.trialClaimedIps||{})};
+
  merged.trialAccounts = {...(a.trialAccounts||{}), ...(b.trialAccounts||{})};
+
  merged.revokedTrials = {...(a.revokedTrials||{}), ...(b.revokedTrials||{})};
+
  const seenLogs = new Set();
+
  const combinedLogs = [];
+
  [...(a.loginLogs||[]), ...(b.loginLogs||[])].forEach(lg=>{
+
   if(!lg)return;
+
   const k = `${lg.at||''}|${lg.email||''}|${lg.username||''}|${lg.ip||''}`;
+
   if(!seenLogs.has(k)){seenLogs.add(k);combinedLogs.push(lg)}
+
  });
+
  merged.loginLogs = combinedLogs.slice(-80);
+
  return merged;
+
 }
 
 async function loadOwnerMaster(silent=true){
+
  const sb=getSb();
+
  if(!sb)return ownerMaster;
+
  try{
+
   const {data,error}=await sb.from('app_state').select('data').eq('id',OWNER_GLOBAL_ROW).maybeSingle();
+
   if(!error && data && data.data){
+
    // Cloud is source of truth for owner identity; local only fills missing maps
+
    const cloud = data.data;
+
    const local = ownerMaster;
+
    ownerMaster = mergeOwnerMasterSnapshots(local, cloud);
+
    // Force cloud owner profile / credentials when cloud has them (fixes PC→mobile drift)
+
    if(cloud.ownerProfile){
+
     const cName=(cloud.ownerProfile.name||'').trim();
+
     const cPhoto=cloud.ownerProfile.photo||'';
+
     if(cName)ownerMaster.ownerProfile={name:cName,photo:cPhoto||(ownerMaster.ownerProfile&&ownerMaster.ownerProfile.photo)||''};
+
     else if(cPhoto)ownerMaster.ownerProfile={...(ownerMaster.ownerProfile||{}),photo:cPhoto};
+
    }
+
    if(cloud.ownerEmail)ownerMaster.ownerEmail=String(cloud.ownerEmail).trim().toLowerCase();
+
    if(cloud.ownerPw)ownerMaster.ownerPw=cloud.ownerPw;
+
    if(cloud.ownerOrgName)ownerMaster.ownerOrgName=cloud.ownerOrgName;
+
    if(cloud.ownerTagline!=null)ownerMaster.ownerTagline=cloud.ownerTagline;
+
    if(cloud.ownerLogo)ownerMaster.ownerLogo=cloud.ownerLogo;
+
    if(cloud.ownerAccent)ownerMaster.ownerAccent=cloud.ownerAccent;
+
    if(typeof cloud.globalAppLocked==='boolean')ownerMaster.globalAppLocked=cloud.globalAppLocked;
+
    if(cloud.globalLockMsg)ownerMaster.globalLockMsg=cloud.globalLockMsg;
+
    if(cloud.trialAdminEmail)ownerMaster.trialAdminEmail=String(cloud.trialAdminEmail).trim().toLowerCase();
+
    if(cloud.trialAdminPw)ownerMaster.trialAdminPw=cloud.trialAdminPw;
+
    if(cloud.trialAdminName)ownerMaster.trialAdminName=cloud.trialAdminName;
+
    if(Number(cloud.trialDays)>0)ownerMaster.trialDays=Number(cloud.trialDays);
+
    if(typeof cloud.trialIpLock==='boolean')ownerMaster.trialIpLock=cloud.trialIpLock;
+
    normalizeOwnerMaster();
+
    try{localStorage.setItem(OWNER_STORE_KEY,JSON.stringify(ownerMaster))}catch(e){}
+
   }
+
  }catch(e){}
+
  return ownerMaster;
+
 }
 
 async function persistOwnerMaster(){
+
  normalizeOwnerMaster();
+
  try{localStorage.setItem(OWNER_STORE_KEY,JSON.stringify(ownerMaster))}catch(e){}
+
  const sb=getSb();
+
  if(!sb)return false;
+
  try{
+
   const {error}=await sb.from('app_state').upsert({id:OWNER_GLOBAL_ROW,data:ownerMaster,updated_at:new Date().toISOString()},{onConflict:'id'});
+
   if(error)throw error;
+
   return true;
+
  }catch(e){
+
   console.warn('persistOwnerMaster failed',e);
+
   return false;
+
  }
+
 }
 
 async function loadCloud(silent=false){
+
  const sb=getSb();
+
  if(!sb)return;
+
  try{
+
   await loadOwnerMaster(true);
+
   const targetRow = ROW_ID;
+
   const {data,error}=await sb.from('app_state').select('data').eq('id',targetRow).maybeSingle();
+
   if(error)throw error;
+
   if(data && data.data){
+
    const cloudDb={...emptyDb(),...data.data};
+
    ownerMaster = mergeOwnerMasterSnapshots(ownerMaster, {
+
     ownerProfile: cloudDb.ownerProfile,
+
     trialDays: cloudDb.trialDays,
+
     trialIpLock: cloudDb.trialIpLock,
+
     trialClaimedIps: cloudDb.trialClaimedIps,
+
     trialAccounts: cloudDb.trialAccounts,
+
     revokedTrials: cloudDb.revokedTrials,
+
     loginLogs: cloudDb.loginLogs
+
    });
+
    normalizeOwnerMaster();
+
    try{localStorage.setItem(OWNER_STORE_KEY,JSON.stringify(ownerMaster))}catch(e){}
+
    const hasCloudRich=((Array.isArray(cloudDb.bat)&&cloudDb.bat.length)||(Array.isArray(cloudDb.stu)&&cloudDb.stu.length)||(cloudDb.orgName&&cloudDb.orgName!==DEFAULT_ORG)||cloudDb.orgLogo);
+
    const hasLocalRich=((Array.isArray(db.bat)&&db.bat.length)||(Array.isArray(db.stu)&&db.stu.length)||(db.orgName&&db.orgName!==DEFAULT_ORG)||db.orgLogo);
+
    if(hasCloudRich || !hasLocalRich){
+
     db=cloudDb;
+
     normalizeDb();
+
    }else{
+
     normalizeDb();
+
    }
+
    if(S.u && S.u.role==='owner' && ownerMaster.ownerProfile && ownerMaster.ownerProfile.name){
+
     S.u={...S.u,e:getOwnerEmail(),name:ownerMaster.ownerProfile.name};
+
     saveSession(S.u);
+
    }else if(S.u && (S.u.role==='client'||S.u.role==='admin') && db.admin && db.admin.name){
+
     S.u={...S.u,name:db.admin.name};
+
     saveSession(S.u);
+
    }
+
    applyAccent();
+
    enforceRemoteLock();
+
    document.title=`${orgName()} — Attendance`;
+
    try{localStorage.setItem(STORE_KEY,JSON.stringify(db))}catch(e){}
+
    syncStatus='Live synced';
+
    if(!silent)render(false);
+
    else updateSyncBadges();
+
   }else{
+
    syncOwnerMasterToDb();
+
    applyAccent();
+
    syncStatus='Live synced';
+
    updateSyncBadges();
+
   }
+
  }catch(err){
+
   syncStatus='Sync error';
+
   if(!silent)toast('Cloud sync error');
+
   else updateSyncBadges();
+
  }
+
 }
 
 function updateSyncBadges(){
+
  $$('.sync').forEach(el=>{
+
   el.classList.toggle('err',syncStatus==='Sync error');
+
   const txtNode=Array.from(el.childNodes).find(n=>n.nodeType===3);
+
   if(txtNode)txtNode.nodeValue=syncStatus;
+
  });
+
 }
 
 async function persist(){
+
  normalizeDb();
+
  applyAccent();
+
  document.title=`${orgName()} — Attendance`;
+
  try{localStorage.setItem(STORE_KEY,JSON.stringify(db))}catch(e){}
+
  const sb=getSb();
+
  if(!sb)return;
+
  syncStatus='Saving...';
+
  updateSyncBadges();
+
  try{
+
   await persistOwnerMaster();
+
   const {error}=await sb.from('app_state').upsert({id:ROW_ID,data:db,updated_at:new Date().toISOString()},{onConflict:'id'});
+
   if(error)throw error;
+
   syncStatus='Live synced';
+
   updateSyncBadges();
+
  }catch(err){
+
   syncStatus='Sync error';
+
   updateSyncBadges();
+
   toast('Failed to save to cloud');
+
  }
+
 }
 
 function subscribeRealtime(){
+
  const sb=getSb();
+
  if(!sb)return;
+
  if(rtChannel){try{sb.removeChannel(rtChannel)}catch(e){}}
+
  const watchId = ROW_ID;
+
  rtChannel = sb.channel('live_'+watchId+'_'+Date.now())
+
   .on('postgres_changes',{event:'*',schema:'public',table:'app_state',filter:`id=eq.${watchId}`},payload=>{
+
    if(payload.new&&payload.new.data){
+
     db={...emptyDb(),...payload.new.data};
+
     normalizeDb();
+
     if(S.u && S.u.role==='owner' && ownerMaster.ownerProfile && ownerMaster.ownerProfile.name){
+
      S.u={...S.u,e:getOwnerEmail(),name:ownerMaster.ownerProfile.name};
+
      saveSession(S.u);
+
     }else if(S.u && (S.u.role==='client'||S.u.role==='admin') && db.admin && db.admin.name){
+
      S.u={...S.u,name:db.admin.name};
+
      saveSession(S.u);
+
     }
+
     applyAccent();
+
     enforceRemoteLock();
+
     document.title=`${orgName()} — Attendance`;
+
     try{localStorage.setItem(STORE_KEY,JSON.stringify(db))}catch(e){}
+
     syncStatus='Live synced';
+
     if(!dirty())render(false);
+
     else updateSyncBadges();
+
    }
+
   })
+
   .on('postgres_changes',{event:'*',schema:'public',table:'app_state',filter:`id=eq.${OWNER_GLOBAL_ROW}`},payload=>{
+
    if(payload.new&&payload.new.data){
+
     const cloud=payload.new.data;
+
     ownerMaster=mergeOwnerMasterSnapshots(ownerMaster,cloud);
+
     if(cloud.ownerProfile){
+
      const cName=(cloud.ownerProfile.name||'').trim();
+
      const cPhoto=cloud.ownerProfile.photo||'';
+
      if(cName)ownerMaster.ownerProfile={name:cName,photo:cPhoto||(ownerMaster.ownerProfile&&ownerMaster.ownerProfile.photo)||''};
+
      else if(cPhoto)ownerMaster.ownerProfile={...(ownerMaster.ownerProfile||{}),photo:cPhoto};
+
     }
+
     if(cloud.ownerPw)ownerMaster.ownerPw=cloud.ownerPw;
+
     if(cloud.ownerOrgName)ownerMaster.ownerOrgName=cloud.ownerOrgName;
+
     if(cloud.ownerLogo)ownerMaster.ownerLogo=cloud.ownerLogo;
+
     if(cloud.ownerAccent)ownerMaster.ownerAccent=cloud.ownerAccent;
+
     if(typeof cloud.globalAppLocked==='boolean')ownerMaster.globalAppLocked=cloud.globalAppLocked;
+
     normalizeOwnerMaster();
+
     try{localStorage.setItem(OWNER_STORE_KEY,JSON.stringify(ownerMaster))}catch(e){}
+
     if(S.u && S.u.role==='owner' && ownerMaster.ownerProfile){
+
      S.u={...S.u,name:ownerMaster.ownerProfile.name||S.u.name};
+
      saveSession(S.u);
+
     }
+
     syncOwnerMasterToDb();
+
     enforceRemoteLock();
+
     if(!dirty())render(false);
+
    }
+
   })
+
   .subscribe();
+
 }
 
 function getUsers(){
+
  const ownEm=getOwnerEmail();
+
  const admEm=getTrialAdminEmail();
+
  const list=[
+
   {e:ownEm,pw:ownerMaster.ownerPw||DEFAULT_OWNER_PW,role:'owner',name:(ownerMaster.ownerProfile&&ownerMaster.ownerProfile.name)||DEFAULT_OWNER_NAME,scope:emailToScopeRow(ownEm)},
+
   {e:admEm,pw:ownerMaster.trialAdminPw||(db.admin&&db.admin.pw)||'admin123',role:'admin',name:ownerMaster.trialAdminName||(db.admin&&db.admin.name)||'Principal (Admin)',scope:emailToScopeRow(admEm)}
+
  ];
+
  Object.entries(ownerMaster.clients||{}).forEach(([em,cfg])=>{
+
   const low=em.toLowerCase();
+
   if(cfg && low && low!==ownEm && low!==admEm){
+
    list.push({
+
     e:low,
+
     pw:cfg.pw||'client123',
+
     role:'client',
+
     name:cfg.name||cfg.orgName||low,
+
     scope:emailToScopeRow(low)
+
    });
+
   }
+
  });
+
  if(db.admin && db.admin.email){
+
   const aem=db.admin.email.toLowerCase();
+
   if(aem!==ownEm && !list.some(x=>x.e===aem)){
+
    list.push({e:aem,pw:db.admin.pw||'admin123',role:'client',name:db.admin.name,scope:emailToScopeRow(aem)});
+
   }
+
  }
+
  db.tch.forEach(t=>list.push({e:t.email.toLowerCase(),pw:t.pw||'teach123',role:'teacher',ref:t.id,name:t.name,scope:ROW_ID}));
+
  db.stu.forEach(s=>list.push({e:s.email.toLowerCase(),pw:s.pw||'student123',role:'student',ref:s.id,name:s.name,scope:ROW_ID}));
+
  return list;
+
 }
 
 const bOf=id=>db.bat.find(b=>b.id===id),sOf=id=>db.stu.find(s=>s.id===id),tOf=id=>db.tch.find(t=>t.id===id);
+
 const mine=()=>!S.u?[]:canManage(S.u.role)?db.bat:S.u.role==='teacher'?db.bat.filter(b=>b.teacher===S.u.ref):[bOf((sOf(S.u.ref)||{}).b)].filter(Boolean);
+
 const myStu=()=>{const ids=mine().map(b=>b.id);return db.stu.filter(s=>ids.includes(s.b))};
+
 function recs(sid,from='0000',to='9999'){const s=sOf(sid),o=[];if(!s)return o;for(const d in db.att){if(d<from||d>to)continue;const ses=db.att[d][s.b];if(ses&&ses.rec[sid])o.push({d,...ses.rec[sid],sub:ses.subject})}return o.sort((a,b)=>a.d<b.d?-1:1)}
+
 const pctOf=a=>{const x=a.filter(r=>r.s!=='V');return x.length?Math.round(x.filter(r=>r.s==='P'||r.s==='L').length/x.length*100):null};
+
 const streak=a=>{let n=0;for(let i=a.length-1;i>=0&&a[i].s==='A';i--)n++;return n};
+
 function dayC(d,ids){const c={P:0,A:0,L:0,V:0};ids.forEach(b=>{const s=db.att[d]&&db.att[d][b];if(s)Object.values(s.rec).forEach(r=>c[r.s]++)});c.n=c.P+c.A+c.L;c.pct=c.n?Math.round((c.P+c.L)/c.n*100):null;return c}
+
 const risk=()=>myStu().map(s=>({s,p:pctOf(recs(s.id)),th:(bOf(s.b)||{}).th||75})).filter(x=>x.p!==null&&x.p<x.th).sort((a,b)=>a.p-b.p);
+
 const pbar=(p,th)=>`<div class="mt"><i class="${p!==null&&p<th?'lo':''}" style="width:${p||0}%"></i></div>`;
+
 const pc=(p,th)=>p===null?'<span class="mut">n/a</span>':`<b class="${p<th?'bad':'ok'}">${p}%</b>`;
+
 const fmtRs=n=>'Rs. '+Number(n||0).toLocaleString('en-PK');
 
 function langSelectHtml(cls='lang-sel'){
+
  return`<select class="${cls}" data-f="lang" aria-label="${esc(T('language'))}">${Object.entries(LANGS).map(([k,v])=>`<option value="${k}" ${currentLang===k?'selected':''}>${esc(v.label)}</option>`).join('')}</select>`;
+
 }
 
 function getFee(sid,m){
+
  const defFee=Number((sOf(sid)||{}).fee)||3500;
+
  const rec=(db.fees[m]&&db.fees[m][sid])||{};
+
  return{amt:rec.amt!=null&&rec.amt!==''?Number(rec.amt):defFee,status:rec.status||'Pending',paidAt:rec.paidAt||''};
+
 }
 
 function waAbsent(phone,stuName,batchName,dateStr,sub){
+
  const digits=String(phone||'').replace(/\D/g,'');
+
  const intl=digits.startsWith('03')?'92'+digits.slice(1):digits;
+
  const msg=encodeURIComponent(`Assalam-o-Alaikum from ${orgName()}, ${stuName} (${batchName}) was marked ABSENT on ${fd(dateStr)} in ${sub}. Please contact ${orgName()} if needed.`);
+
  return `https://wa.me/${intl}?text=${msg}`
+
 }
+
 function waLow(phone,stuName,pct){
+
  const digits=String(phone||'').replace(/\D/g,'');
+
  const intl=digits.startsWith('03')?'92'+digits.slice(1):digits;
+
  const msg=encodeURIComponent(`Assalam-o-Alaikum from ${orgName()}, ${stuName}'s attendance is currently ${pct!==null?pct+'%':'below threshold'}. Please ensure regular attendance.`);
+
  return `https://wa.me/${intl}?text=${msg}`
+
 }
+
 function waFee(phone,stuName,monthStr,amt){
+
  const digits=String(phone||'').replace(/\D/g,'');
+
  const intl=digits.startsWith('03')?'92'+digits.slice(1):digits;
+
  const msg=encodeURIComponent(`Assalam-o-Alaikum from ${orgName()}, friendly reminder that ${stuName}'s monthly fee (${fmtRs(amt)}) for ${monthStr} is pending. Kindly clear at your earliest.`);
+
  return `https://wa.me/${intl}?text=${msg}`
+
 }
 
 function toast(m){const t=$('#toast');t.textContent=m;t.style.opacity=1;clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.opacity=0,2500)}
+
 function copyText(txt,label='Copied'){
+
  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(()=>toast(label)).catch(()=>toast(txt))}
+
  else{toast(txt)}
+
 }
+
 function modal(t,body,ok,cb,wide){$('#m').innerHTML=`<div class="ov" data-a="mx"><div class="md ${wide?'w':''}" role="dialog" aria-modal="true" aria-label="${esc(t)}"><h3>${esc(t)}</h3>${body}<div class="mf"><button class="b" data-a="mx">${ok?'Cancel':'Close'}</button>${ok?`<button class="b pri" data-a="mok">${esc(ok)}</button>`:''}</div></div></div>`;modal.cb=cb}
+
 const closeM=()=>$('#m').innerHTML='';
+
 const val=id=>($('#'+id)||{}).value||'';
+
 function closeDr(){S.drawerId=null;$('#dr').innerHTML=''}
+
 function openDr(id){if(!S.u||!sOf(id))return;S.drawerId=id;$('#dr').innerHTML=`<aside class="dr" role="dialog" aria-label="Student profile">${profile(id)}</aside>`}
 
 function shouldHideLoginUsername(){
+
  const em=(val('le')||'').trim().toLowerCase();
+
  return em===getOwnerEmail() || em===DEFAULT_OWNER_EMAIL.toLowerCase() || !!(ownerMaster.clients && ownerMaster.clients[em]);
+
 }
+
 function syncLoginUsernameVisibility(){
+
  const box=$('#loginUserWrap');
+
  if(!box)return;
+
  box.style.display=shouldHideLoginUsername()?'none':'grid';
+
 }
 
 function LockedScreen(){
+
  const msg = ownerMaster.globalAppLocked ? (ownerMaster.globalLockMsg||'This coaching portal is currently paused by the owner.') : (db.lockMsg||'This coaching portal is currently paused.');
+
  return`<div class="lg"><div class="card" style="text-align:center">
+
   <div style="display:flex;justify-content:center">${brandHtml()}</div>
+
   <h2>Portal Paused (Owner Kill Switch)</h2>
+
   <div class="al">${esc(msg)}</div>
+
   <div class="fl"><label>${esc(T('email'))}<input id="le" type="email" autocomplete="username" placeholder="${esc(getOwnerEmail())}"></label><label>${esc(T('password'))}<input id="lp" type="password" autocomplete="current-password" placeholder="••••••••"></label></div>
+
   <button class="b pri" data-a="login">${esc(T('signIn'))}</button>
+
  </div></div>`
+
 }
 
 function Login(){
+
  if(ownerMaster.globalAppLocked || db.appLocked)return LockedScreen();
+
  return`<div class="lg"><div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">${brandHtml()}<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span class="ver-pill">v${esc(APP_VERSION)}</span><span class="sync ${syncStatus==='Sync error'?'err':''}"><i></i>${esc(syncStatus)}</span></div></div>${db.orgTagline?`<div class="mut sm">${esc(db.orgTagline)}</div>`:''}<h2>${esc(T('signIn'))}</h2>
+
  <div class="fl">
+
   <label>${esc(T('email'))}<input id="le" type="email" autocomplete="username" placeholder="${esc(getTrialAdminEmail())}"></label>
+
   <label id="loginUserWrap">${esc(T('usernameLabel'))}<input id="luser" type="text" autocomplete="name" placeholder="${esc(T('usernamePh'))}"></label>
+
   <label>${esc(T('password'))}<input id="lp" type="password" autocomplete="current-password" placeholder="••••••••"></label>
+
  </div>
+
  <button class="b pri" data-a="login">${esc(T('signIn'))}</button>
+
  <div class="mut sm">Same email across any mobile, browser or IP keeps your data &amp; settings synced.</div>
+
  <button class="b sm" data-a="restoreJson">Restore backup (JSON)</button></div></div>`
+
 }
 
 const NAV={
+
  owner:[['dash','dash'],['mark','mark'],['students','students'],['fees','fees'],['reports','reports'],['batches','batches'],['settings','settings']],
+
  client:[['dash','dash'],['mark','mark'],['students','students'],['fees','fees'],['reports','reports'],['batches','batches'],['settings','settings']],
+
  admin:[['dash','dash'],['mark','mark'],['students','students'],['fees','fees'],['reports','reports'],['batches','batches'],['settings','settings']],
+
  teacher:[['dash','dash'],['mark','mark'],['students','students'],['reports','reports']],
+
  student:[['dash','myAtt']]
+
 };
+
 function Shell(){
+
  const u=S.u,curProf=getCurrentUserProfile(),n=NAV[u.role].map(x=>`<button class="nv ${S.v===x[0]?'on':''}" data-a="nav" data-v="${x[0]}">${esc(T(x[1]))}</button>`).join('');
+
  const mobNav=NAV[u.role].map(x=>`<button type="button" class="${S.v===x[0]?'on':''}" data-a="nav" data-v="${x[0]}"><span>${esc(T(x[1]))}</span>${S.v===x[0]?'<span>●</span>':''}</button>`).join('');
+
  const ctx=S.v==='mark'?`${esc((bOf(S.b)||{}).name||'')} · ${fd(S.d)}`:`${fd(TODAY)}`,nr=risk().length;
- const portalBadge='';
+
  return`<div class="shell"><aside class="side">${brandHtml()}${db.orgTagline?`<div class="tagline">${esc(db.orgTagline)}</div>`:''}${n}<div style="flex:1"></div><button class="nv" data-a="myProfile">${esc(T('editProf'))}</button><button class="nv" data-a="syncNow">${esc(T('syncNow'))}</button><button class="nv" data-a="theme">${esc(T('themeBtn'))}</button><button class="nv" data-a="backupJson">${esc(T('exportBak'))}</button><button class="nv" data-a="logout">${esc(T('logout'))}</button><div class="mut sm" style="padding:6px 12px 0">Version ${esc(APP_VERSION)}</div></aside>
- <div><div class="top"><b class="mut sm rl">${esc(ctx)}</b>${portalBadge}<span class="sync ${syncStatus==='Sync error'?'err':''}"><i></i>${esc(syncStatus)}</span><div class="sp"></div>
+
+ <div><div class="top"><b class="mut sm rl">${esc(ctx)}</b><span class="sync ${syncStatus==='Sync error'?'err':''}"><i></i>${esc(syncStatus)}</span><div class="sp"></div>
+
  <button type="button" class="chip" data-a="myProfile" title="${esc(T('editProf'))}">${avOf(curProf.name,curProf.photo)}<span class="role">${esc(u.role)}</span></button><button class="b sm" data-a="logout">${esc(T('logout'))}</button>
- <div class="mob-dots-wrap"><button type="button" class="b sm mob-dots-btn" data-a="mobDots" aria-label="Menu" aria-expanded="${S.mobMenuOpen?'true':'false'}">⋮</button>${S.mobMenuOpen?`<div class="mob-dots-backdrop" data-a="mobDotsClose"></div><div class="mob-dots-menu" role="menu">${mobNav}${isStaff(u.role)?`<button type="button" data-a="bell"><span>${esc(T('alerts'))}</span>${nr?`<b class="bad">${nr}</b>`:''}</button>`:''}${u.role==='owner'?`<button type="button" data-a="openPortalPicker">⇄ Switch Client Portal</button>`:''}<hr><button type="button" data-a="myProfile">${esc(T('editProf'))}</button><button type="button" data-a="syncNow">${esc(T('syncNow'))}</button><button type="button" data-a="theme">${esc(T('themeBtn'))}</button><button type="button" data-a="backupJson">${esc(T('exportBak'))}</button></div>`:''}</div>
+
+ <div class="mob-dots-wrap"><button type="button" class="b sm mob-dots-btn" data-a="mobDots" aria-label="Menu" aria-expanded="${S.mobMenuOpen?'true':'false'}">⋮</button>${S.mobMenuOpen?`<div class="mob-dots-backdrop" data-a="mobDotsClose"></div><div class="mob-dots-menu" role="menu">${mobNav}${isStaff(u.role)?`<button type="button" data-a="bell"><span>${esc(T('alerts'))}</span>${nr?`<b class="bad">${nr}</b>`:''}</button>`:''}<hr><button type="button" data-a="myProfile">${esc(T('editProf'))}</button><button type="button" data-a="syncNow">${esc(T('syncNow'))}</button><button type="button" data-a="theme">${esc(T('themeBtn'))}</button><button type="button" data-a="backupJson">${esc(T('exportBak'))}</button></div>`:''}</div>
+
  ${isStaff(u.role)?`<input id="gq" placeholder="${esc(T('searchStu'))}" aria-label="${esc(T('searchStu'))}" value="${esc(S.q)}">`:''}</div>
+
  <main id="mn"><div class="tab-anim" data-tab-key="${esc(S.v)}-${S.tabTick}">${View()}</div></main></div></div>`
-}
-function View(){
- if(S.u && S.u.role==='owner' && !isOwnerViewingCoachingData() && ['mark','students','fees','reports','batches'].includes(S.v)){
-  return `${OwnerPortalSwitchStrip()}${OwnerWorkspaceGate()}`;
- }
- return({dash:S.u.role==='student'?Portal:Dash,mark:Mark,students:Studs,fees:Fees,reports:Reports,batches:Batches,settings:Settings})[S.v]();
+
 }
 
-function OwnerPortalSwitchStrip(){
- return '';
- const clients=getClientEntries();
- const trials=getTrialPortalCandidates();
- const activeLabel = S.ownerSelectedPortal ? getActivePortalLabel() : 'None Selected (Coaching Data Hidden)';
- return`<div class="card" style="margin-bottom:14px;padding:12px 14px">
-  <div class="bar" style="margin:0">
-   <span class="sm"><b>Selected Portal:</b> <span class="role">${esc(activeLabel)}</span></span>
-   <select data-f="ownerPortalSel" aria-label="Select client coaching or trial admin" style="min-width:220px">
-    <option value="__OWNER_MASTER__" ${!S.ownerSelectedPortal?'selected':''}>[Master] Owner Master (Hide Coaching Data)</option>
-    ${clients.map(([em,cfg])=>{
-     const sc=cfg.scope||emailToScopeRow(em);
-     const lbl=cfg.orgName||cfg.name||em;
-     return`<option value="${esc(sc)}" ${S.ownerSelectedPortal && ROW_ID===sc?'selected':''}>[Client] ${esc(lbl)} (${esc(em)})</option>`;
-    }).join('')}
-    ${trials.map(tr=>{
-     return`<option value="${esc(tr.scope)}" ${S.ownerSelectedPortal && ROW_ID===tr.scope?'selected':''}>[Trial] ${esc(tr.orgName)} (${esc(tr.email)})</option>`;
-    }).join('')}
-   </select>
-   ${S.ownerSelectedPortal?`<button type="button" class="b sm" data-a="goOwnerMaster">← Owner Master</button>`:''}
-   <button type="button" class="b sm" data-a="openPortalPicker">Select Portal (${clients.length + trials.length + 1})</button>
-  </div>
- </div>`;
+function View(){
+
+ return({dash:S.u.role==='student'?Portal:Dash,mark:Mark,students:Studs,fees:Fees,reports:Reports,batches:Batches,settings:Settings})[S.v]();
+
 }
 
 function Dash(){
- if(!isOwnerViewingCoachingData()){
-  return `${OwnerPortalSwitchStrip()}<div class="ph"><h1>Owner Master — Portal Selection Required</h1></div>${OwnerWorkspaceGate()}`;
- }
+
  const ids=mine().map(b=>b.id),t=dayC(TODAY,ids),rk=risk();
+
  const m=curMonth();
+
  const dueCount=myStu().filter(s=>getFee(s.id,m).status!=='Paid').length;
+
  const days=Object.keys(db.att).sort().slice(-14).map(d=>({d,p:dayC(d,ids).pct})).filter(x=>x.p!==null);
+
  const pts=days.map((x,i)=>[30+i*(540/Math.max(days.length-1,1)),140-x.p*1.2]);
+
  const chart=days.length?`<svg viewBox="0 0 600 170" width="100%" style="display:block;max-width:100%" role="img" aria-label="${esc(T('attTrend'))}">${[50,75,100].map(v=>`<line x1="30" x2="590" y1="${140-v*1.2}" y2="${140-v*1.2}" stroke="var(--line)"/><text x="0" y="${144-v*1.2}" font-size="10" fill="var(--mut)">${v}</text>`).join('')}<polyline fill="none" stroke="var(--pri)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="${pts.map(p=>p.join(',')).join(' ')}"/>${pts.map((p,i)=>`<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="var(--pri)"><title>${fd(days[i].d)}: ${days[i].p}%</title></circle>`).join('')}${days.map((x,i)=>i%3===0?`<text x="${pts[i][0]-12}" y="162" font-size="10" fill="var(--mut)">${x.d.slice(5)}</text>`:'').join('')}</svg>`:'<div class="emp">No attendance recorded yet.</div>';
+
  const bb=mine().length?mine().map(b=>{const a=myStu().filter(s=>s.b===b.id).flatMap(s=>recs(s.id,addD(TODAY,-14)));const p=pctOf(a);return`<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span><b>${esc(b.name)}</b></span>${pc(p,b.th)}</div>${pbar(p,b.th)}</div>`}).join(''):'<div class="emp">No batches added yet.</div>';
- return`${OwnerPortalSwitchStrip()}<div class="ph"><h1>${esc(orgName())} — ${canManage(S.u.role)?esc(T('dash')):esc(T('batches'))}</h1><div class="bar" style="margin:0"><button class="b sm" data-a="nav" data-v="mark">${esc(T('markToday'))}</button>${canManage(S.u.role)?`<button class="b sm pri" data-a="nav" data-v="fees">${esc(T('feeDues'))} (${dueCount})</button>`:''}</div></div>
+
+ return`<div class="ph"><h1>${esc(orgName())} — ${canManage(S.u.role)?esc(T('dash')):esc(T('batches'))}</h1><div class="bar" style="margin:0"><button class="b sm" data-a="nav" data-v="mark">${esc(T('markToday'))}</button>${canManage(S.u.role)?`<button class="b sm pri" data-a="nav" data-v="fees">${esc(T('feeDues'))} (${dueCount})</button>`:''}</div></div>
+
  <div class="kp"><div class="card tilt-3d"><span class="mut">${esc(T('todayAtt'))}</span><b>${t.pct===null?'–':t.pct+'%'}</b></div><div class="card tilt-3d"><span class="mut">${esc(T('presentToday'))}</span><b class="ok">${t.P}</b></div><div class="card tilt-3d"><span class="mut">${esc(T('absentToday'))}</span><b class="bad">${t.A}</b></div><div class="card tilt-3d"><span class="mut">${esc(T('lateArr'))}</span><b>${t.L}</b></div><div class="card tilt-3d"><span class="mut">${esc(T('atRisk'))}</span><b class="bad">${rk.length}</b></div>${canManage(S.u.role)?`<div class="card tilt-3d"><span class="mut">${esc(T('unpaidFees'))} (${m})</span><b class="${dueCount?'bad':'ok'}">${dueCount}</b></div>`:''}</div>
+
  <div class="g2"><div class="card tilt-3d"><h2>${esc(T('attTrend'))}</h2>${chart}</div><div class="card tilt-3d"><h2 style="margin-bottom:12px">${esc(T('batchComp'))}</h2>${bb}</div></div>
+
  <div class="card tilt-3d"><h2 style="margin-bottom:10px">${esc(T('lowAtt'))}</h2>${rk.length?`<div class="tw"><table><tr><th>Student</th><th>Batch</th><th>Attendance</th><th></th></tr>${rk.slice(0,10).map(x=>`<tr><td><a href="#" data-a="sp" data-id="${x.s.id}" style="color:var(--pri);font-weight:600;display:inline-flex;align-items:center;gap:8px">${avOf(x.s.name,x.s.photo)}<span>${esc(x.s.name)}</span></a></td><td>${esc((bOf(x.s.b)||{}).name||'')}</td><td>${pc(x.p,x.th)}</td><td>${x.s.par?`<a class="b sm" target="_blank" rel="noopener" href="${esc(waLow(x.s.par,x.s.name,x.p))}">WhatsApp</a>`:'<span class="mut sm">No parent no.</span>'}</td></tr>`).join('')}</table></div>`:'<div class="emp">No low-attendance alerts right now.</div>'}`
+
 }
 
 function openDraft(){const b=bOf(S.b);if(!b){S.dr=null;return}const ses=db.att[S.d]&&db.att[S.d][S.b],o={subject:ses?ses.subject:b.subs[0],rec:ses?ses.rec:{}};S.dr={b:S.b,d:S.d,subject:o.subject,rec:JSON.parse(JSON.stringify(o.rec)),orig:JSON.stringify(o)}}
+
 const dirty=()=>S.dr&&JSON.stringify({subject:S.dr.subject,rec:S.dr.rec})!==S.dr.orig;
 
 function Mark(){
+
  const bs=mine();
+
  if(!bs.length)return`<div class="ph"><h1>${esc(T('mark'))}</h1></div><div class="emp">Create a batch and add students first.</div>`;
+
  if(!S.b||!bs.find(b=>b.id===S.b)){S.b=bs[0].id}
+
  if(!S.dr||S.dr.b!==S.b||S.dr.d!==S.d)openDraft();
+
  const dr=S.dr,b=bOf(S.b),all=db.stu.filter(s=>s.b===S.b).sort((a,c)=>a.roll.localeCompare(c.roll)),c={P:0,A:0,L:0,V:0};
+
  all.forEach(s=>{const r=dr.rec[s.id];if(r)c[r.s]++});
+
  const lock=S.u.role==='teacher'&&S.d<addD(TODAY,-3),q=S.q.toLowerCase();
+
  const rows=all.filter(s=>(!q||s.name.toLowerCase().includes(q)||s.roll.toLowerCase().includes(q))&&(!S.f||(S.f==='N'?!dr.rec[s.id]:(dr.rec[s.id]||{}).s===S.f)));
+
  const ses=db.att[S.d]&&db.att[S.d][S.b];
+
  const absList=all.filter(s=>(dr.rec[s.id]||{}).s==='A');
- return`<div class="ph"><h1>${esc(T('mark'))}</h1><div class="bar" style="margin:0">${absList.length?`<button class="b sm" data-a="bulkWaAbs">Absent list (${absList.length})</button>`:''}${dirty()?'<span class="dirty">● Unsaved changes</span>':'<span class="mut">All changes saved</span>'}</div></div>
+
+ return`<div class="ph"><h1>${esc(T('mark'))}</h1><div class="bar" style="margin:0">${absList.length?`<button class="b sm" data-a="bulkWaAbs">Absent list (${absList.length})</button>`:''}${db.waAuto?`<span class="wa-note" style="color:var(--pri);font-weight:700">📱 Auto-notify on</span>`:''}${dirty()?'<span class="dirty">● Unsaved changes</span>':'<span class="mut">All changes saved</span>'}</div></div>
+
  <div class="bar"><select data-f="b" aria-label="Batch">${bs.map(x=>`<option value="${x.id}" ${x.id===S.b?'selected':''}>${esc(x.name)}</option>`).join('')}</select>
+
  <select data-f="sub" aria-label="Subject">${b.subs.map(x=>`<option ${x===dr.subject?'selected':''}>${esc(x)}</option>`).join('')}</select>
+
  <input type="date" data-f="d" max="${TODAY}" value="${S.d}" aria-label="Date"><span class="mut sm">${esc(b.time)}</span></div>
+
  ${S.d<TODAY?`<div class="al w">Backdated record: a reason is required when saving.${ses&&ses.reason?` Last edit: “${esc(ses.reason)}” by ${esc(ses.by)}`:''}</div>`:''}
+
  ${lock?'<div class="al">Teachers can edit only the last 3 days. Ask the admin to correct older records.</div>':''}
+
  <div class="cnt"><span style="background:var(--line)">Total ${all.length}</span><span class="sP">Present ${c.P}</span><span class="sA">Absent ${c.A}</span><span class="sL">Late ${c.L}</span><span class="sV">Leave ${c.V}</span><span class="sN">Unmarked ${all.length-c.P-c.A-c.L-c.V}</span></div>
+
  <div class="bar"><input id="q" placeholder="Name or roll no." value="${esc(S.q)}" aria-label="Filter students"><select data-f="f" aria-label="Status filter"><option value="">All statuses</option>${Object.entries(ST).map(([k,v])=>`<option value="${k}" ${S.f===k?'selected':''}>${v}</option>`).join('')}<option value="N" ${S.f==='N'?'selected':''}>Not marked</option></select>
+
  <button class="b" data-a="all" data-v="P" ${lock||!all.length?'disabled':''}>Mark all present</button><button class="b" data-a="all" data-v="A" ${lock||!all.length?'disabled':''}>Mark all absent</button><button class="b" data-a="clrDraft" ${lock||!Object.keys(dr.rec).length?'disabled':''}>Reset</button><button class="b pri" data-a="save" ${lock||!dirty()?'disabled':''}>Save attendance</button></div>
+
  ${rows.length?rows.map(s=>{const r=dr.rec[s.id]||{};return`<div class="row"><div class="nm" data-a="sp" data-id="${s.id}" style="display:flex;align-items:center;gap:10px">${avOf(s.name,s.photo)}<div><b>${esc(s.name)}</b><span class="mut sm">${esc(s.roll)}${s.par?' · Parent: '+esc(s.par):''}</span></div></div>${r.s==='L'?`<input class="mins" type="number" min="1" data-f="m" data-id="${s.id}" value="${r.m||''}" placeholder="min" aria-label="Late minutes">`:''}${r.s==='A'&&s.par?`<a class="b sm" target="_blank" rel="noopener" href="${esc(waAbsent(s.par,s.name,b.name,S.d,dr.subject))}">WA Absent</a>`:''}<div class="seg">${Object.keys(ST).map(k=>`<button class="${r.s===k?'o'+k:''}" data-a="mk" data-id="${s.id}" data-v="${k}" aria-label="${ST[k]}" aria-pressed="${r.s===k}" ${lock?'disabled':''}>${k}</button>`).join('')}</div></div>`}).join(''):'<div class="emp">No students in this batch match the filter.</div>'}`
+
+}
+
+/* ============ WhatsApp Absence Automation ============ */
+
+function fillTemplate(tpl,ctx){
+
+ return String(tpl||'').replace(/\{(\w+)\}/g,(m,k)=>ctx[k]!=null?String(ctx[k]):m);
+
+}
+
+function waAbsentUrl(s, b, dateStr, subject){
+
+ const digits=String((s&&s.par)||'').replace(/\D/g,'');
+
+ if(!digits)return'';
+
+ const intl=digits.startsWith('03')?'92'+digits.slice(1):digits;
+
+ const msg=fillTemplate(db.waTemplate||DEFAULT_WA_TEMPLATE,{
+
+  org:orgName(),student:(s&&s.name)||'',roll:(s&&s.roll)||'',batch:(b&&b.name)||'',subject:subject||'',date:fd(dateStr)
+
+ });
+
+ return 'https://wa.me/'+intl+'?text='+encodeURIComponent(msg);
+
+}
+
+function maybeNotifyAbsences(dr, oldRec, newRec){
+
+ try{
+
+  if(!db.waAuto)return;
+
+  if(!dr||dr.d!==TODAY)return;
+
+  const newAbsent=db.stu.filter(s=>s.b===dr.b && newRec[s.id] && newRec[s.id].s==='A' && !(oldRec&&oldRec[s.id]&&oldRec[s.id].s==='A') && !(db.waNotified&&db.waNotified[dr.d+'|'+s.id]));
+
+  if(!newAbsent.length)return;
+
+  if(!newAbsent.some(s=>String(s.par||'').replace(/\D/g,'')))return;
+
+  const b=bOf(dr.b)||{name:'Batch',subs:['General']};
+
+  S.waPending={date:dr.d,batchId:dr.b,batchName:b.name,subject:dr.subject||(b.subs&&b.subs[0])||'',items:newAbsent.map(s=>({id:s.id,name:s.name,roll:s.roll,par:s.par||'',hasParent:!!String(s.par||'').replace(/\D/g,'')}))};
+
+  showAbsenceNotificationModal();
+
+ }catch(e){}
+
+}
+
+function showAbsenceNotificationModal(){
+
+ const p=S.waPending;
+
+ if(!p)return;
+
+ const itemsHtml=p.items.map(it=>{
+
+  const digits=String(it.par||'').replace(/\D/g,'');
+
+  if(!digits){
+
+   return`<div class="wa-item"><div class="nm"><b>${esc(it.name)}</b><span>${esc(it.roll)} · No parent number on file</span></div></div>`;
+
+  }
+
+  const sent=!!(db.waNotified&&db.waNotified[p.date+'|'+it.id]);
+
+  const btn=sent?`<span class="bd sP">✓ Sent</span>`:`<button class="b sm pri" data-a="waSend" data-id="${esc(it.id)}">Send WhatsApp</button>`;
+
+  return`<div class="wa-item"><div class="nm"><b>${esc(it.name)}</b><span>${esc(it.roll)} · Parent: ${esc(it.par)}</span></div>${btn}</div>`;
+
+ }).join('');
+
+ modal('Absent Today — Notify Parents',`
+
+  <p class="mut sm"><b>${p.items.length}</b> student${p.items.length>1?'s':''} marked absent today (${esc(fd(p.date))}) · Batch: <b>${esc(p.batchName)}</b> · Subject: <b>${esc(p.subject||'—')}</b></p>
+
+  <p class="wa-note">WhatsApp opens on <b>your device</b> — tap Send in WhatsApp to deliver. Browsers block silent background sending, so this composer needs one tap.</p>
+
+  <div class="fl" style="gap:8px">${itemsHtml}</div>
+
+  <div class="bar" style="margin-bottom:0">
+
+   <button class="b pri" data-a="waAll">Send all now</button>
+
+   <span class="mut sm">Browsers block many popups at once — if tabs don't open, tap each student's Send button.</span>
+
+  </div>`);
+
+}
+
+function markWaiItemSent(sid){
+
+ const btn=document.querySelector(`[data-a="waSend"][data-id="${sid}"]`);
+
+ if(btn)btn.outerHTML=`<span class="bd sP">✓ Sent</span>`;
+
+}
+
+async function waSendStudent(sid){
+
+ const p=S.waPending;
+
+ if(!p)return;
+
+ const it=(p.items||[]).find(x=>x.id===sid);
+
+ if(!it)return;
+
+ if(!String(it.par||'').replace(/\D/g,'')){toast('No parent number for this student');return}
+
+ const s=sOf(sid);
+
+ const b=bOf(p.batchId)||{name:p.batchName||'Batch'};
+
+ const url=waAbsentUrl(s,b,p.date,p.subject);
+
+ if(!url){toast('Invalid parent number');return}
+
+ window.open(url,'_blank');
+
+ db.waNotified=db.waNotified||{};
+
+ db.waNotified[p.date+'|'+sid]={at:new Date().toISOString()};
+
+ addAudit('WhatsApp Absence',`${it.name} · ${it.roll} — ${(b&&b.name)||'Batch'} on ${fd(p.date)}`);
+
+ await persist();
+
+ markWaiItemSent(sid);
+
+ toast('WhatsApp opened for '+it.name);
+
+}
+
+async function waSendAll(){
+
+ const p=S.waPending;
+
+ if(!p)return;
+
+ const sendable=(p.items||[]).filter(it=>String(it.par||'').replace(/\D/g,'')&&!(db.waNotified&&db.waNotified[p.date+'|'+it.id]));
+
+ if(!sendable.length){toast('No pending students to notify');return}
+
+ const b=bOf(p.batchId)||{name:p.batchName||'Batch'};
+
+ sendable.forEach((it,i)=>{
+
+  const s=sOf(it.id);
+
+  const url=waAbsentUrl(s,b,p.date,p.subject);
+
+  if(!url)return;
+
+  const open=()=>{window.open(url,'_blank');markWaiItemSent(it.id)};
+
+  if(i===0){open()}
+
+  else{setTimeout(open,i*700)}
+
+  db.waNotified=db.waNotified||{};
+
+  db.waNotified[p.date+'|'+it.id]={at:new Date().toISOString()};
+
+  addAudit('WhatsApp Absence',`${it.name} · ${it.roll} — ${(b&&b.name)||'Batch'} on ${fd(p.date)}`);
+
+ });
+
+ await persist();
+
+ toast(sendable.length+' parent message(s) opened — check your browser and tap Send in WhatsApp');
+
 }
 
 function save(){
+
  const dr=S.dr;if(!dr)return;
+
  const bObj=bOf(dr.b)||{name:dr.b};
+
  const go=async reason=>{
+
   db.att[dr.d]=db.att[dr.d]||{};
+
   const old=db.att[dr.d][dr.b];
-  db.att[dr.d][dr.b]={subject:dr.subject,rec:dr.rec,by:S.u.name,upd:new Date().toISOString(),reason:reason||(old&&old.reason)||''};
+
+  const oldRec=old&&old.rec?old.rec:{};
+
+  const newRec=JSON.parse(JSON.stringify(dr.rec));
+
+  db.att[dr.d][dr.b]={subject:dr.subject,rec:newRec,by:S.u.name,upd:new Date().toISOString(),reason:reason||(old&&old.reason)||''};
+
   addAudit('Attendance',`${bObj.name} · ${dr.subject} (${fd(dr.d)})${reason?' — '+reason:''}`);
-  await persist();openDraft();render(false);toast('Attendance saved')
+
+  await persist();
+
+  openDraft();
+
+  render(false);
+
+  toast('Attendance saved');
+
+  maybeNotifyAbsences(dr, oldRec, newRec);
+
  };
+
  if(!Object.keys(dr.rec).length){toast('Mark at least one student first');return}
+
  if(dr.d!==TODAY)modal('Confirm backdated edit',`<p class="mut">Changing ${fd(dr.d)} is logged with your name and time.</p><textarea id="rs" placeholder="Reason for edit (required)"></textarea>`,'Save edit',()=>{const r=val('rs').trim();if(!r){toast('Please enter a reason');return false}go(r)});
+
  else go('')
+
 }
+
 function guard(fn){if(dirty())modal('Discard unsaved changes?','<p class="mut">Unsaved attendance changes will be lost.</p>','Discard',()=>fn());else fn()}
 
 function Studs(){
+
  const q=S.q.toLowerCase(),L=myStu().filter(s=>(!S.rb||s.b===S.rb)&&(!q||s.name.toLowerCase().includes(q)||s.roll.toLowerCase().includes(q)));
+
  return`<div class="ph"><h1>${esc(T('students'))} <span class="mut sm">${L.length}</span></h1>${canManage(S.u.role)?`<div class="bar" style="margin:0"><button class="b" data-a="bulkS">Bulk / CSV import</button><button class="b pri" data-a="addS">Add student</button></div>`:''}</div>
+
  <div class="bar"><input id="q" placeholder="Search name or roll no." value="${esc(S.q)}"><select data-f="rb" aria-label="Batch">${'<option value="">All batches</option>'+mine().map(b=>`<option value="${b.id}" ${S.rb===b.id?'selected':''}>${esc(b.name)}</option>`).join('')}</select></div>
+
  <div class="card tw" style="padding:0">${L.length?`<table><tr><th>Roll</th><th>Name</th><th>Batch</th><th>Parent phone</th><th>Attendance</th><th>Alert</th>${canManage(S.u.role)?'<th>Actions</th>':''}</tr>${L.map(s=>{const a=recs(s.id),p=pctOf(a),th=(bOf(s.b)||{}).th||75,n=streak(a);return`<tr class="cl" data-a="sp" data-id="${s.id}"><td>${esc(s.roll)}</td><td><span style="display:inline-flex;align-items:center;gap:8px">${avOf(s.name,s.photo)}<b>${esc(s.name)}</b></span></td><td>${esc((bOf(s.b)||{}).name||'')}</td><td>${esc(s.par||'–')}</td><td>${pc(p,th)}</td><td>${n>=2?`<span class="bd sA">${n} absences in a row</span>`:p!==null&&p<th?'<span class="bd sL">Low</span>':''}</td>${canManage(S.u.role)?`<td><div style="display:flex;gap:6px"><button class="b sm" data-a="idCard" data-id="${s.id}">ID Card</button><button class="b sm" data-a="sLogin" data-id="${s.id}">Login</button><button class="b sm" data-a="moveS" data-id="${s.id}">Batch</button><button class="b sm del" data-a="delS" data-id="${s.id}">Remove</button></div></td>`:''}</tr>`}).join('')}</table>`:'<div class="emp">No students added yet.</div>'}</div>`
+
 }
 
 function profile(id){
+
  const s=sOf(id),b=bOf(s.b)||{name:'Batch',th:75},a=recs(id),th=b.th,p=pctOf(a),n=streak(a),subs={};a.forEach(r=>(subs[r.sub]=subs[r.sub]||[]).push(r));
+
  const needed=p!==null&&p<th?Math.max(1,Math.ceil((th*a.filter(r=>r.s!=='V').length - 100*a.filter(r=>r.s==='P'||r.s==='L').length)/(100-th))):0;
+
  const fRec=getFee(id,curMonth());
+
  return`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div style="display:flex;align-items:center;gap:10px">${avOf(s.name,s.photo,'lg-av')}<div><h2>${esc(s.name)}</h2><div class="mut">${esc(s.roll)} · ${esc(b.name)}</div></div></div><button class="b sm" data-a="drx">Close</button></div>
+
  <div class="card tilt-3d"><span class="mut">Overall attendance</span><b style="font-size:28px;display:block" class="${p!==null&&p<th?'bad':'ok'}">${p===null?'–':p+'%'}</b>${pbar(p,th)}<div class="mut sm" style="margin-top:4px">Threshold ${th}%${needed?` · ~${needed} classes needed to reach ${th}%`:''}</div></div>
+
  ${n>=2?`<div class="al">${n} consecutive absences</div>`:''}
+
  <div class="card sm"><b>Monthly Fee (${curMonth()})</b><div style="margin-top:4px">Amount: <b>${fmtRs(fRec.amt)}</b> · Status: <span class="bd ${fRec.status==='Paid'?'sP':'sL'}">${esc(fRec.status)}</span></div></div>
+
  <div class="card"><h2 style="margin-bottom:8px">By subject</h2>${Object.entries(subs).map(([k,v])=>{const sp=pctOf(v);return`<div style="display:flex;justify-content:space-between;margin-top:6px"><span>${esc(k)}</span>${pc(sp,th)}</div>`}).join('')||'<span class="mut">No records yet</span>'}</div>
+
  <div class="card sm"><b>Contact &amp; Login</b><div>Student: ${esc(s.phone||'–')} · ${esc(s.email||'–')}</div><div>Parent: ${esc(s.par||'–')}</div>${canManage(S.u.role)?`<div style="margin-top:6px">Password: <b>${esc(s.pw||'student123')}</b></div>`:''}</div>
+
  ${isStaff(S.u.role)?`<div class="bar"><button class="b" data-a="idCard" data-id="${id}">ID &amp; Fee Card</button>${s.par?`<a class="b pri" target="_blank" rel="noopener" href="${esc(waLow(s.par,s.name,p))}">WhatsApp parent</a>`:''}${canManage(S.u.role)?`<button class="b" data-a="editS" data-id="${id}">Edit</button><button class="b del" data-a="delS" data-id="${id}">Remove</button>`:''}</div>`:''}
+
  <div class="card"><h2 style="margin-bottom:6px">Date-wise log</h2>${a.slice(0,15).map(r=>`<div style="display:flex;justify-content:space-between;padding:4px 0"><span>${fd(r.d)} <span class="mut sm">${esc(r.sub)}</span></span>${bdg(r.s)}</div>`).join('')||'<span class="mut sm">No entries yet.</span>'}</div>`
+
 }
 
 function studForm(s){
+
  s=s||{};
+
  return`<div class="fl"><label>Full name<input id="fn" value="${esc(s.name)}"></label><label>Roll number<input id="fr" value="${esc(s.roll)}"></label><label>Batch<select id="fb">${db.bat.map(b=>`<option value="${b.id}" ${b.id===s.b?'selected':''}>${esc(b.name)}</option>`).join('')}</select></label><label>Monthly fee (PKR)<input id="ffee" type="number" min="0" value="${esc(s.fee||3500)}"></label><label>Student phone<input id="fp" value="${esc(s.phone)}"></label><label>Parent phone (WhatsApp)<input id="fq" value="${esc(s.par)}" placeholder="03001234567"></label><label>Student login email<input id="fe" type="email" value="${esc(s.email)}"></label><label>Student password<input id="fpw" type="text" value="${esc(s.pw||'student123')}"></label></div>`
+
 }
 
 async function saveStud(id){
+
  const n=val('fn').trim();if(!n){toast('Name is required');return false}
+
  if(!db.bat.length){toast('Create a batch first');return false}
+
  const prev=id?sOf(id):null;
+
  const o={name:n,roll:val('fr').trim()||('R-'+(1001+db.stu.length)),b:val('fb'),fee:Math.max(0,Number(val('ffee'))||3500),phone:val('fp').trim(),par:val('fq').trim(),email:val('fe').trim()||(n.toLowerCase().replace(/\W+/g,'.')+'.'+Date.now()+'@ourcoaching.pk'),pw:val('fpw').trim()||'student123',photo:(prev&&prev.photo)||''};
+
  if(id)Object.assign(prev,o);else db.stu.push({id:'s'+Date.now(),...o});
+
  await persist();if(S.drawerId===id)openDr(id);render(false);toast('Student saved')
+
 }
 
 function removeStudent(id){
+
  const st=sOf(id);if(!st)return;
+
  modal('Remove student',`<p>Are you sure you want to remove <b>${esc(st.name)}</b> (${esc(st.roll)})? Their attendance and fee records will also be removed.</p>`,'Remove student',async()=>{
+
   db.stu=db.stu.filter(x=>x.id!==id);
+
   for(const d in db.att){
+
    for(const b in db.att[d]){
+
     if(db.att[d][b]&&db.att[d][b].rec&&db.att[d][b].rec[id])delete db.att[d][b].rec[id];
+
    }
+
   }
+
   for(const m in db.fees){
+
    if(db.fees[m]&&db.fees[m][id])delete db.fees[m][id];
+
   }
+
   S.selectedFeeIds=(S.selectedFeeIds||[]).filter(x=>x!==id);
+
   if(S.dr&&S.dr.rec&&S.dr.rec[id])delete S.dr.rec[id];
+
   if(S.drawerId===id)closeDr();
+
   await persist();
+
   render(false);
+
   toast('Student removed');
+
  });
+
 }
 
 function Fees(){
+
  if(!canManage(S.u.role))return'<div class="emp">Admin / Owner access only.</div>';
+
  const m=S.feeMonth||curMonth(),q=S.q.toLowerCase();
+
  const list=db.stu.filter(s=>{
+
   const f=getFee(s.id,m);
+
   return (!S.rb||s.b===S.rb) && (!S.feeFilter||f.status===S.feeFilter) && (!q||s.name.toLowerCase().includes(q)||s.roll.toLowerCase().includes(q));
+
  });
+
  const validIds=new Set(list.map(x=>x.id));
+
  S.selectedFeeIds=(S.selectedFeeIds||[]).filter(id=>validIds.has(id));
+
  const allSelected=list.length>0 && list.every(s=>S.selectedFeeIds.includes(s.id));
 
  let collected=0,pendingAmt=0,paidCnt=0,dueCnt=0;
+
  list.forEach(s=>{
+
   const f=getFee(s.id,m);
+
   if(f.status==='Paid'){collected+=f.amt;paidCnt++}else{pendingAmt+=f.amt;dueCnt++}
+
  });
 
  return`<div class="ph"><h1>${esc(T('fees'))}</h1><input type="month" data-f="feeMonth" value="${esc(m)}" aria-label="Fee month"></div>
+
  <div class="kp"><div class="card tilt-3d"><span class="mut">Collected (${m})</span><b class="ok">${fmtRs(collected)}</b></div><div class="card tilt-3d"><span class="mut">Pending dues</span><b class="bad">${fmtRs(pendingAmt)}</b></div><div class="card tilt-3d"><span class="mut">Paid students</span><b class="ok">${paidCnt}</b></div><div class="card tilt-3d"><span class="mut">Unpaid / Due</span><b class="bad">${dueCnt}</b></div></div>
+
  <div class="bar"><input id="q" placeholder="Search name or roll no." value="${esc(S.q)}"><select data-f="rb" aria-label="Batch"><option value="">All batches</option>${db.bat.map(b=>`<option value="${b.id}" ${S.rb===b.id?'selected':''}>${esc(b.name)}</option>`).join('')}</select><select data-f="feeFilter" aria-label="Fee status"><option value="">All statuses</option><option value="Pending" ${S.feeFilter==='Pending'?'selected':''}>Pending</option><option value="Paid" ${S.feeFilter==='Paid'?'selected':''}>Paid</option></select></div>
+
  <div class="card" style="margin-bottom:12px;padding:12px 14px">
+
   <div class="bar" style="margin:0">
+
    <span class="sm"><b>Selected: ${S.selectedFeeIds.length}</b></span>
+
    <input type="number" id="bulkFeeAmt" min="0" placeholder="Set fee amount (PKR)" style="width:170px">
+
    <select id="bulkFeeSt" aria-label="Bulk status"><option value="">Keep current status</option><option value="Pending">Mark Pending</option><option value="Paid">Mark Paid</option></select>
+
    <button type="button" class="b sm pri" data-a="applyBulkFee" data-m="${esc(m)}" ${!S.selectedFeeIds.length?'disabled':''}>Set Fee for Selected</button>
+
   </div>
+
  </div>
+
  <div class="card tw" style="padding:0">${list.length?`<table><tr><th style="width:42px"><input type="checkbox" data-f="feeSelAll" ${allSelected?'checked':''} aria-label="Select all"></th><th>Roll</th><th>Student</th><th>Batch</th><th>Fee</th><th>Status</th><th>Actions</th></tr>${list.map(s=>{const f=getFee(s.id,m);const chk=S.selectedFeeIds.includes(s.id);return`<tr><td><input type="checkbox" data-f="feeSelOne" data-id="${s.id}" ${chk?'checked':''} aria-label="Select ${esc(s.name)}"></td><td>${esc(s.roll)}</td><td><span style="display:inline-flex;align-items:center;gap:8px">${avOf(s.name,s.photo)}<b>${esc(s.name)}</b></span></td><td>${esc((bOf(s.b)||{}).name||'')}</td><td><b>${fmtRs(f.amt)}</b></td><td><span class="bd ${f.status==='Paid'?'sP':'sA'}">${esc(f.status)}</span></td><td><div style="display:flex;gap:6px"><button class="b sm ${f.status==='Paid'?'':'pri'}" data-a="toggleFee" data-id="${s.id}" data-m="${esc(m)}">${f.status==='Paid'?'Mark Pending':'Mark Paid'}</button><button class="b sm" data-a="idCard" data-id="${s.id}">Slip</button>${s.par&&f.status!=='Paid'?`<a class="b sm" target="_blank" rel="noopener" href="${esc(waFee(s.par,s.name,m,f.amt))}">WA Reminder</a>`:''}</div></td></tr>`}).join('')}</table>`:'<div class="emp">No students match this filter.</div>'}</div>`
+
 }
 
 function range(){const e=TODAY;if(S.rp==='week')return[addD(e,-6),e];if(S.rp==='month')return[e.slice(0,8)+'01',e];return[S.from||addD(e,-13),S.to||e]}
+
 function repRows(){const[f,t]=range(),ids=mine().map(b=>b.id),o=[];Object.keys(db.att).sort().forEach(d=>{if(d<f||d>t)return;ids.forEach(b=>{if(S.rb&&S.rb!==b)return;const ses=db.att[d][b];if(!ses)return;db.stu.filter(s=>s.b===b).forEach(s=>{const r=ses.rec[s.id];if(r&&(!S.rf||r.s===S.rf))o.push({d,b:(bOf(b)||{}).name||b,sub:ses.subject,roll:s.roll,name:s.name,s:r.s,m:r.m||'',par:s.par||'',by:ses.by})})})});return o}
 
 function Reports(){
+
  const[f,t]=range(),R=repRows(),c={P:0,A:0,L:0,V:0};R.forEach(r=>c[r.s]++);
+
  const logs=(db.auditLogs||[]).slice(-10).reverse();
+
  return`<div class="ph"><h1>${esc(T('reports'))}</h1><div class="bar noprint" style="margin:0"><button class="b" data-a="csv">Export CSV</button><button class="b pri" data-a="print">Print summary</button></div></div>
+
  <div class="bar noprint"><select data-f="rp" aria-label="Range"><option value="week" ${S.rp==='week'?'selected':''}>This week</option><option value="month" ${S.rp==='month'?'selected':''}>This month</option><option value="custom" ${S.rp==='custom'?'selected':''}>Custom range</option></select>
+
  ${S.rp==='custom'?`<input type="date" data-f="from" value="${f}" aria-label="From"><input type="date" data-f="to" value="${t}" aria-label="To">`:''}
+
  <select data-f="rb" aria-label="Batch"><option value="">All batches</option>${mine().map(b=>`<option value="${b.id}" ${S.rb===b.id?'selected':''}>${esc(b.name)}</option>`).join('')}</select>
+
  <select data-f="rf" aria-label="Status"><option value="">All statuses</option>${Object.entries(ST).map(([k,v])=>`<option value="${k}" ${S.rf===k?'selected':''}>${v}</option>`).join('')}</select></div>
+
  <p class="mut">${fd(f)} to ${fd(t)} · ${R.length} records</p><div class="cnt"><span class="sP">Present ${c.P}</span><span class="sA">Absent ${c.A}</span><span class="sL">Late ${c.L}</span><span class="sV">Leave ${c.V}</span></div>
+
  <div class="card tw" style="padding:0;margin-bottom:14px">${R.length?`<table><tr><th>Date</th><th>Batch</th><th>Subject</th><th>Roll</th><th>Name</th><th>Status</th></tr>${R.slice(-150).reverse().map(r=>`<tr><td>${fd(r.d)}</td><td>${esc(r.b)}</td><td>${esc(r.sub)}</td><td>${esc(r.roll)}</td><td>${esc(r.name)}</td><td>${bdg(r.s)}${r.m?` <span class="mut sm">${esc(r.m)} min</span>`:''}</td></tr>`).join('')}</table>`:'<div class="emp">No records for these filters.</div>'}</div>
+
  ${canManage(S.u.role)?`<div class="card"><h2 style="margin-bottom:8px">Recent Activity Log</h2>${logs.length?logs.map(x=>`<div class="sm" style="display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)"><span><b>${esc(x.action)}</b> — ${esc(x.detail)} <span class="mut">by ${esc(x.by)}</span></span><span class="mut">${esc((x.at||'').slice(0,16).replace('T',' '))}</span></div>`).join(''):'<div class="emp">No activity logs yet.</div>'}</div>`:''}`
+
 }
+
 function csv(){const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';return[['Date','Batch','Subject','Roll','Name','Status','Late min','Parent phone','Marked by'].join(',')].concat(repRows().map(r=>[r.d,r.b,r.sub,r.roll,r.name,ST[r.s],r.m,r.par,r.by].map(q).join(','))).join('\n')}
 
 function Batches(){
+
  return`<div class="ph"><h1>${esc(T('batches'))}</h1><div class="bar" style="margin:0"><button class="b" data-a="addT">Add teacher</button><button class="b pri" data-a="addB">New batch</button></div></div>
+
  <div class="card tw" style="padding:0">${db.bat.length?`<table><tr><th>Batch</th><th>Timing</th><th>Teacher</th><th>Min. attendance</th><th>Students</th><th>Action</th></tr>${db.bat.map(b=>`<tr><td><b>${esc(b.name)}</b></td><td><input data-f="bt" data-id="${b.id}" value="${esc(b.time)}" style="width:130px" aria-label="Timing"></td><td><select data-f="bte" data-id="${b.id}" aria-label="Teacher"><option value="">Unassigned</option>${db.tch.map(t=>`<option value="${t.id}" ${t.id===b.teacher?'selected':''}>${esc(t.name)}</option>`).join('')}</select></td><td><input type="number" min="50" max="100" data-f="bth" data-id="${b.id}" value="${b.th}" style="width:70px" aria-label="Threshold"> %</td><td>${db.stu.filter(s=>s.b===b.id).length}</td><td><button class="b sm del" data-a="delB" data-id="${b.id}">Delete</button></td></tr>`).join('')}</table>`:'<div class="emp">No batches yet. Click "New batch" to start.</div>'}</div>
+
  <h2 style="margin:16px 0 8px">Teachers</h2><div class="card tw" style="padding:0">${db.tch.length?`<table><tr><th>Name</th><th>Email</th><th>Password</th><th>Batches</th><th>Action</th></tr>${db.tch.map(t=>`<tr><td><span style="display:inline-flex;align-items:center;gap:8px">${avOf(t.name,t.photo)}<span>${esc(t.name)}</span></span></td><td>${esc(t.email)}</td><td>${esc(t.pw||'teach123')}</td><td>${db.bat.filter(b=>b.teacher===t.id).map(b=>esc(b.name)).join(', ')||'–'}</td><td><button class="b sm del" data-a="delT" data-id="${t.id}">Remove</button></td></tr>`).join('')}</table>`:'<div class="emp">No teachers added yet.</div>'}</div>`
+
 }
 
 function Settings(){
+
  if(!canManage(S.u.role))return'<div class="emp">Admin / Owner access only.</div>';
+
  const selAcc=S.tempAccent||db.accent||'indigo';
+
  const logoCur=S.tempLogo!==undefined?S.tempLogo:(db.orgLogo||'');
+
  const isOwner=S.u.role==='owner';
- const clients=getClientEntries();
+
  const trialAccList=Object.values(ownerMaster.trialAccounts||{}).sort((a,b)=>new Date(b.firstLoginAt||0)-new Date(a.firstLoginAt||0));
+
  const claimedList=Object.entries(ownerMaster.trialClaimedIps||{});
+
  const limitDays=Number(ownerMaster.trialDays)||7;
+
  const revokedEntries=Object.entries(ownerMaster.revokedTrials||{});
+
  const recentLogs=(ownerMaster.loginLogs||[]).slice(-15).reverse();
+
  return`<div class="ph"><h1>${esc(T('settings'))}</h1><span class="mut sm">Account: <b>${esc((S.u&&S.u.e)||'')}</b> · App <b>v${esc(APP_VERSION)}</b></span></div>
+
  ${isOwner?`
+
   <div class="card own-box" style="margin-bottom:14px">
 
    <div style="min-width:0;max-width:100%">
+
     <b class="sm">Trial Logins (${trialAccList.length}):</b>
+
     ${trialAccList.length?`<div class="tw" style="margin-top:6px"><table><tr><th>Username</th><th>Account Email</th><th>Role</th><th>IP</th><th>Logged In Since</th><th>First Login</th><th>Status</th><th>Manage</th></tr>${trialAccList.map(acc=>{
+
      const em=(acc&&acc.email)||'';
+
      const usr=(acc&&acc.username)||'–';
+
      const ip=(acc&&acc.ip)||'';
+
      const sinceStr=formatElapsed(acc&&acc.firstLoginAt);
+
      const firstStr=acc&&acc.firstLoginAt?acc.firstLoginAt.slice(0,16).replace('T',' '):'–';
+
      const st=isTrialExpiredOrRemoved(em,ip);
+
      const badge=st==='removed'?'<span class="bd sA">Removed</span>':st==='expired'?'<span class="bd sL">Expired</span>':'<span class="bd sP">Active</span>';
+
      return`<tr><td><b>${esc(usr)}</b></td><td>${esc(em||'–')}</td><td><span class="role">${esc(acc.role||'admin')}</span></td><td>${esc(ip||'–')}</td><td><b>${esc(sinceStr)}</b></td><td class="sm mut">${esc(firstStr)}</td><td>${badge}</td><td><div style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="b sm" data-a="extendTrial" data-ip="${esc(ip)}" data-em="${esc(em)}">+7d</button><button type="button" class="b sm del" data-a="removeTrialUser" data-ip="${esc(ip)}" data-em="${esc(em)}">Remove Trial</button></div></td></tr>`;
+
     }).join('')}</table></div>`:'<div class="mut sm" style="margin-top:4px">No trial logins recorded yet.</div>'}
+
    </div>
+
    <div style="min-width:0;max-width:100%">
+
     <b class="sm">Claimed Trial IPs (${claimedList.length}) — ${limitDays} days from first IP login:</b>
+
     ${claimedList.length?`<div class="tw" style="margin-top:6px"><table><tr><th>Username</th><th>User Email</th><th>IP Address</th><th>First Login / Days</th><th>Status</th><th>Manage</th></tr>${claimedList.map(([ip,info])=>{
+
      const em=(info&&info.email)||'';
+
      const usr=(info&&info.username)||'–';
+
      const used=trialDaysElapsed(info&&info.claimedAt);
+
      const st=isTrialExpiredOrRemoved(em,ip);
+
      const badge=st==='removed'?'<span class="bd sA">Removed</span>':st==='expired'?'<span class="bd sL">Expired</span>':'<span class="bd sP">Active</span>';
+
      return`<tr><td><b>${esc(usr)}</b></td><td>${esc(em||'–')}</td><td>${esc(ip)}</td><td class="sm"><b>${used}</b> / ${limitDays} days</td><td>${badge}</td><td><div style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="b sm" data-a="extendTrial" data-ip="${esc(ip)}" data-em="${esc(em)}">+7d</button><button type="button" class="b sm del" data-a="removeTrialUser" data-ip="${esc(ip)}" data-em="${esc(em)}">Remove Trial</button></div></td></tr>`;
+
     }).join('')}</table></div>`:'<div class="mut sm" style="margin-top:4px">No trial IPs claimed yet.</div>'}
+
    </div>
+
    ${revokedEntries.length?`<div style="word-break:break-word"><b class="sm">Removed / Blocked Trial Keys (${revokedEntries.length}):</b> <span class="mut sm">${revokedEntries.map(([k])=>esc(k)).join(', ')}</span> <button type="button" class="b sm" data-a="restoreAllTrials">Allow / Restore All</button></div>`:''}
+
    <div style="min-width:0;max-width:100%">
+
     <b class="sm">Recent Sign-In Activity (${recentLogs.length}):</b>
+
     ${recentLogs.length?`<div class="tw" style="margin-top:6px"><table><tr><th>Time</th><th>Username</th><th>User Email</th><th>Role</th><th>IP</th></tr>${recentLogs.map(lg=>`<tr class="sm"><td class="mut">${esc((lg.at||'').slice(0,16).replace('T',' '))}</td><td><b>${esc(lg.username||'–')}</b></td><td>${esc(lg.email||'')}</td><td><span class="role">${esc(lg.role||'')}</span></td><td>${esc(lg.ip||'–')}</td></tr>`).join('')}</table></div>`:'<div class="mut sm" style="margin-top:4px">No sign-in logs recorded yet.</div>'}
+
    </div>
+
   </div>
+
  `:''}
+
  <div class="g2">
+
   <div class="card fl">
+
    <h2>Branding, Language &amp; Theme</h2>
+
    <div class="prof-bar" id="orgLogoPreview">
+
     ${logoCur?`<img class="org-img" style="width:46px;height:46px" src="${logoCur}" alt="Logo">`:`<div class="av" style="width:46px;height:46px;font-size:16px">${esc((orgName()||'C')[0].toUpperCase())}</div>`}
+
     <div style="display:grid;gap:6px;min-width:0">
+
      <b class="sm">Institute Logo</b>
+
      <div style="display:flex;gap:6px;flex-wrap:wrap">
+
       <label class="b sm" style="cursor:pointer;margin:0">Upload Logo<input type="file" id="orgLogoInput" accept="image/*" style="display:none"></label>
+
       ${logoCur?`<button type="button" class="b sm" data-a="clearOrgLogo">Remove</button>`:''}
+
      </div>
+
     </div>
+
    </div>
-   
+
    <label>Coaching institute name<input id="setOrg" value="${esc(orgName())}" placeholder="e.g. Apex Science Academy"></label>
+
    <label>Tagline / subtitle<input id="setTag" value="${esc(db.orgTagline||'')}" placeholder="e.g. Excellence in Science & Math"></label>
+
    <div><span class="mut sm">Theme accent color</span>
+
     <div class="swatches">${Object.entries(ACCENTS).map(([k,v])=>`<button type="button" class="sw ${selAcc===k?'on':''}" data-a="pickAcc" data-v="${k}" style="background:${v.pri}" title="${v.label}" aria-label="${v.label}"></button>`).join('')}</div>
+
    </div>
+
    <div class="bar" style="margin-top:4px"><button class="b sm" data-a="theme">${esc(T('themeBtn'))}</button></div>
+
    <hr style="border:0;border-top:1px solid var(--line);margin:4px 0">
+
    <h2>Account Credentials</h2>
+
    <label>Display name<input id="setAName" value="${esc(isOwner?((ownerMaster.ownerProfile&&ownerMaster.ownerProfile.name)||DEFAULT_OWNER_NAME):db.admin.name)}"></label>
+
    <label>Login email<input id="setAEmail" type="email" value="${esc(isOwner?getOwnerEmail():db.admin.email)}"></label>
+
    <label>Password<input id="setAPw" type="text" value="${esc(isOwner?(ownerMaster.ownerPw||DEFAULT_OWNER_PW):db.admin.pw)}"></label>
+
    ${isOwner?`
+
     <hr style="border:0;border-top:1px solid var(--line);margin:4px 0">
+
     <h2>Trial Admin Credentials</h2>
+
     <label>Trial Admin Name<input id="setTAdminName" value="${esc(ownerMaster.trialAdminName||'Principal (Admin)')}"></label>
+
     <label>Trial Admin Email<input id="setTAdminEmail" type="email" value="${esc(getTrialAdminEmail())}"></label>
+
     <label>Trial Admin Password<input id="setTAdminPw" type="text" value="${esc(ownerMaster.trialAdminPw||'admin123')}"></label>
+
    `:''}
+
   </div>
+
   <div class="card fl">
+
    ${isOwner?`
+
     <div class="kill-box">
+
      <h2 style="color:var(--A)">Owner Kill Switch (Global Portal Lock)</h2>
+
      <p class="mut sm">Turn ON to immediately pause the entire coaching portal for all Admins, Clients, Teachers, and Students across every device.</p>
+
      <label class="chk"><input type="checkbox" id="setGlobalLock" ${ownerMaster.globalAppLocked?'checked':''}> Pause entire portal (Kill Switch)</label>
+
      <label>Pause screen message<input id="setGlobalLockMsg" value="${esc(ownerMaster.globalLockMsg||'')}" placeholder="Portal is temporarily paused..."></label>
+
     </div>
+
     <h2>Trial Duration &amp; IP Timer</h2>
+
     <p class="mut sm">Trial duration applies from first IP login.</p>
+
     <label>Trial duration (days)<input id="setTrialDays" type="number" min="1" max="365" value="${esc(limitDays)}"></label>
+
     <label class="chk"><input type="checkbox" id="setTrialIpLock" ${ownerMaster.trialIpLock?'checked':''}> Enforce trial timer per IP &amp; expiry lock</label>
+
     ${claimedList.length?`<div class="bar"><button type="button" class="b sm" data-a="resetTrialIps">Clear all claimed IPs</button></div>`:''}
+
    `:''}
+
    <h2>Campus Wi-Fi / IP Access Lock</h2>
+
    <p class="mut sm">When enabled, <b>Students</b> can only sign in when connected to your coaching center’s Wi-Fi/internet IP.</p>
+
    <label class="chk"><input type="checkbox" id="setIpLock" ${db.ipLock?'checked':''}> Enable campus-only IP access for students</label>
+
    <label>Allowed coaching public IP(s) (comma separated)<input id="setIps" value="${esc(db.allowedIps||'')}" placeholder="e.g. 103.255.4.12"></label>
+
    <div class="bar"><button type="button" class="b sm" data-a="grabIp">Use my current IP</button><span class="mut sm" id="curIpTxt" style="word-break:break-all">${clientIp?'Detected IP: '+esc(clientIp):''}</span></div>
+
   </div>
+
  </div>
+
+ <div class="card" style="margin-bottom:14px;padding:16px">
+
+  <h2 style="margin-bottom:8px">WhatsApp Absence Automation</h2>
+
+  <label class="chk"><input type="checkbox" id="setWaAuto" ${db.waAuto!==false?'checked':''}> Auto-notify parents when a student is marked absent today</label>
+
+  <label>Message template — used for the parent message<textarea id="setWaTemplate" placeholder="Assalam-o-Alaikum from {org}, {student} ({roll}) was marked ABSENT today...">${esc(db.waTemplate||DEFAULT_WA_TEMPLATE)}</textarea></label>
+
+  <div class="wa-note">Placeholders: <b>{org}</b> · <b>{student}</b> · <b>{roll}</b> · <b>{batch}</b> · <b>{subject}</b> · <b>{date}</b></div>
+
+ </div>
+
  <div class="bar"><button class="b pri" data-a="saveSettings">${esc(T('saveSettings'))}</button><button class="b" data-a="loadDemo">Load sample demo data</button><button class="b del" data-a="clearAllData">Clear all records</button></div>`
+
 }
 
 function Portal(){
+
  const s=sOf(S.u.ref);
+
  if(!s)return'<div class="emp">Student record not found.</div>';
+
  const b=bOf(s.b)||{name:'Batch',th:75},a=recs(s.id),th=b.th,p=pctOf(a),n=streak(a),m=TODAY.slice(0,7),first=new Date(m+'-01T00:00:00'),days=new Date(first.getFullYear(),first.getMonth()+1,0).getDate(),map={};a.forEach(r=>map[r.d]=r.s);const subs={};a.forEach(r=>(subs[r.sub]=subs[r.sub]||[]).push(r));
+
  const fRec=getFee(s.id,m);
+
  return`<div class="ph"><div style="display:flex;align-items:center;gap:12px">${avOf(s.name,s.photo,'lg-av')}<div><h1>${esc(s.name)}</h1><span class="mut">${esc(b.name)} · ${esc(s.roll)}</span></div></div><div class="bar" style="margin:0"><button class="b sm" data-a="idCard" data-id="${s.id}">ID &amp; Fee Card</button><button class="b sm" data-a="myProfile">${esc(T('editProf'))}</button></div></div>
+
  ${p!==null&&p<th?`<div class="al">Attendance is ${p}%, below the required ${th}%.</div>`:''}${n>=2?`<div class="al w">${n} absences in a row.</div>`:''}
+
  <div class="kp"><div class="card tilt-3d"><span class="mut">Overall</span><b class="${p!==null&&p<th?'bad':'ok'}">${p===null?'–':p+'%'}</b></div><div class="card tilt-3d"><span class="mut">Present / Late</span><b>${a.filter(r=>r.s==='P'||r.s==='L').length}</b></div><div class="card tilt-3d"><span class="mut">Absent</span><b class="bad">${a.filter(r=>r.s==='A').length}</b></div><div class="card tilt-3d"><span class="mut">Fee (${m})</span><b class="${fRec.status==='Paid'?'ok':'bad'}">${esc(fRec.status)}</b></div></div>
+
  <div class="g2"><div class="card tilt-3d"><h2 style="margin-bottom:8px">${first.toLocaleDateString('en-GB',{month:'long',year:'numeric'})}</h2><div class="cal">${'MTWTFSS'.split('').map(x=>`<div class="mut" style="background:none">${x}</div>`).join('')}${'.'.repeat((first.getDay()+6)%7).split('').map(()=>'<div style="background:none"></div>').join('')}${Array.from({length:days},(_,i)=>{const d=m+'-'+String(i+1).padStart(2,'0'),v=map[d];return`<div class="${v?'s'+v:''}" title="${v?ST[v]:''}">${i+1}</div>`}).join('')}</div></div>
+
  <div class="card tilt-3d"><h2 style="margin-bottom:8px">By subject</h2>${Object.entries(subs).map(([k,v])=>{const sp=pctOf(v);return`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between"><span>${esc(k)}</span>${pc(sp,th)}</div>${pbar(sp,th)}</div>`}).join('')||'<div class="mut sm">No subject records yet.</div>'}</div></div>
+
  <div class="card tilt-3d"><h2 style="margin-bottom:8px">Recent attendance log</h2>${a.length?a.slice(0,15).map(r=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)"><span>${fd(r.d)} · <span class="mut sm">${esc(r.sub)}</span></span>${bdg(r.s)}</div>`).join(''):'<div class="emp">No records yet.</div>'}</div>`
+
 }
 
 async function seedDemoData(){
+
  const t1='t_demo_1',t2='t_demo_2';
+
  const b1='b_demo_1',b2='b_demo_2';
+
  db.tch=[
+
   {id:t1,name:'Sir Kamran Ali',email:'kamran@ourcoaching.pk',pw:'teach123',photo:''},
+
   {id:t2,name:'Ms. Hina Tariq',email:'hina@ourcoaching.pk',pw:'teach123',photo:''}
+
  ];
+
  db.bat=[
+
   {id:b1,name:'Matric Science',time:'16:00–17:30',teacher:t1,th:75,subs:['Math','Physics','Chemistry']},
+
   {id:b2,name:'FSC Pre-Medical',time:'17:45–19:15',teacher:t2,th:80,subs:['Biology','Chemistry','English']}
+
  ];
+
  const names=['Zainab Tariq','Bilal Ahmed','Ayesha Siddiqui','Hamza Mahmood','Mahnoor Raza','Usman Farooq','Hira Khalid','Daniyal Sheikh'];
+
  db.stu=names.map((nm,i)=>{
+
   const bid=i<4?b1:b2;
+
   const slug=nm.toLowerCase().replace(/\W+/g,'.');
+
   return{id:'s_demo_'+(i+1),name:nm,roll:'R-'+(101+i),b:bid,fee:i<4?3500:4500,phone:'0300111223'+i,par:'0321998877'+i,email:`${slug}@ourcoaching.pk`,pw:'student123',photo:''};
+
  });
+
  db.att={};
+
  const sts=['P','P','P','P','L','A'];
+
  for(let k=6;k>=0;k--){
+
   const d=addD(TODAY,-k);
+
   db.att[d]={};
+
   db.bat.forEach((b,bi)=>{
+
    const rec={};
+
    db.stu.filter(s=>s.b===b.id).forEach((s,si)=>{
+
     const pick=(k===0&&si===1&&bi===0)?'A':sts[(k+si+bi)%sts.length];
+
     rec[s.id]={s:pick,m:pick==='L'?12:'',n:''};
+
    });
+
    db.att[d][b.id]={subject:b.subs[k%b.subs.length],rec,by:db.admin.name||'Admin',upd:new Date().toISOString(),reason:''};
+
   });
+
  }
+
  const m=curMonth();
+
  db.fees[m]={};
+
  db.stu.forEach((s,i)=>{
+
   db.fees[m][s.id]={amt:s.fee,status:i%3===0?'Pending':'Paid',paidAt:i%3===0?'':TODAY};
+
  });
+
  addAudit('Demo Data','Loaded sample batches, teachers, students, attendance & fees');
+
  await persist();
+
  render(false);
+
  toast('Sample demo data loaded');
+
 }
 
 function bindLogoFileInput(){
+
  const lin=$('#orgLogoInput');
+
  if(!lin)return;
+
  lin.addEventListener('change',()=>{
+
   if(!lin.files||!lin.files[0])return;
+
   readPhotoFile(lin.files[0],url=>{
+
    S.tempLogo=url;
+
    const box=$('#orgLogoPreview');
+
    if(box)box.innerHTML=`<img class="org-img" style="width:46px;height:46px" src="${S.tempLogo}" alt="Logo"><div style="display:grid;gap:6px"><b class="sm">Institute Logo</b><div style="display:flex;gap:6px;flex-wrap:wrap"><label class="b sm" style="cursor:pointer;margin:0">Change Logo<input type="file" id="orgLogoInput" accept="image/*" style="display:none"></label><button type="button" class="b sm" data-a="clearOrgLogo">Remove</button></div></div>`;
+
    bindLogoFileInput();
+
   },180);
+
  });
+
 }
 
 function render(animateTab=true){
+
  try{
+
   if(animateTab)S.tabTick++;
+
   document.title=`${orgName()} — Attendance`;
+
   const bgEl=$('#bg-fx');
+
   if(bgEl){
+
    const bgHtml=S.u?'<div class="dot-field"></div><div class="mesh-wave-1"></div><div class="mesh-wave-2"></div><div class="scan-ribbon"></div><div class="geo-orbit"></div><div class="glow-node gn1"></div><div class="glow-node gn2"></div><div class="glow-node gn3"></div>':'<div class="dot-field"></div><div class="mesh-wave-1"></div><div class="mesh-wave-2"></div><div class="geo-orbit"></div><div class="glow-node gn1"></div><div class="glow-node gn2"></div>';
+
    const mode=S.u?'app':'login';
+
    if(bgEl.dataset.mode!==mode){bgEl.innerHTML=bgHtml;bgEl.dataset.mode=mode}
+
   }
+
   syncCursorFx();
+
   const appEl=$('#app');
+
   if(appEl){
+
    appEl.innerHTML=S.u?Shell():Login();
+
   }
+
   if(!S.u)syncLoginUsernameVisibility();
+
   if(S.u&&S.v==='settings')bindLogoFileInput();
+
   const drEl=$('#dr');
+
   if(drEl){
+
    if(S.u&&S.drawerId&&sOf(S.drawerId)){drEl.innerHTML=`<aside class="dr" role="dialog" aria-label="Student profile">${profile(S.drawerId)}</aside>`}else{drEl.innerHTML=''}
+
   }
+
  }catch(err){
+
   const appEl=$('#app');
+
   if(appEl && !appEl.innerHTML.trim()){
+
    appEl.innerHTML=`<div class="lg"><div class="card"><h2>${esc(DEFAULT_ORG)}</h2><p class="mut sm">Initializing view...</p><button type="button" class="b pri" onclick="location.reload()">Reload</button></div></div>`;
+
   }
+
  }
+
 }
 
 async function checkExpiryOnLoad(){
+
  if(S.u && isPaidTier(S.u.role))return;
+
  let ip='';
+
  try{ip=await fetchPublicIp()}catch(e){}
+
  const reason=isTrialExpiredOrRemoved(getTrialAdminEmail(),ip);
+
  if(reason){
+
   if(S.u && S.u.role==='admin'){
+
    S.u=null;
+
    saveSession(null);
+
    render(false);
+
   }
+
   if(!S.u && !S.expiredShownOnce){
+
    S.expiredShownOnce=true;
+
    const msg=reason==='expired'?'Aapka 1 week / trial khatam ho gaya hai.':'Aapka trial access khatam/remove kar diya gaya hai.';
+
    showTrialExpiredPopup(msg);
+
   }
+
  }
+
 }
 
 document.addEventListener('click',async e=>{
+
  if(S.mobMenuOpen && !e.target.closest('.mob-dots-wrap') && !e.target.closest('.mob-dots-menu')){S.mobMenuOpen=false;render(false)}
+
  const el=e.target.closest('[data-a]');if(!el)return;
+
  if(el.tagName==='A'&&el.dataset.a==='sp')e.preventDefault();
+
  const a=el.dataset.a,id=el.dataset.id,v=el.dataset.v;
+
  if(a==='mobDots'){e.stopPropagation();S.mobMenuOpen=!S.mobMenuOpen;render(false);return}
+
  if(a==='mobDotsClose'){e.stopPropagation();S.mobMenuOpen=false;render(false);return}
+
  if(a!=='mobDots'&&S.mobMenuOpen)S.mobMenuOpen=false;
+
  if(a==='mx'){if(e.target===el||el.classList.contains('b'))closeM()}
+
  else if(a==='mok'){if(modal.cb&&await modal.cb()===false)return;closeM()}
+
  else if(a==='myProfile'){openMyProfileModal()}
- else if(a==='openPortalPicker'){openOwnerPortalPicker(false)}
- else if(a==='goOwnerMaster'){closeM();await returnToOwnerMasterGate()}
- else if(a==='pickScope'){
-  const sc=el.dataset.scope;
-  const lbl=el.dataset.label||'';
-  closeM();
-  if(sc)await switchOwnerToScope(sc,lbl);
- }
+
  else if(a==='idCard'){e.stopPropagation();openStudentIdCard(id)}
+
  else if(a==='clearOrgLogo'){
+
   S.tempLogo='';
+
   const box=$('#orgLogoPreview');
+
   if(box)box.innerHTML=`<div class="av" style="width:46px;height:46px;font-size:16px">${esc((orgName()||'C')[0].toUpperCase())}</div><div style="display:grid;gap:6px"><b class="sm">Institute Logo</b><div style="display:flex;gap:6px;flex-wrap:wrap"><label class="b sm" style="cursor:pointer;margin:0">Upload Logo<input type="file" id="orgLogoInput" accept="image/*" style="display:none"></label></div></div>`;
+
   bindLogoFileInput();
+
  }
+
  else if(a==='clearMyPhoto'){
+
   S.tempPhoto='';
+
   const nm=val('profNameInput').trim()||getCurrentUserProfile().name;
+
   const box=$('#myProfPreview');
+
   if(box)box.innerHTML=`${avOf(nm,'','lg-av')}<div style="display:grid;gap:6px"><div><b>${esc(nm)}</b> <span class="role">${esc(S.u.role)}</span></div><label class="b sm" style="cursor:pointer;margin:0">Upload Photo<input type="file" id="profPhotoInput" accept="image/*" style="display:none"></label></div>`;
+
  }
- else if(a==='addClientModal'){
-  if(!S.u || S.u.role!=='owner'){toast('Only Owner can add clients');return}
-  const nextNum=Object.keys(ownerMaster.clients||{}).length+1;
-  modal('Clients Add',`
-   <div class="fl">
-    <label>Client Email<input id="ncEmail" type="email" value="client.${nextNum}@ourcoaching.pk" placeholder="client.1@ourcoaching.pk"></label>
-    <label>Client Password<input id="ncPw" type="text" value="client123"></label>
-    <label>Client Name<input id="ncName" placeholder="e.g. Ali"></label>
-    <label>Coaching Name<input id="ncOrg" placeholder="e.g. Ali Coaching Academy"></label>
-    <label>Client WhatsApp Number<input id="ncPhone" placeholder="e.g. 03001234567"></label>
-   </div>
-  `,'Add Client',async()=>{
-   const em=val('ncEmail').trim().toLowerCase();
-   const pw=val('ncPw').trim();
-   const cname=val('ncName').trim()||'Client Admin';
-   const corg=val('ncOrg').trim()||orgName();
-   const cphone=val('ncPhone').trim();
-   if(!em||!em.includes('@')||!pw){toast('Valid email and password required');return false}
-   if(em===getOwnerEmail()||em===getTrialAdminEmail()){toast('Use a separate email for client');return false}
-   const scope=emailToScopeRow(em);
-   ownerMaster.clients=ownerMaster.clients||{};
-   ownerMaster.clients[em]={email:em,pw,name:cname,orgName:corg,phone:cphone,scope,paused:false,createdAt:new Date().toISOString()};
-   await persistOwnerMaster();
-   const sb=getSb();
-   if(sb){
-    const initClientDb={...emptyDb(),orgName:corg,clientPhone:cphone,admin:{name:cname,email:em,pw,photo:''}};
-    await sb.from('app_state').upsert({id:scope,data:initClientDb,updated_at:new Date().toISOString()},{onConflict:'id'});
-   }
-   render(false);
-   toast('Client added: '+em);
-  });
- }
- else if(a==='editClientModal'){
-  if(!S.u || S.u.role!=='owner'){toast('Only Owner can edit clients');return}
-  const oldEm=(el.dataset.em||'').toLowerCase();
-  const c=ownerMaster.clients&&ownerMaster.clients[oldEm];
-  if(!c)return;
-  modal('Edit Client Credentials',`
-   <div class="fl">
-    <label>Client Email<input id="ecEmail" type="email" value="${esc(oldEm)}"></label>
-    <label>Client Password<input id="ecPw" type="text" value="${esc(c.pw||'')}"></label>
-    <label>Client Name<input id="ecName" value="${esc(c.name||'')}"></label>
-    <label>Coaching Name<input id="ecOrg" value="${esc(c.orgName||'')}"></label>
-    <label>Client WhatsApp Number<input id="ecPhone" value="${esc(c.phone||'')}"></label>
-   </div>
-  `,'Save Client',async()=>{
-   const newEm=val('ecEmail').trim().toLowerCase();
-   const newPw=val('ecPw').trim();
-   const newName=val('ecName').trim()||'Client Admin';
-   const newOrg=val('ecOrg').trim()||orgName();
-   const newPhone=val('ecPhone').trim();
-   if(!newEm||!newEm.includes('@')||!newPw){toast('Valid email and password required');return false}
-   if(newEm===getOwnerEmail()||newEm===getTrialAdminEmail()){toast('Cannot conflict with Owner or Trial Admin email');return false}
-   if(newEm!==oldEm && ownerMaster.clients[newEm]){toast('Another client already uses this email');return false}
-   const oldScope=emailToScopeRow(oldEm);
-   const newScope=emailToScopeRow(newEm);
-   const updatedCfg={...c,email:newEm,pw:newPw,name:newName,orgName:newOrg,phone:newPhone,scope:newScope};
-   if(newEm!==oldEm)delete ownerMaster.clients[oldEm];
-   ownerMaster.clients[newEm]=updatedCfg;
-   await persistOwnerMaster();
-   const sb=getSb();
-   if(sb){
-    const {data}=await sb.from('app_state').select('data').eq('id',oldScope).maybeSingle();
-    const clientData={...emptyDb(),...((data&&data.data)||{})};
-    clientData.orgName=newOrg;
-    clientData.clientPhone=newPhone;
-    clientData.admin={...(clientData.admin||{}),name:newName,email:newEm,pw:newPw};
-    await sb.from('app_state').upsert({id:newScope,data:clientData,updated_at:new Date().toISOString()},{onConflict:'id'});
-   }
-   if(ROW_ID===oldScope && newScope!==oldScope)setActiveScope(newScope);
-   render(false);
-   toast('Client updated: '+newEm);
-  });
- }
- else if(a==='toggleClientPause'){
-  if(!S.u || S.u.role!=='owner')return;
-  const em=(el.dataset.em||'').toLowerCase();
-  const c=ownerMaster.clients&&ownerMaster.clients[em];
-  if(!c)return;
-  c.paused=!c.paused;
-  await persistOwnerMaster();
-  const sb=getSb();
-  if(sb){
-   const sc=emailToScopeRow(em);
-   const {data}=await sb.from('app_state').select('data').eq('id',sc).maybeSingle();
-   if(data&&data.data){
-    data.data.appLocked=!!c.paused;
-    await sb.from('app_state').upsert({id:sc,data:data.data,updated_at:new Date().toISOString()},{onConflict:'id'});
-   }
-  }
-  render(false);
-  toast(c.paused?'Client paused':'Client activated');
- }
- else if(a==='delClient'){
-  if(!S.u || S.u.role!=='owner')return;
-  const em=(el.dataset.em||'').toLowerCase();
-  if(!ownerMaster.clients||!ownerMaster.clients[em])return;
-  modal('Remove Client?',`<p class="mut">Remove <b>${esc(em)}</b> from client list?</p>`,'Remove',async()=>{
-   const delScope=emailToScopeRow(em);
-   delete ownerMaster.clients[em];
-   await persistOwnerMaster();
-   if(ROW_ID===delScope)await switchOwnerToScope(emailToScopeRow(getOwnerEmail()),'Owner Master');
-   else render(false);
-   toast('Client removed');
-  });
- }
+
  else if(a==='login'){
+
   const em=val('le').trim().toLowerCase(),pw=val('lp');
+
   const enteredUser=val('luser').trim();
+
   await loadOwnerMaster(true);
 
   const isOwnerEmail = em===getOwnerEmail() || em===DEFAULT_OWNER_EMAIL.toLowerCase();
+
   const targetScope = isOwnerEmail ? emailToScopeRow(getOwnerEmail()) : emailToScopeRow(em);
+
   loadLocalScopeDb(targetScope, em);
+
   await loadCloud(true);
 
   if(isOwnerEmail){
+
    const validOwnerPw = pw===(ownerMaster.ownerPw||DEFAULT_OWNER_PW) || pw===DEFAULT_OWNER_PW;
+
    if(!validOwnerPw){toast('Invalid owner password');return}
+
    // Re-pull owner master so mobile always gets latest PC changes
+
    await loadOwnerMaster(true);
+
    syncOwnerMasterToDb();
+
    const ownName=(ownerMaster.ownerProfile&&ownerMaster.ownerProfile.name)||DEFAULT_OWNER_NAME;
-   S.ownerSelectedPortal=false;
-   S.u={e:getOwnerEmail(),role:'owner',name:ownName,scope:targetScope,ownerSelectedPortal:false};
+
+   S.u={e:getOwnerEmail(),role:'owner',name:ownName,scope:targetScope};
+
    saveSession(S.u);
+
    S.v='dash';S.dr=null;S.drawerId=null;
+
    subscribeRealtime();
+
    applyAccent();
+
    render(true);
+
    toast('Signed in: '+ownName);
+
    // Do NOT seed demo for owner — keep empty or their own data
+
    persist();
+
    return;
+
   }
 
   if(ownerMaster.globalAppLocked){
+
    toast(ownerMaster.globalLockMsg||'Portal paused by owner');
+
    return;
+
   }
 
   const paidClient = ownerMaster.clients && ownerMaster.clients[em];
+
   if(paidClient){
+
    if(pw!==paidClient.pw){toast('Invalid password');return}
+
    if(paidClient.paused){
+
     showTrialExpiredPopup('Aapka account temporarily paused hai. Renewal ke liye contact karein.');
+
     return;
+
    }
+
    db.orgName = db.orgName===DEFAULT_ORG && paidClient.orgName ? paidClient.orgName : db.orgName;
+
    db.admin = {...db.admin, email:em, pw:paidClient.pw, name:db.admin.name||paidClient.name||'Principal (Admin)'};
+
    if(db.appLocked){toast(db.lockMsg||'Access is paused');return}
+
    const activeClientName=(db.admin&&db.admin.name)||paidClient.name||paidClient.orgName||em;
+
    S.u={e:em,role:'client',name:activeClientName,scope:targetScope};
+
    saveSession(S.u);
+
    S.v='dash';S.dr=null;S.drawerId=null;
+
    subscribeRealtime();
+
    applyAccent();
+
    render(true);
+
    toast('Welcome, '+activeClientName);
+
    // Clients never get auto-demo — only their own / empty data
+
    persist();
+
    return;
+
   }
 
   const u=getUsers().find(x=>x.e===em&&x.pw===pw);
+
   if(!u){toast('Invalid email or password');return}
+
   if(db.appLocked){toast(db.lockMsg||'Access is paused');return}
 
   const activeUsername=(enteredUser||u.name||u.e);
+
   let detectedIp='';
+
   if(u.role==='admin'){
+
    let ip='';
+
    try{ip=await fetchPublicIp()}catch(err){}
+
    detectedIp=ip;
+
    const badTrial=isTrialExpiredOrRemoved(u.e,ip);
+
    if(badTrial){
+
     const msg=badTrial==='expired'?'Aapka 1 week / trial khatam ho gaya hai.':'Aapka trial khatam ho gaya hai.';
+
     showTrialExpiredPopup(msg);
+
     return;
+
    }
+
    if(ownerMaster.trialIpLock && ip){
+
     const claimed=ownerMaster.trialClaimedIps[ip];
+
     if(!claimed){
+
      ownerMaster.trialClaimedIps[ip]={email:u.e,username:activeUsername,claimedAt:new Date().toISOString()};
+
     }else if(enteredUser){
+
      claimed.username=enteredUser;
+
     }
+
    }
+
   }
+
   if(u.role==='student'&&db.ipLock){
+
    const allowed=String(db.allowedIps||'').split(',').map(x=>x.trim()).filter(Boolean);
+
    if(allowed.length){
+
     const ip=detectedIp||await fetchPublicIp();
+
     detectedIp=ip;
+
     if(!ip||!allowed.includes(ip)){
+
      toast('Access denied: Please connect to coaching Wi-Fi');
+
      return;
+
     }
+
    }
+
   }
+
   const nowIso=new Date().toISOString();
+
   if(u.role==='admin'){
+
    recordTrialAccount(u.e,u.role,detectedIp||'',nowIso,activeUsername);
+
    ownerMaster.loginLogs=(ownerMaster.loginLogs||[]).concat([{email:u.e,username:activeUsername,role:u.role,ip:detectedIp||'',at:nowIso}]).slice(-60);
+
   }
+
   S.u={...u,name:activeUsername,scope:targetScope};saveSession(S.u);S.v='dash';S.dr=null;S.drawerId=null;
+
   subscribeRealtime();
+
   // Trial admin only: auto-load demo data if coaching is empty
+
   if(u.role==='admin'){
+
    const emptyTrial = !(Array.isArray(db.bat)&&db.bat.length) && !(Array.isArray(db.stu)&&db.stu.length);
+
    if(emptyTrial){
+
     await seedDemoData();
+
     toast('Welcome, '+activeUsername+' · Demo data loaded');
+
    }else{
+
     render(true);toast('Welcome, '+activeUsername);
+
     persist();
+
    }
+
   }else{
+
    render(true);toast('Welcome, '+activeUsername);
+
    persist();
+
   }
+
  }
- else if(a==='logout'){guard(()=>{S.u=null;saveSession(null);S.dr=null;S.drawerId=null;S.q='';S.f='';render(false)})}
+
+ else if(a==='logout'){guard(()=>{S.u=null;saveSession(null);S.dr=null;S.drawerId=null;S.q='';S.f='';S.waPending=null;render(false)})}
+
  else if(a==='syncNow'){await loadCloud(false);toast('Synced with cloud')}
+
  else if(a==='pickAcc'){S.tempAccent=v;db.accent=v;applyAccent();render(false)}
+
  else if(a==='grabIp'){
+
   toast('Detecting IP...');
+
   const ip=await fetchPublicIp();
+
   if(!ip){toast('Could not detect IP, check internet');return}
+
   const inp=$('#setIps');
+
   if(inp){
+
    const cur=inp.value.split(',').map(x=>x.trim()).filter(Boolean);
+
    if(!cur.includes(ip))cur.push(ip);
+
    inp.value=cur.join(', ');
+
   }
+
   const lbl=$('#curIpTxt');if(lbl)lbl.textContent='Detected IP: '+ip;
+
   toast('IP added: '+ip);
+
  }
+
  else if(a==='removeTrialUser'){
+
   if(!S.u || S.u.role!=='owner'){toast('Only Owner can manage trials');return}
+
   const targetIp=(el.dataset.ip||'').trim();
+
   const targetEm=(el.dataset.em||'').trim().toLowerCase();
+
   ownerMaster.revokedTrials=ownerMaster.revokedTrials||{};
+
   if(targetEm)ownerMaster.revokedTrials['email:'+targetEm]=new Date().toISOString();
+
   if(targetIp){
+
    ownerMaster.revokedTrials['ip:'+targetIp]=new Date().toISOString();
+
    if(ownerMaster.trialClaimedIps&&ownerMaster.trialClaimedIps[targetIp])delete ownerMaster.trialClaimedIps[targetIp];
+
   }
+
   await persistOwnerMaster();
+
   render(false);
+
   toast('Trial removed for '+(targetEm||targetIp));
+
  }
+
  else if(a==='extendTrial'){
+
   if(!S.u || S.u.role!=='owner'){toast('Only Owner can manage trials');return}
+
   const targetIp=(el.dataset.ip||'').trim();
+
   const targetEm=(el.dataset.em||'').trim().toLowerCase();
+
   if(ownerMaster.revokedTrials){
+
    if(targetEm)delete ownerMaster.revokedTrials['email:'+targetEm];
+
    if(targetIp)delete ownerMaster.revokedTrials['ip:'+targetIp];
+
   }
+
   if(targetIp&&ownerMaster.trialClaimedIps&&ownerMaster.trialClaimedIps[targetIp]){
+
    const curStart=new Date(ownerMaster.trialClaimedIps[targetIp].claimedAt||Date.now()).getTime();
+
    ownerMaster.trialClaimedIps[targetIp].claimedAt=new Date(curStart+7*86400000).toISOString();
+
   }
+
   if(ownerMaster.trialAccounts){
+
    Object.values(ownerMaster.trialAccounts).forEach(acc=>{
+
     if((targetEm&&acc.email===targetEm)||(targetIp&&acc.ip===targetIp)){
+
      const curFirst=new Date(acc.firstLoginAt||Date.now()).getTime();
+
      acc.firstLoginAt=new Date(curFirst+7*86400000).toISOString();
+
     }
+
    });
+
   }
+
   await persistOwnerMaster();
+
   render(false);
+
   toast('Extended trial by +7 days');
+
  }
+
  else if(a==='restoreAllTrials'){
+
   if(!S.u || S.u.role!=='owner')return;
+
   ownerMaster.revokedTrials={};
+
   await persistOwnerMaster();
+
   render(false);
+
   toast('All trial blocks cleared');
+
  }
+
  else if(a==='resetTrialIps'){
+
   if(!S.u || S.u.role!=='owner')return;
+
   ownerMaster.trialClaimedIps={};
+
   await persistOwnerMaster();
+
   render(false);
+
   toast('Claimed trial IPs cleared');
+
  }
+
  else if(a==='saveSettings'){
+
   const nm=val('setOrg').trim(),tag=val('setTag').trim(),anm=val('setAName').trim()||'Principal (Admin)',aem=val('setAEmail').trim().toLowerCase(),apw=val('setAPw').trim();
+
   if(!nm||!aem||!aem.includes('@')||!apw){toast('Valid name, email and password are required');return}
+
   const lock=!!($('#setIpLock')&&$('#setIpLock').checked);
+
   const ips=val('setIps').trim();
+
   if(lock&&!ips){toast('Please add at least one allowed IP or disable IP lock');return}
 
   db.orgName=nm;
+
   db.orgTagline=tag;
+
   if(S.tempLogo!==undefined)db.orgLogo=S.tempLogo;
+
   db.accent=S.tempAccent||db.accent||'indigo';
+
   db.ipLock=lock;
+
   db.allowedIps=ips;
 
+  db.waAuto=!!($('#setWaAuto')&&$('#setWaAuto').checked);
+
+  db.waTemplate=(val('setWaTemplate')||'').trim()||DEFAULT_WA_TEMPLATE;
+
   if(S.u.role==='owner'){
-   const isViewingOwnMaster = ROW_ID===emailToScopeRow(getOwnerEmail());
-   if(isViewingOwnMaster){
-    const tAdmEm=val('setTAdminEmail').trim().toLowerCase();
+
+   const tAdmEm=val('setTAdminEmail').trim().toLowerCase();
+
     const tAdmPw=val('setTAdminPw').trim();
+
     const tAdmNm=val('setTAdminName').trim()||'Principal (Admin)';
+
     if(!tAdmEm||!tAdmEm.includes('@')||!tAdmPw){toast('Valid Trial Admin email and password required');return}
+
     if(tAdmEm===aem){toast('Owner and Trial Admin emails must be different');return}
 
     ownerMaster.ownerEmail=aem;
+
     ownerMaster.ownerOrgName=nm;
+
     ownerMaster.ownerTagline=tag;
+
     if(S.tempLogo!==undefined)ownerMaster.ownerLogo=S.tempLogo;
+
     ownerMaster.ownerAccent=db.accent;
+
     ownerMaster.ownerProfile={...(ownerMaster.ownerProfile||{}),name:anm,photo:(ownerMaster.ownerProfile&&ownerMaster.ownerProfile.photo)||''};
+
     ownerMaster.ownerPw=apw;
 
     ownerMaster.trialAdminEmail=tAdmEm;
+
     ownerMaster.trialAdminPw=tAdmPw;
+
     ownerMaster.trialAdminName=tAdmNm;
 
     ownerMaster.globalAppLocked=!!($('#setGlobalLock')&&$('#setGlobalLock').checked);
+
     ownerMaster.globalLockMsg=val('setGlobalLockMsg').trim()||'This coaching portal is currently paused by the owner. Please contact the service provider.';
 
     const tDays=Math.max(1,Math.min(365,Number(val('setTrialDays'))||7));
+
     ownerMaster.trialDays=tDays;
+
     ownerMaster.trialIpLock=!!($('#setTrialIpLock')&&$('#setTrialIpLock').checked);
 
     const newOwnerScope=emailToScopeRow(aem);
+
     if(newOwnerScope!==ROW_ID){
+
      setActiveScope(newOwnerScope);
+
     }
+
     S.u={...S.u,e:aem,name:anm,scope:newOwnerScope};
-   }else{
-    db.admin={...db.admin,name:anm,email:aem,pw:apw};
-    const matchedClient=getClientEntries().find(([em,cfg])=>(cfg.scope||emailToScopeRow(em))===ROW_ID);
-    if(matchedClient){
-     const [cem,ccfg]=matchedClient;
-     ownerMaster.clients[cem]={...ccfg,orgName:nm,name:anm,pw:apw};
-    }
-   }
+
   }else{
+
    db.admin={...db.admin,name:anm,email:S.u.role==='client'?S.u.e:aem,pw:apw};
+
    if(S.u.role==='admin'){
+
     ownerMaster.trialAdminEmail=aem;
+
     ownerMaster.trialAdminPw=apw;
+
     ownerMaster.trialAdminName=anm;
+
     const newAdmScope=emailToScopeRow(aem);
+
     if(newAdmScope!==ROW_ID)setActiveScope(newAdmScope);
+
     S.u={...S.u,e:aem,name:anm,scope:newAdmScope};
+
    }else if(S.u.role==='client' && ownerMaster.clients && ownerMaster.clients[S.u.e]){
+
     ownerMaster.clients[S.u.e].pw=apw;
+
     ownerMaster.clients[S.u.e].name=anm;
+
     ownerMaster.clients[S.u.e].orgName=nm;
+
     S.u={...S.u,name:anm};
+
    }
+
   }
+
   saveSession(S.u);
+
   addAudit('Settings Saved',nm);
+
   await persist();
+
   subscribeRealtime();
+
   render(false);
+
   toast('Settings saved & synced');
+
  }
+
  else if(a==='loadDemo'){
+
   modal('Load sample demo data','<p class="mut">This will add sample teachers, batches, students, attendance history, and fee entries for testing/demo.</p>','Load Demo',seedDemoData);
+
  }
+
  else if(a==='clearAllData'){
+
   modal('Clear all coaching records?','<p class="mut">Batches, teachers, students, attendance, and fees will be cleared. Login stays intact.</p>','Clear Records',async()=>{
-   const keepOrg=orgName(),keepTag=db.orgTagline,keepLogo=db.orgLogo,keepAcc=db.accent,keepAdm={...db.admin},keepIpLock=db.ipLock,keepIps=db.allowedIps;
-   db={...emptyDb(),orgName:keepOrg,orgTagline:keepTag,orgLogo:keepLogo,accent:keepAcc,admin:keepAdm,ipLock:keepIpLock,allowedIps:keepIps};
+
+   const keepOrg=orgName(),keepTag=db.orgTagline,keepLogo=db.orgLogo,keepAcc=db.accent,keepAdm={...db.admin},keepIpLock=db.ipLock,keepIps=db.allowedIps,keepWaAuto=db.waAuto,keepWaTemplate=db.waTemplate;
+
+   db={...emptyDb(),orgName:keepOrg,orgTagline:keepTag,orgLogo:keepLogo,accent:keepAcc,admin:keepAdm,ipLock:keepIpLock,allowedIps:keepIps,waAuto:keepWaAuto,waTemplate:keepWaTemplate};
+
    addAudit('Records Cleared','Wiped batches, students, attendance & fees');
+
    S.dr=null;closeDr();await persist();render(false);toast('All records cleared');
+
   });
+
  }
+
  else if(a==='theme'){const nx=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=nx;try{localStorage.setItem(THEME_KEY,nx)}catch(err){}toast(nx==='dark'?'Dark mode':'Light mode')}
- else if(a==='nav'){guard(()=>{closeDr();S.v=v;S.f='';if(v==='settings'){S.tempAccent=db.accent;S.tempLogo=db.orgLogo||''}render(true)})}
+
+ else if(a==='nav'){guard(()=>{closeDr();S.v=v;S.f='';if(v==='settings'){S.tempAccent=db.accent;S.tempLogo=db.orgLogo||''}S.waPending=null;render(true)})}
+
  else if(a==='sp'){openDr(id)}
+
  else if(a==='drx'){closeDr()}
+
  else if(a==='sLogin'){e.stopPropagation();const st=sOf(id);if(!st)return;const pw=st.pw||'student123';modal('Student login details',`<div class="card sm"><div><b>Student:</b> ${esc(st.name)} (${esc(st.roll)})</div><div><b>Email:</b> ${esc(st.email)}</div><div><b>Password:</b> ${esc(pw)}</div></div><div class="bar"><button class="b sm" data-a="copyCred" data-txt="${esc(`Email: ${st.email}\nPassword: ${pw}`)}">Copy credentials</button></div>`)}
+
  else if(a==='moveS'){
+
   e.stopPropagation();
+
   const st=sOf(id);if(!st||!db.bat.length)return;
+
   modal('Transfer student batch',`<div class="fl"><label>Student<b>${esc(st.name)} (${esc(st.roll)})</b></label><label>Select new batch<select id="mvBat">${db.bat.map(b=>`<option value="${b.id}" ${b.id===st.b?'selected':''}>${esc(b.name)}</option>`).join('')}</select></label></div>`,'Transfer',async()=>{
+
    const nb=val('mvBat');if(!nb)return false;
+
    st.b=nb;await persist();if(S.drawerId===id)openDr(id);render(false);toast('Batch transferred');
+
   });
+
  }
+
  else if(a==='delS'){e.stopPropagation();removeStudent(id)}
+
  else if(a==='applyBulkFee'){
+
   const m=el.dataset.m||curMonth();
+
   const ids=[...(S.selectedFeeIds||[])];
+
   if(!ids.length){toast('Select at least one student');return}
+
   const rawAmt=val('bulkFeeAmt').trim();
+
   const bulkSt=val('bulkFeeSt');
+
   const amtNum=rawAmt!==''?Math.max(0,Number(rawAmt)||0):null;
+
   if(amtNum===null && !bulkSt){toast('Enter fee amount or choose status');return}
+
   db.fees[m]=db.fees[m]||{};
+
   ids.forEach(sid=>{
+
    const prev=getFee(sid,m);
+
    const nextAmt=amtNum!==null?amtNum:prev.amt;
+
    const nextSt=bulkSt||prev.status;
+
    db.fees[m][sid]={amt:nextAmt,status:nextSt,paidAt:nextSt==='Paid'?(prev.paidAt||TODAY):''};
+
    const stObj=sOf(sid);
+
    if(stObj && amtNum!==null)stObj.fee=nextAmt;
+
   });
+
   addAudit('Bulk Fee Set',`${ids.length} students (${m})${amtNum!==null?' · '+fmtRs(amtNum):''}${bulkSt?' · '+bulkSt:''}`);
+
   await persist();
+
   render(false);
+
   toast(`Updated fee for ${ids.length} students`);
+
  }
+
  else if(a==='toggleFee'){
+
   const m=el.dataset.m||curMonth(),f=getFee(id,m),stObj=sOf(id);
+
   db.fees[m]=db.fees[m]||{};
+
   const nextSt=f.status==='Paid'?'Pending':'Paid';
+
   db.fees[m][id]={amt:f.amt,status:nextSt,paidAt:nextSt==='Paid'?TODAY:''};
+
   addAudit('Fee '+nextSt,`${stObj?stObj.name:id} (${m} · ${fmtRs(f.amt)})`);
+
   await persist();render(false);toast(`Marked ${nextSt}`);
+
  }
+
  else if(a==='bulkWaAbs'){
+
   const b=bOf(S.b),abs=db.stu.filter(s=>s.b===S.b&&(S.dr.rec[s.id]||{}).s==='A');
+
   const txt=abs.map(s=>`${s.name} (${s.roll}) — Parent: ${s.par||'N/A'}`).join('\n');
+
   modal(`Absent students (${fd(S.d)})`,`<p class="mut sm">Batch: <b>${esc((b||{}).name||'')}</b> · Subject: <b>${esc(S.dr.subject||'')}</b></p><textarea readonly>${esc(txt)}</textarea><div class="bar"><button class="b sm" data-a="copyCred" data-txt="${esc(txt)}">Copy list</button></div>`);
+
  }
+
+ else if(a==='waSend'){await waSendStudent(id)}
+
+ else if(a==='waAll'){await waSendAll()}
+
  else if(a==='clrDraft'){if(!S.dr)return;S.dr.rec={};render(false);toast('Draft reset')}
+
  else if(a==='copyCred'){copyText(el.dataset.txt||'','Copied to clipboard')}
+
  else if(a==='bell'){const rk=risk();modal('Low attendance alerts',rk.length?rk.map(x=>`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)"><div style="display:flex;align-items:center;gap:8px">${avOf(x.s.name,x.s.photo)}<div><b>${esc(x.s.name)}</b> <span class="mut sm">(${esc(x.s.roll)})</span><div class="mut sm">${esc((bOf(x.s.b)||{}).name||'')}</div></div></div><div style="display:flex;align-items:center;gap:8px"><span class="bad"><b>${x.p}%</b></span>${x.s.par?`<a class="b sm" target="_blank" rel="noopener" href="${esc(waLow(x.s.par,x.s.name,x.p))}">WA</a>`:''}</div></div>`).join(''):'<div class="emp">No alerts.</div>')}
+
  else if(a==='mk'){if(!S.dr)return;const cur=(S.dr.rec[id]||{}).s;if(cur===v)delete S.dr.rec[id];else S.dr.rec[id]={s:v,m:v==='L'?((S.dr.rec[id]||{}).m||10):'',n:''};render(false)}
+
  else if(a==='all'){if(!S.dr)return;db.stu.filter(s=>s.b===S.b).forEach(s=>{S.dr.rec[s.id]={s:v,m:'',n:''}});render(false);toast(v==='P'?'Marked all present':'Marked all absent')}
+
  else if(a==='save'){save()}
+
  else if(a==='addS'){if(!db.bat.length){toast('Create a batch first');return}modal('Add student',studForm({b:db.bat[0].id}),'Add student',()=>saveStud(null))}
+
  else if(a==='editS'){const st=sOf(id);if(!st)return;modal('Edit student',studForm(st),'Save changes',()=>saveStud(id))}
+
  else if(a==='bulkS'){
+
   if(!db.bat.length){toast('Create a batch first');return}
+
   modal('Bulk / CSV import students',`
+
    <p class="mut sm">Upload a <b>.csv</b> file OR paste rows (one per line): <b>Name, Roll No, Parent Phone, Fee (optional)</b></p>
+
    <div class="fl">
+
     <label>Batch<select id="bkb">${db.bat.map(b=>`<option value="${b.id}">${esc(b.name)}</option>`).join('')}</select></label>
+
     <label>Upload CSV file<input type="file" id="csvStuFile" accept=".csv,text/csv"></label>
+
     <label>Rows<textarea id="bkt" placeholder="Ali Raza, R-101, 03001234567, 3500&#10;Sara Khan, R-102, 03219876543, 3500"></textarea></label>
+
    </div>
+
   `,'Import',async()=>{
+
    const rawLines=val('bkt').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+
    const b=val('bkb');
+
    if(!rawLines.length){toast('Upload CSV or paste at least one line');return false}
+
    let added=0;
+
    rawLines.forEach((ln,i)=>{
+
     const p=ln.split(',').map(x=>x.trim().replace(/^"|"$/g,''));
+
     const name=p[0];
+
     if(!name)return;
+
     if(i===0 && /^name$/i.test(name) && (!p[1]||/^roll/i.test(p[1])))return;
+
     const roll=p[1]||('R-'+(1001+db.stu.length+added));
+
     const par=p[2]||'';
+
     const fee=Number(p[3])||3500;
+
     db.stu.push({id:'s'+Date.now()+'_'+added,name,roll,b,fee,phone:'',par,email:name.toLowerCase().replace(/\W+/g,'.')+'.'+Date.now()+'_'+added+'@ourcoaching.pk',pw:'student123',photo:''});
+
     added++;
+
    });
+
    if(!added){toast('No valid student rows found');return false}
+
    addAudit('Bulk Import',`Added ${added} students`);
+
    await persist();render(false);toast(added+' students imported');
+
   },true);
+
   const fin=$('#csvStuFile');
+
   if(fin){
+
    fin.addEventListener('change',()=>{
+
     if(!fin.files||!fin.files[0])return;
+
     const fr=new FileReader();
+
     fr.onload=ev=>{const ta=$('#bkt');if(ta)ta.value=String(ev.target.result||'');toast('CSV loaded into editor')};
+
     fr.readAsText(fin.files[0]);
+
    });
+
   }
+
  }
+
  else if(a==='addB'){modal('Create new batch',`<div class="fl"><label>Batch name<input id="bn" placeholder="e.g. Matric Science"></label><label>Class timing<input id="bt" placeholder="e.g. 16:00–18:00"></label><label>Assigned teacher<select id="btea"><option value="">Unassigned</option>${db.tch.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('')}</select></label><label>Minimum attendance (%)<input id="bth" type="number" min="50" max="100" value="75"></label><label>Subjects (comma separated)<input id="bsub" value="Math, Physics, Chemistry"></label></div>`,'Create batch',async()=>{const name=val('bn').trim();if(!name){toast('Batch name is required');return false}const subs=val('bsub').split(',').map(x=>x.trim()).filter(Boolean);db.bat.push({id:'b'+Date.now(),name,time:val('bt').trim()||'16:00–18:00',teacher:val('btea'),th:Math.min(100,Math.max(50,Number(val('bth'))||75)),subs:subs.length?subs:['General']});await persist();render(false);toast('Batch created')})}
+
  else if(a==='delB'){
+
   const b=bOf(id);if(!b)return;
+
   modal('Delete batch?',`<p class="mut">Delete <b>${esc(b.name)}</b>? Assigned students will stay in database without this batch.</p>`,'Delete',async()=>{
+
    db.bat=db.bat.filter(x=>x.id!==id);
+
    for(const d in db.att){if(db.att[d]&&db.att[d][id])delete db.att[d][id]}
+
    if(S.b===id)S.b='';
+
    await persist();render(false);toast('Batch deleted');
+
   });
+
  }
+
  else if(a==='addT'){modal('Add teacher',`<div class="fl"><label>Full name<input id="tn" placeholder="e.g. Sir Kamran"></label><label>Email<input id="te" type="email" placeholder="kamran@ourcoaching.pk"></label><label>Password<input id="tpw" type="text" value="teach123"></label></div>`,'Add teacher',async()=>{const name=val('tn').trim(),email=val('te').trim();if(!name||!email){toast('Name and email are required');return false}db.tch.push({id:'t'+Date.now(),name,email,pw:val('tpw').trim()||'teach123',photo:''});await persist();render(false);toast('Teacher added')})}
+
  else if(a==='delT'){
+
   const t=tOf(id);if(!t)return;
+
   modal('Remove teacher?',`<p class="mut">Remove <b>${esc(t.name)}</b> from teachers?</p>`,'Remove',async()=>{
+
    db.tch=db.tch.filter(x=>x.id!==id);
+
    db.bat.forEach(b=>{if(b.teacher===id)b.teacher=''});
+
    await persist();render(false);toast('Teacher removed');
+
   });
+
  }
+
  else if(a==='csv'){const blob=new Blob([csv()],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download=`${orgName().toLowerCase().replace(/\W+/g,'-')}-attendance-${range()[0]}-to-${range()[1]}.csv`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('CSV exported')}
+
  else if(a==='backupJson'){const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download=`${orgName().toLowerCase().replace(/\W+/g,'-')}-backup-${TODAY}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Backup downloaded')}
+
  else if(a==='restoreJson'){modal('Restore backup JSON','<p class="mut sm">Paste a previously exported JSON backup to restore data.</p><textarea id="jrestore" placeholder=\'{"bat":...}\'></textarea>','Restore',async()=>{try{const parsed=JSON.parse(val('jrestore'));if(!parsed||!Array.isArray(parsed.bat)||!Array.isArray(parsed.stu))throw 0;db=parsed;normalizeDb();applyAccent();await persist();render(false);toast('Backup restored')}catch(err){toast('Invalid JSON backup');return false}})}
+
  else if(a==='print'){window.print()}
+
 });
 
 function filterRowsInPlace(qVal){
+
  const q=qVal.toLowerCase();
+
  if(S.v==='mark'){
+
   $$('#mn .row').forEach(row=>{
+
    const txt=(row.querySelector('.nm')||row).textContent.toLowerCase();
+
    row.style.display=(!q||txt.includes(q))?'':'none';
+
   });
+
  }else if(S.v==='students' || S.v==='fees'){
+
   $$('#mn table tr.cl, #mn table tr:not(:first-child)').forEach(tr=>{
+
    const txt=tr.textContent.toLowerCase();
+
    tr.style.display=(!q||txt.includes(q))?'':'none';
+
   });
+
  }
+
 }
 
 document.addEventListener('input',e=>{
+
  const el=e.target;
+
  if(el.id==='le')syncLoginUsernameVisibility();
+
  else if(el.id==='q'||el.id==='gq'){
+
   S.q=el.value;
+
   $$('#q, #gq').forEach(inp=>{if(inp!==el && inp.value!==el.value)inp.value=el.value});
+
   filterRowsInPlace(el.value);
+
  }
+
  else if(el.dataset.f==='m'&&S.dr){const id=el.dataset.id;if(S.dr.rec[id])S.dr.rec[id].m=el.value}
+
 });
 
 document.addEventListener('change',async e=>{
+
  const el=e.target,f=el.dataset.f;if(!f)return;
+
  if(f==='lang'){if(LANGS[el.value]){currentLang=el.value;applyLanguage();render(false);toast(LANGS[currentLang].label)}}
- else if(f==='ownerPortalSel'){if(el.value==='__OWNER_MASTER__')await returnToOwnerMasterGate();else if(el.value)await switchOwnerToScope(el.value)}
+
+
  else if(f==='b'){guard(()=>{S.b=el.value;openDraft();render(false)})}
+
  else if(f==='sub'&&S.dr){S.dr.subject=el.value;render(false)}
+
  else if(f==='d'){guard(()=>{S.d=el.value||TODAY;openDraft();render(false)})}
+
  else if(f==='f'){S.f=el.value;render(false)}
+
  else if(f==='rb'){S.rb=el.value;render(false)}
+
  else if(f==='rf'){S.rf=el.value;render(false)}
+
  else if(f==='rp'){S.rp=el.value;render(false)}
+
  else if(f==='from'){S.from=el.value;render(false)}
+
  else if(f==='to'){S.to=el.value;render(false)}
+
  else if(f==='feeMonth'){S.feeMonth=el.value||curMonth();render(false)}
+
  else if(f==='feeFilter'){S.feeFilter=el.value;render(false)}
+
  else if(f==='feeSelAll'){
+
   const m=S.feeMonth||curMonth(),q=S.q.toLowerCase();
+
   const ids=db.stu.filter(s=>{const fc=getFee(s.id,m);return(!S.rb||s.b===S.rb)&&(!S.feeFilter||fc.status===S.feeFilter)&&(!q||s.name.toLowerCase().includes(q)||s.roll.toLowerCase().includes(q))}).map(x=>x.id);
+
   S.selectedFeeIds=el.checked?ids:[];
+
   render(false);
+
  }
+
  else if(f==='feeSelOne'){
+
   const sid=el.dataset.id;
+
   if(!sid)return;
+
   const cur=new Set(S.selectedFeeIds||[]);
+
   if(el.checked)cur.add(sid);else cur.delete(sid);
+
   S.selectedFeeIds=Array.from(cur);
+
   render(false);
+
  }
+
  else if(f==='bt'){const b=bOf(el.dataset.id);if(b){b.time=el.value;await persist();toast('Timing updated')}}
+
  else if(f==='bte'){const b=bOf(el.dataset.id);if(b){b.teacher=el.value;await persist();render(false);toast('Teacher assigned')}}
+
  else if(f==='bth'){const b=bOf(el.dataset.id);if(b){b.th=Math.min(100,Math.max(50,Number(el.value)||75));await persist();toast('Threshold updated')}}
+
 });
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeM();closeDr();if(S.mobMenuOpen){S.mobMenuOpen=false;render(false)}}});
 
 /* =========================================================
+
    INITIAL BOOTSTRAP: Email-Synced Scope + Legacy Recovery
+
 ========================================================= */
+
 try{
+
  const savedOm=JSON.parse(localStorage.getItem(OWNER_STORE_KEY));
+
  if(savedOm)ownerMaster=savedOm;
+
 }catch(e){}
+
 try{normalizeOwnerMaster()}catch(e){ownerMaster=emptyOwnerMaster()}
 
 S.u = (()=>{try{return JSON.parse(localStorage.getItem(SESSION_KEY))}catch(e){return null}})();
-S.ownerSelectedPortal = !!(S.u && S.u.role==='owner' && S.u.ownerSelectedPortal);
+
 const bootEmail = (S.u && S.u.e) || '';
-const initialScope = bootEmail ? emailToScopeRow(bootEmail) : ((()=>{try{return localStorage.getItem(ACTIVE_SCOPE_KEY)}catch(e){return ''}})() || BASE_TRIAL_ROW);
+
+const initialScope = bootEmail ? emailToScopeRow(bootEmail) : (()=>{try{return localStorage.getItem(ACTIVE_SCOPE_KEY)}catch(e){return ''}})() || BASE_TRIAL_ROW;
+
 try{
+
  loadLocalScopeDb(initialScope, bootEmail);
+
 }catch(e){
+
  db=emptyDb();
+
 }
+
 applyAccent();
+
 S.tempAccent = db.accent;
+
 S.tempLogo = db.orgLogo || '';
 
 render(true);
 
 const startBackgroundSync = async ()=>{
+
  try{
+
   subscribeRealtime();
+
   await loadCloud(true);
+
   await checkExpiryOnLoad();
+
  }catch(e){}
+
 };
+
 if(document.readyState === 'loading'){
+
  document.addEventListener('DOMContentLoaded',()=>setTimeout(startBackgroundSync,30));
+
 }else{
+
  setTimeout(startBackgroundSync,30);
+
 }
+
 </script>
-</body>
+
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5decf39db9c5d1e',t:'MTc5NTI1NDgyOQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5decf39db9c5d1e',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+
 </html>
